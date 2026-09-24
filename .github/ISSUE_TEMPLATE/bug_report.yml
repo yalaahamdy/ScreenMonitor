@@ -1,0 +1,48 @@
+name: 🐛 تقرير خطأ برمج (Bug Report)
+description: الإبلاغ عن مشكلة برمجية أو خطأ غير متوقع في تطبيق ScreenMonitor
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        شكراً لإبلاغك عن المشكلة لمساعدتنا في تحسين ScreenMonitor!
+  - type: input
+    id: version
+    attributes:
+      label: إصدار التطبيق (App Version)
+      description: ما هو إصدار التطبيق الذي تستخدمه؟
+      placeholder: v1.0.0
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: نوع الجهاز وإصدار أندرويد (Device & Android Version)
+      placeholder: Google Pixel 7 (Android 14) / Samsung Galaxy S23 (Android 14)
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: وصف المشكلة (Problem Description)
+      description: صف بدقة ما حدث بشكل غير متوقع.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: خطوات إعادة المشكلة (Steps to Reproduce)
+      description: كيف يمكننا تكرار المشكلة؟
+      placeholder: |
+        1. تشغيل المراقبة
+        2. إطفاء الشاشة
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: السلوك المتوقع (Expected Behavior)
+      description: ما الذي كان يجب أن يحدث بدلاً من ذلك؟
+    validations:
+      required: true

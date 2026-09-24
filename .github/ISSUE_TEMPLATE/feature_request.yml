@@ -1,0 +1,29 @@
+name: 💡 اقتراح ميزة جديدة (Feature Request)
+description: اقتراح فكرة أو ميزة لتحسين تطبيق ScreenMonitor
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        نرحب بجميع الأفكار والمقترحات التي تحافظ على بساطة وأمان وخصوصية التطبيق.
+  - type: textarea
+    id: problem
+    attributes:
+      label: المشكلة أو الدافع (Problem Context)
+      description: هل هذا الاقتراح مرتبط بمشكلة تواجهها؟
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: الحل المقترح (Proposed Solution)
+      description: اشرح الميزة أو التغيير الذي تود رؤيته وكيف يجب أن يعمل.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: البدائل التي فكرت بها (Alternatives Considered)
+      description: هل هناك أي طرق بديلة قمت بتجربتها؟
+    validations:
+      required: false

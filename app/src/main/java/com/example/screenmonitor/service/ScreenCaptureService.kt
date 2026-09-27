@@ -28,6 +28,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import com.example.screenmonitor.MainActivity
+import com.example.screenmonitor.data.InsufficientStorageException
 import com.example.screenmonitor.data.PreferencesManager
 import com.example.screenmonitor.data.ScreenshotRepository
 import com.example.screenmonitor.data.SecurityEventType
@@ -58,6 +59,17 @@ class ScreenCaptureService : Service() {
     private var imageReader: ImageReader? = null
     private val mainHandler = Handler(Looper.getMainLooper())
     private var isReceiverRegistered = false
+    private var isDisplayListenerRegistered = false
+
+    private val displayListener = object : DisplayManager.DisplayListener {
+        override fun onDisplayAdded(displayId: Int) {}
+        override fun onDisplayRemoved(displayId: Int) {}
+        override fun onDisplayChanged(displayId: Int) {
+            if (displayId == Display.DEFAULT_DISPLAY) {
+                handleDisplayChanged()
+            }
+        }
+    }
 
     private val screenStateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -101,6 +113,11 @@ class ScreenCaptureService : Service() {
             }
             ACTION_STOP -> {
                 stopMonitoring()
+            }
+            ACTION_UPDATE_INTERVAL -> {
+                if (mediaProjection != null && preferencesManager.isMonitoringActive && isScreenOn()) {
+                    startCaptureLoop()
+                }
             }
             else -> {
                 if (mediaProjection == null) {
@@ -149,6 +166,7 @@ class ScreenCaptureService : Service() {
 
             setupVirtualDisplay()
             registerScreenReceiver()
+            registerDisplayListener()
 
             preferencesManager.isMonitoringActive = true
             _isMonitoringFlow.value = true
@@ -159,6 +177,48 @@ class ScreenCaptureService : Service() {
         } catch (e: Exception) {
             e.printStackTrace()
             stopMonitoring()
+        }
+    }
+
+    private fun registerDisplayListener() {
+        if (!isDisplayListenerRegistered) {
+            val displayManager = getSystemService(Context.DISPLAY_SERVICE) as? DisplayManager
+            displayManager?.registerDisplayListener(displayListener, mainHandler)
+            isDisplayListenerRegistered = true
+        }
+    }
+
+    private fun unregisterDisplayListener() {
+        if (isDisplayListenerRegistered) {
+            try {
+                val displayManager = getSystemService(Context.DISPLAY_SERVICE) as? DisplayManager
+                displayManager?.unregisterDisplayListener(displayListener)
+            } catch (_: Exception) {
+            } finally {
+                isDisplayListenerRegistered = false
+            }
+        }
+    }
+
+    private fun handleDisplayChanged() {
+        val windowManager = getSystemService(Context.WINDOW_SERVICE) as? WindowManager ?: return
+        val bounds = windowManager.maximumWindowMetrics.bounds
+        val newWidth = bounds.width()
+        val newHeight = bounds.height()
+        val newDensityDpi = resources.displayMetrics.densityDpi
+
+        val currentReader = imageReader ?: return
+        if (currentReader.width != newWidth || currentReader.height != newHeight) {
+            try {
+                val oldReader = currentReader
+                val newReader = ImageReader.newInstance(newWidth, newHeight, PixelFormat.RGBA_8888, 2)
+                imageReader = newReader
+                virtualDisplay?.resize(newWidth, newHeight, newDensityDpi)
+                virtualDisplay?.surface = newReader.surface
+                oldReader.close()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
@@ -286,6 +346,12 @@ class ScreenCaptureService : Service() {
             return false
         }
 
+        if (isAppInForeground) {
+            // Do not take screenshots of the ScreenMonitor app itself (privacy & recursion guard)
+            drainImageReader()
+            return false
+        }
+
         val reader = imageReader ?: return false
         var image = reader.acquireLatestImage()
         var retries = 0
@@ -295,7 +361,7 @@ class ScreenCaptureService : Service() {
             retries++
         }
 
-        if (image == null || !isScreenOn()) {
+        if (image == null || !isScreenOn() || isAppInForeground) {
             image?.close()
             return false
         }
@@ -324,7 +390,7 @@ class ScreenCaptureService : Service() {
                 cropped
             }
 
-            if (!isScreenOn()) {
+            if (!isScreenOn() || isAppInForeground) {
                 cleanBitmap.recycle()
                 return false
             }
@@ -339,6 +405,18 @@ class ScreenCaptureService : Service() {
                 preferencesManager.lastCaptureTimeMillis = now
                 _lastCaptureTimeFlow.value = now
                 return true
+            } else {
+                val exception = result.exceptionOrNull()
+                if (exception is InsufficientStorageException) {
+                    securityLogManager.logEvent(
+                        SecurityEventType.STORAGE_FULL,
+                        "توقف المراقبة لامتلاء مساحة التخزين",
+                        "تم إيقاف المراقبة تلقائياً لأن المساحة المتبقية على وحدة التخزين أقل من 50 ميجابايت."
+                    )
+                    showStorageAlertNotification()
+                    stopMonitoring()
+                    return false
+                }
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -348,8 +426,33 @@ class ScreenCaptureService : Service() {
         return false
     }
 
+    private fun showStorageAlertNotification() {
+        val openAppIntent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val pendingOpenApp = PendingIntent.getActivity(
+            this,
+            0,
+            openAppIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("توقفت مراقبة الشاشة")
+            .setContentText("المساحة المتبقية على التخزين غير كافية (أقل من 50MB). يرجى تحرير مساحة.")
+            .setSmallIcon(android.R.drawable.ic_dialog_alert)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setContentIntent(pendingOpenApp)
+            .build()
+
+        val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        manager.notify(NOTIFICATION_ID_STORAGE_ALERT, notification)
+    }
+
     private fun stopMonitoring() {
         unregisterScreenReceiver()
+        unregisterDisplayListener()
 
         captureJob?.cancel()
         captureJob = null
@@ -431,11 +534,13 @@ class ScreenCaptureService : Service() {
     companion object {
         const val ACTION_START = "com.example.screenmonitor.action.START"
         const val ACTION_STOP = "com.example.screenmonitor.action.STOP"
+        const val ACTION_UPDATE_INTERVAL = "com.example.screenmonitor.action.UPDATE_INTERVAL"
 
         const val EXTRA_RESULT_CODE = "extra_result_code"
         const val EXTRA_RESULT_DATA = "extra_result_data"
 
         private const val NOTIFICATION_ID = 1001
+        private const val NOTIFICATION_ID_STORAGE_ALERT = 1002
         private const val CHANNEL_ID = "screen_monitor_service_channel"
 
         private val _isMonitoringFlow = MutableStateFlow(false)
@@ -446,5 +551,12 @@ class ScreenCaptureService : Service() {
 
         private val _isScreenOnFlow = MutableStateFlow(true)
         val isScreenOnFlow = _isScreenOnFlow.asStateFlow()
+
+        @Volatile
+        private var isAppInForeground = false
+
+        fun setAppInForeground(inForeground: Boolean) {
+            isAppInForeground = inForeground
+        }
     }
 }

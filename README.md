@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/yalaahamdy/ScreenMonitor/releases/latest"><img src="https://img.shields.io/badge/Release-v1.0.0-brightgreen.svg" alt="Latest Release" /></a>
+  <a href="https://github.com/yalaahamdy/ScreenMonitor/releases/latest"><img src="https://img.shields.io/badge/Release-v1.1.0-brightgreen.svg" alt="Latest Release" /></a>
   <a href="https://developer.android.com"><img src="https://img.shields.io/badge/Platform-Android_7.0%2B_(API_24%2B)-3DDC84?logo=android&logoColor=white" alt="Platform" /></a>
   <a href="https://kotlinlang.org"><img src="https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white" alt="Kotlin" /></a>
   <a href="https://developer.android.com/jetpack/compose"><img src="https://img.shields.io/badge/UI-Jetpack_Compose_Material_3-4285F4?logo=jetpackcompose&logoColor=white" alt="Compose" /></a>

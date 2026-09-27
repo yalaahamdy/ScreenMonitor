@@ -10,7 +10,8 @@ import java.util.UUID
 enum class SecurityEventType {
     PERMISSION_REVOKED,      // سحب أو إيقاف إذن التقاط الشاشة أثناء فترة المراقبة
     UNEXPECTED_SERVICE_STOP, // توقف الخدمة بشكل مفاجئ دون أمر إيقاف من داخل التطبيق
-    FAILED_ATTEMPTS_LOCKOUT  // قفل مؤقت بسبب محاولات دخول خاطئة متكررة
+    FAILED_ATTEMPTS_LOCKOUT, // قفل مؤقت بسبب محاولات دخول خاطئة متكررة
+    STORAGE_FULL             // توقف المراقبة تلقائياً بسبب انخفاض مساحة التخزين الحرج
 }
 
 data class SecurityEvent(

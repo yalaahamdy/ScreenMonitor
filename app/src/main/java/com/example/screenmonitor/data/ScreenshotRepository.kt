@@ -29,6 +29,8 @@ data class StorageSummary(
     val totalBytes: Long
 )
 
+class InsufficientStorageException(message: String) : IOException(message)
+
 class ScreenshotRepository(private val context: Context) {
 
     private val screenshotsDir: File by lazy {
@@ -59,7 +61,7 @@ class ScreenshotRepository(private val context: Context) {
         autoClean: Boolean = true
     ): Result<File> {
         if (!hasSufficientStorage()) {
-            return Result.failure(IOException("مساحة التخزين غير كافية لحفظ لقطة الشاشة"))
+            return Result.failure(InsufficientStorageException("مساحة التخزين المتبقية أقل من 50 ميجابايت"))
         }
 
         val now = System.currentTimeMillis()

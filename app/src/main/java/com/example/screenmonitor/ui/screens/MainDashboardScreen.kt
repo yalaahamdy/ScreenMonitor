@@ -76,6 +76,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import android.content.Intent
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -103,6 +105,7 @@ fun MainDashboardScreen(
     onOpenGallery: () -> Unit,
     onLockApp: () -> Unit
 ) {
+    val context = LocalContext.current
     val isServiceMonitoring by ScreenCaptureService.isMonitoringFlow.collectAsState()
     val lastServiceCaptureTime by ScreenCaptureService.lastCaptureTimeFlow.collectAsState()
 
@@ -650,6 +653,10 @@ fun MainDashboardScreen(
                             .clickable {
                                 selectedInterval = sec
                                 preferencesManager.captureIntervalSeconds = sec
+                                val serviceIntent = Intent(context, ScreenCaptureService::class.java).apply {
+                                    action = ScreenCaptureService.ACTION_UPDATE_INTERVAL
+                                }
+                                context.startService(serviceIntent)
                                 showIntervalBottomSheet = false
                             }
                             .padding(vertical = 12.dp, horizontal = 8.dp),

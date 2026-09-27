@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.media.projection.MediaProjectionManager
 import android.os.Build
 import android.os.Bundle
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -24,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import com.example.screenmonitor.data.PreferencesManager
 import com.example.screenmonitor.data.ScreenshotRepository
+import com.example.screenmonitor.data.SecurityEventType
 import com.example.screenmonitor.data.SecurityLogManager
 import com.example.screenmonitor.data.SecurityManager
 import com.example.screenmonitor.service.ScreenCaptureService
@@ -80,6 +82,10 @@ class MainActivity : ComponentActivity() {
             getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
 
         enableEdgeToEdge()
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_SECURE,
+            WindowManager.LayoutParams.FLAG_SECURE
+        )
         setContent {
             ScreenMonitorTheme {
                 Surface(
@@ -119,6 +125,24 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        ScreenCaptureService.setAppInForeground(true)
+        if (preferencesManager.isMonitoringActive && !ScreenCaptureService.isMonitoringFlow.value) {
+            securityLogManager.logEvent(
+                SecurityEventType.UNEXPECTED_SERVICE_STOP,
+                "توقف غير متوقع لخدمة المراقبة",
+                "تم رصد إيقاف الخدمة بواسطة نظام التشغيل (بسبب إدارة الذاكرة أو توفير الطاقة) أثناء وقت المراقبة النشطة."
+            )
+            preferencesManager.isMonitoringActive = false
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        ScreenCaptureService.setAppInForeground(false)
     }
 
     override fun onStop() {

@@ -43,4 +43,13 @@ class PreferencesManagerTest {
         preferencesManager.isMonitoringActive = true
         assertTrue(preferencesManager.isMonitoringActive)
     }
+
+    @Test
+    fun wasMonitoringBeforeReboot_persistsCorrectly() {
+        assertFalse(preferencesManager.wasMonitoringBeforeReboot)
+        preferencesManager.wasMonitoringBeforeReboot = true
+        assertTrue(preferencesManager.wasMonitoringBeforeReboot)
+        preferencesManager.wasMonitoringBeforeReboot = false
+        assertFalse(preferencesManager.wasMonitoringBeforeReboot)
+    }
 }

@@ -24,6 +24,10 @@ class PreferencesManager(
         get() = prefs.getBoolean(KEY_MONITORING_ACTIVE, false)
         set(value) = prefs.edit().putBoolean(KEY_MONITORING_ACTIVE, value).apply()
 
+    var wasMonitoringBeforeReboot: Boolean
+        get() = prefs.getBoolean(KEY_WAS_MONITORING_BEFORE_REBOOT, false)
+        set(value) = prefs.edit().putBoolean(KEY_WAS_MONITORING_BEFORE_REBOOT, value).apply()
+
     var lastCaptureTimeMillis: Long
         get() = prefs.getLong(KEY_LAST_CAPTURE_TIME, 0L)
         set(value) = prefs.edit().putLong(KEY_LAST_CAPTURE_TIME, value).apply()
@@ -34,6 +38,7 @@ class PreferencesManager(
         private const val KEY_RETENTION_HOURS = "retention_hours"
         private const val KEY_AUTO_CLEAN_ENABLED = "auto_clean_enabled"
         private const val KEY_MONITORING_ACTIVE = "monitoring_active"
+        private const val KEY_WAS_MONITORING_BEFORE_REBOOT = "was_monitoring_before_reboot"
         private const val KEY_LAST_CAPTURE_TIME = "last_capture_time"
 
         const val DEFAULT_INTERVAL_SECONDS = 60 // 1 minute

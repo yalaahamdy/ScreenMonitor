@@ -17,15 +17,20 @@ class BootReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val action = intent.action ?: return
-        if (action == Intent.ACTION_BOOT_COMPLETED || action == Intent.ACTION_MY_PACKAGE_REPLACED) {
+        if (action == Intent.ACTION_BOOT_COMPLETED ||
+            action == Intent.ACTION_MY_PACKAGE_REPLACED ||
+            action == "android.intent.action.QUICKBOOT_POWERON" ||
+            action == "com.htc.intent.action.QUICKBOOT_POWERON"
+        ) {
             val preferencesManager = PreferencesManager(context)
-            if (preferencesManager.isMonitoringActive) {
+            if (preferencesManager.isMonitoringActive || preferencesManager.wasMonitoringBeforeReboot) {
                 val securityLogManager = SecurityLogManager(context)
                 securityLogManager.logEvent(
                     SecurityEventType.UNEXPECTED_SERVICE_STOP,
                     "توقف المراقبة بعد إعادة تشغيل الهاتف",
-                    "تمت إعادة تشغيل الجهاز أثناء فترة المراقبة النشطة. يتطلب نظام أندرويد إعادة فتح التطبيق لتأكيد بدء المراقبة."
+                    "تمت إعادة تشغيل الجهاز أثناء فترة المراقبة النشطة. افتح التطبيق لاستئناف المراقبة فوراً."
                 )
+                preferencesManager.wasMonitoringBeforeReboot = true
                 preferencesManager.isMonitoringActive = false
 
                 showRebootNotification(context)
@@ -51,6 +56,7 @@ class BootReceiver : BroadcastReceiver() {
 
         val openIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra(MainActivity.EXTRA_RESUME_AFTER_REBOOT, true)
         }
         val pendingIntent = PendingIntent.getActivity(
             context,
@@ -59,19 +65,31 @@ class BootReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        val resumeIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra(MainActivity.EXTRA_RESUME_AFTER_REBOOT, true)
+        }
+        val pendingResume = PendingIntent.getActivity(
+            context,
+            1,
+            resumeIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         val notification = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(android.R.drawable.ic_dialog_alert)
-            .setContentTitle("توقفت مراقبة الشاشة")
-            .setContentText("أُعيد تشغيل الهاتف. انقر هنا لاستئناف المراقبة فوراً.")
+            .setContentTitle("استئناف مراقبة الشاشة")
+            .setContentText("أُعيد تشغيل الهاتف وتوقفت المراقبة مؤقتاً. انقر لاستئناف المراقبة فوراً.")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
+            .addAction(android.R.drawable.ic_media_play, "استئناف المراقبة", pendingResume)
             .build()
 
         notificationManager.notify(NOTIFICATION_ID_REBOOT, notification)
     }
 
     companion object {
-        private const val NOTIFICATION_ID_REBOOT = 2002
+        const val NOTIFICATION_ID_REBOOT = 2002
     }
 }

@@ -469,6 +469,7 @@ class ScreenCaptureService : Service() {
         mediaProjection = null
 
         preferencesManager.isMonitoringActive = false
+        preferencesManager.wasMonitoringBeforeReboot = false
         _isMonitoringFlow.value = false
 
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)

@@ -2,6 +2,7 @@ package com.example.screenmonitor
 
 import android.Manifest
 import android.app.Activity
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -28,6 +29,7 @@ import com.example.screenmonitor.data.ScreenshotRepository
 import com.example.screenmonitor.data.SecurityEventType
 import com.example.screenmonitor.data.SecurityLogManager
 import com.example.screenmonitor.data.SecurityManager
+import com.example.screenmonitor.receiver.BootReceiver
 import com.example.screenmonitor.service.ScreenCaptureService
 import com.example.screenmonitor.theme.ScreenMonitorTheme
 import com.example.screenmonitor.ui.screens.GalleryScreen
@@ -81,6 +83,10 @@ class MainActivity : ComponentActivity() {
         mediaProjectionManager =
             getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
 
+        if (preferencesManager.isAutoCleanEnabled && preferencesManager.retentionHours > 0) {
+            screenshotRepository.cleanOldScreenshots(preferencesManager.retentionHours)
+        }
+
         enableEdgeToEdge()
         window.setFlags(
             WindowManager.LayoutParams.FLAG_SECURE,
@@ -95,7 +101,10 @@ class MainActivity : ComponentActivity() {
                     if (!isUnlocked) {
                         LockScreen(
                             securityManager = securityManager,
-                            onUnlocked = { isUnlocked = true }
+                            onUnlocked = {
+                                isUnlocked = true
+                                checkAndAutoResumeMonitoring()
+                            }
                         )
                     } else {
                         when (currentScreen) {
@@ -127,14 +136,23 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        if (isUnlocked) {
+            checkAndAutoResumeMonitoring()
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         ScreenCaptureService.setAppInForeground(true)
         if (preferencesManager.isMonitoringActive && !ScreenCaptureService.isMonitoringFlow.value) {
+            preferencesManager.wasMonitoringBeforeReboot = true
             securityLogManager.logEvent(
                 SecurityEventType.UNEXPECTED_SERVICE_STOP,
                 "توقف غير متوقع لخدمة المراقبة",
-                "تم رصد إيقاف الخدمة بواسطة نظام التشغيل (بسبب إدارة الذاكرة أو توفير الطاقة) أثناء وقت المراقبة النشطة."
+                "تم رصد إيقاف الخدمة بواسطة نظام التشغيل (بسبب إعادة تشغيل الهاتف أو توفير الطاقة) أثناء وقت المراقبة النشطة."
             )
             preferencesManager.isMonitoringActive = false
         }
@@ -149,6 +167,18 @@ class MainActivity : ComponentActivity() {
         super.onStop()
         if (!isChangingConfigurations) {
             isUnlocked = false
+        }
+    }
+
+    private fun checkAndAutoResumeMonitoring() {
+        val shouldResume = preferencesManager.wasMonitoringBeforeReboot ||
+                intent.getBooleanExtra(EXTRA_RESUME_AFTER_REBOOT, false)
+        if (shouldResume && !ScreenCaptureService.isMonitoringFlow.value) {
+            preferencesManager.wasMonitoringBeforeReboot = false
+            val notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.cancel(BootReceiver.NOTIFICATION_ID_REBOOT)
+            requestStartMonitoring()
         }
     }
 
@@ -183,5 +213,9 @@ class MainActivity : ComponentActivity() {
         }
         startService(stopIntent)
         Toast.makeText(this, "تم إيقاف المراقبة", Toast.LENGTH_SHORT).show()
+    }
+
+    companion object {
+        const val EXTRA_RESUME_AFTER_REBOOT = "extra_resume_after_reboot"
     }
 }

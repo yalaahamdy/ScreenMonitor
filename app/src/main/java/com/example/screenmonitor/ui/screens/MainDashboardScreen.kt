@@ -41,6 +41,7 @@ import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Shield
 import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material.icons.outlined.Timer
+import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -112,6 +113,7 @@ fun MainDashboardScreen(
     var selectedInterval by remember { mutableIntStateOf(preferencesManager.captureIntervalSeconds) }
     var selectedRetention by remember { mutableIntStateOf(preferencesManager.retentionHours) }
     var autoCleanEnabled by remember { mutableStateOf(preferencesManager.isAutoCleanEnabled) }
+    var discreetNotificationEnabled by remember { mutableStateOf(preferencesManager.isDiscreetNotificationEnabled) }
 
     var showChangePinDialog by remember { mutableStateOf(false) }
     var showIntervalBottomSheet by remember { mutableStateOf(false) }
@@ -599,7 +601,69 @@ fun MainDashboardScreen(
                             color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)
                         )
 
-                        // Setting 4: Security Audit Log Row
+                        // Setting 4: Discreet Notification Switch Row
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(
+                                modifier = Modifier.weight(1f),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.VisibilityOff,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column {
+                                    Text(
+                                        text = "وضع التمويه للإشعار",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Text(
+                                        text = "عرض إشعار حماية النظام بدلاً من مراقبة الشاشة",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                            Switch(
+                                checked = discreetNotificationEnabled,
+                                onCheckedChange = {
+                                    discreetNotificationEnabled = it
+                                    preferencesManager.isDiscreetNotificationEnabled = it
+                                    if (isServiceMonitoring) {
+                                        val updateIntent = Intent(context, ScreenCaptureService::class.java).apply {
+                                            action = ScreenCaptureService.ACTION_UPDATE_NOTIFICATION
+                                        }
+                                        context.startService(updateIntent)
+                                    }
+                                },
+                                colors = SwitchDefaults.colors(checkedThumbColor = MaterialTheme.colorScheme.primary)
+                            )
+                        }
+
+                        HorizontalDivider(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)
+                        )
+
+                        // Setting 5: Security Audit Log Row
                         SettingsRow(
                             icon = Icons.Outlined.Shield,
                             title = "سجل الأمان والتحقق من الأذونات",

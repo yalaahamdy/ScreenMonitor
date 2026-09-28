@@ -52,4 +52,13 @@ class PreferencesManagerTest {
         preferencesManager.wasMonitoringBeforeReboot = false
         assertFalse(preferencesManager.wasMonitoringBeforeReboot)
     }
+
+    @Test
+    fun discreetNotification_defaultsToTrue_andPersistsCorrectly() {
+        assertTrue(preferencesManager.isDiscreetNotificationEnabled)
+        preferencesManager.isDiscreetNotificationEnabled = false
+        assertFalse(preferencesManager.isDiscreetNotificationEnabled)
+        preferencesManager.isDiscreetNotificationEnabled = true
+        assertTrue(preferencesManager.isDiscreetNotificationEnabled)
+    }
 }

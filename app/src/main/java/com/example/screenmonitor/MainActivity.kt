@@ -31,6 +31,7 @@ import com.example.screenmonitor.data.SecurityLogManager
 import com.example.screenmonitor.data.SecurityManager
 import com.example.screenmonitor.receiver.BootReceiver
 import com.example.screenmonitor.service.ScreenCaptureService
+import com.example.screenmonitor.service.ScreenMonitorAccessibilityService
 import com.example.screenmonitor.theme.ScreenMonitorTheme
 import com.example.screenmonitor.ui.screens.GalleryScreen
 import com.example.screenmonitor.ui.screens.LockScreen
@@ -194,7 +195,18 @@ class MainActivity : ComponentActivity() {
                 return
             }
         }
-        launchScreenCapture()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+            ScreenMonitorAccessibilityService.isServiceEnabled(this)
+        ) {
+            val serviceIntent = Intent(this, ScreenCaptureService::class.java).apply {
+                action = ScreenCaptureService.ACTION_START
+            }
+            ContextCompat.startForegroundService(this, serviceIntent)
+            Toast.makeText(this, "تم بدء المراقبة بنجاح (المحرك المحصن ضد القفل)", Toast.LENGTH_SHORT).show()
+        } else {
+            launchScreenCapture()
+        }
     }
 
     private fun launchScreenCapture() {

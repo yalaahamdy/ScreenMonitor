@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">مراقب الشاشة</string>
+    <string name="accessibility_service_label">خدمة حماية ومراقبة الشاشة (ScreenMonitor)</string>
+    <string name="accessibility_description">خدمة حماية وأمان الشاشة لتمكين الالتقاط الدوري المستمر 24/7 دون انقطاع حتى عند قفل الهاتف.</string>
 </resources>

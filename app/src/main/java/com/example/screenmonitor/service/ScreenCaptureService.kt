@@ -34,6 +34,7 @@ import com.example.screenmonitor.data.PreferencesManager
 import com.example.screenmonitor.data.ScreenshotRepository
 import com.example.screenmonitor.data.SecurityEventType
 import com.example.screenmonitor.data.SecurityLogManager
+import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -44,11 +45,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
 class ScreenCaptureService : Service() {
 
     private val serviceScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private var captureJob: Job? = null
+    private var wakeLock: PowerManager.WakeLock? = null
 
     private lateinit var preferencesManager: PreferencesManager
     private lateinit var screenshotRepository: ScreenshotRepository
@@ -78,7 +82,7 @@ class ScreenCaptureService : Service() {
                 Intent.ACTION_SCREEN_OFF -> {
                     onScreenTurnedOff()
                 }
-                Intent.ACTION_SCREEN_ON -> {
+                Intent.ACTION_SCREEN_ON, Intent.ACTION_USER_PRESENT -> {
                     onScreenTurnedOn()
                 }
             }
@@ -95,48 +99,83 @@ class ScreenCaptureService : Service() {
         createNotificationChannel()
     }
 
+    private fun acquireWakeLock() {
+        if (wakeLock == null || wakeLock?.isHeld == false) {
+            val pm = getSystemService(Context.POWER_SERVICE) as? PowerManager
+            wakeLock = pm?.newWakeLock(
+                PowerManager.PARTIAL_WAKE_LOCK,
+                "ScreenMonitor::CaptureServiceCpuWakeLock"
+            )
+            try {
+                wakeLock?.acquire(24 * 60 * 60 * 1000L) // 24h safe timeout
+            } catch (e: Exception) {
+                Log.w(TAG, "Error acquiring WakeLock: ${e.message}")
+            }
+        }
+    }
+
+    private fun releaseWakeLock() {
+        try {
+            if (wakeLock?.isHeld == true) {
+                wakeLock?.release()
+            }
+        } catch (_: Exception) {}
+        wakeLock = null
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_START -> {
-                val resultCode = intent.getIntExtra(EXTRA_RESULT_CODE, 0)
+                val resultCode = intent.getIntExtra(EXTRA_RESULT_CODE, savedResultCode)
                 val resultData: Intent? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    intent.getParcelableExtra(EXTRA_RESULT_DATA, Intent::class.java)
+                    intent.getParcelableExtra(EXTRA_RESULT_DATA, Intent::class.java) ?: savedResultData
                 } else {
                     @Suppress("DEPRECATION")
-                    intent.getParcelableExtra(EXTRA_RESULT_DATA)
+                    (intent.getParcelableExtra(EXTRA_RESULT_DATA) ?: savedResultData)
                 }
 
                 if (resultCode != 0 && resultData != null) {
+                    savedResultCode = resultCode
+                    savedResultData = resultData
                     startMonitoring(resultCode, resultData)
                 } else {
-                    stopMonitoring()
+                    val accessibilityInstance = ScreenMonitorAccessibilityService.instance
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && accessibilityInstance != null) {
+                        startMonitoring(0, null)
+                    } else {
+                        stopMonitoring()
+                    }
                 }
             }
             ACTION_STOP -> {
                 stopMonitoring()
             }
             ACTION_UPDATE_INTERVAL -> {
-                if (mediaProjection != null && preferencesManager.isMonitoringActive && isScreenOn()) {
+                if (preferencesManager.isMonitoringActive) {
                     startCaptureLoop()
                 }
             }
             ACTION_UPDATE_NOTIFICATION -> {
-                if (mediaProjection != null) {
-                    val notification = buildNotification("مراقبة الشاشة نشطة")
-                    val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                    manager.notify(NOTIFICATION_ID, notification)
-                }
+                val notification = buildNotification("مراقبة الشاشة نشطة")
+                val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                manager.notify(NOTIFICATION_ID, notification)
             }
             else -> {
-                if (mediaProjection == null) {
+                if (preferencesManager.isMonitoringActive) {
+                    if (savedResultCode != 0 && savedResultData != null) {
+                        startMonitoring(savedResultCode, savedResultData)
+                    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && ScreenMonitorAccessibilityService.instance != null) {
+                        startMonitoring(0, null)
+                    }
+                } else {
                     stopSelf()
                 }
             }
         }
-        return START_NOT_STICKY
+        return START_STICKY
     }
 
-    private fun startMonitoring(resultCode: Int, resultData: Intent) {
+    private fun startMonitoring(resultCode: Int, resultData: Intent?) {
         val notification = buildNotification("مراقبة الشاشة نشطة")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             ServiceCompat.startForeground(
@@ -149,42 +188,42 @@ class ScreenCaptureService : Service() {
             startForeground(NOTIFICATION_ID, notification)
         }
 
-        try {
-            val projection = mediaProjectionManager.getMediaProjection(resultCode, resultData)
-            if (projection == null) {
-                stopMonitoring()
-                return
-            }
-            mediaProjection = projection
+        acquireWakeLock()
 
-            projection.registerCallback(object : MediaProjection.Callback() {
-                override fun onStop() {
-                    mainHandler.post {
-                        if (preferencesManager.isMonitoringActive) {
-                            securityLogManager.logEvent(
-                                SecurityEventType.PERMISSION_REVOKED,
-                                "تم إيقاف أو سحب إذن التقاط الشاشة",
-                                "تم رصد إيقاف جلسة مشاركة الشاشة أو سحب الإذن خارجياً أثناء فترة المراقبة النشطة (محاولة تعطيل أو تجاوز)."
-                            )
-                        }
-                        stopMonitoring()
-                    }
-                }
-            }, mainHandler)
-
+        if (resultCode != 0 && resultData != null) {
+            savedResultCode = resultCode
+            savedResultData = resultData
+            initOrResumeMediaProjection(resultCode, resultData)
             setupVirtualDisplay()
-            registerScreenReceiver()
-            registerDisplayListener()
+        }
 
-            preferencesManager.isMonitoringActive = true
-            _isMonitoringFlow.value = true
+        registerScreenReceiver()
+        registerDisplayListener()
 
-            if (isScreenOn()) {
-                startCaptureLoop()
+        preferencesManager.isMonitoringActive = true
+        _isMonitoringFlow.value = true
+
+        startCaptureLoop()
+    }
+
+    private fun initOrResumeMediaProjection(resultCode: Int, resultData: Intent) {
+        try {
+            if (mediaProjection == null) {
+                val projection = mediaProjectionManager.getMediaProjection(resultCode, resultData) ?: return
+                mediaProjection = projection
+                projection.registerCallback(object : MediaProjection.Callback() {
+                    override fun onStop() {
+                        mainHandler.post {
+                            Log.w(TAG, "MediaProjection onStop called (screen lock or system pause)")
+                            mediaProjection = null
+                            virtualDisplay?.release()
+                            virtualDisplay = null
+                        }
+                    }
+                }, mainHandler)
             }
         } catch (e: Exception) {
-            e.printStackTrace()
-            stopMonitoring()
+            Log.w(TAG, "initOrResumeMediaProjection error: ${e.message}")
         }
     }
 
@@ -235,13 +274,18 @@ class ScreenCaptureService : Service() {
             val filter = IntentFilter().apply {
                 addAction(Intent.ACTION_SCREEN_OFF)
                 addAction(Intent.ACTION_SCREEN_ON)
+                addAction(Intent.ACTION_USER_PRESENT)
             }
-            ContextCompat.registerReceiver(
-                this,
-                screenStateReceiver,
-                filter,
-                ContextCompat.RECEIVER_NOT_EXPORTED
-            )
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                ContextCompat.registerReceiver(
+                    this,
+                    screenStateReceiver,
+                    filter,
+                    ContextCompat.RECEIVER_EXPORTED
+                )
+            } else {
+                registerReceiver(screenStateReceiver, filter)
+            }
             isReceiverRegistered = true
         }
     }
@@ -274,15 +318,15 @@ class ScreenCaptureService : Service() {
 
     private fun onScreenTurnedOff() {
         _isScreenOnFlow.value = false
-        captureJob?.cancel()
-        captureJob = null
         drainImageReader()
     }
 
     private fun onScreenTurnedOn() {
         _isScreenOnFlow.value = true
-        if (preferencesManager.isMonitoringActive && mediaProjection != null && imageReader != null) {
-            startCaptureLoop()
+        if (preferencesManager.isMonitoringActive) {
+            if (captureJob == null || captureJob?.isActive == false) {
+                startCaptureLoop()
+            }
         }
     }
 
@@ -321,27 +365,55 @@ class ScreenCaptureService : Service() {
     private fun startCaptureLoop() {
         captureJob?.cancel()
         captureJob = serviceScope.launch {
-            // Give the virtual display a moment to populate initial surface frames
-            delay(1200L)
+            delay(1000L)
             while (isActive) {
-                if (mediaProjection == null || imageReader == null) {
-                    if (preferencesManager.isMonitoringActive) {
-                        securityLogManager.logEvent(
-                            SecurityEventType.PERMISSION_REVOKED,
-                            "فشل التقاط اللقطة الدورية",
-                            "تعذر التقاط الصورة الدورية لعدم توفر جلسة الشاشة أو إبطال إذن الالتقاط وقت موعد الالتقاط."
-                        )
-                    }
-                    stopMonitoring()
+                if (!preferencesManager.isMonitoringActive) {
                     break
                 }
 
                 if (!isScreenOn()) {
                     drainImageReader()
-                    break
+                    delay(2500L)
+                    continue
+                }
+
+                // Check Priority 1: Native Accessibility Service (Lock-Proof Engine)
+                val accessibilityInstance = ScreenMonitorAccessibilityService.instance
+                val isAccessibilityActive = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && accessibilityInstance != null
+
+                if (!isAccessibilityActive) {
+                    // Priority 2: MediaProjection Engine
+                    val code = savedResultCode
+                    val data = savedResultData
+                    if (mediaProjection == null && data != null && code != 0) {
+                        try {
+                            val newProj = mediaProjectionManager.getMediaProjection(code, data)
+                            if (newProj != null) {
+                                mediaProjection = newProj
+                                newProj.registerCallback(object : MediaProjection.Callback() {
+                                    override fun onStop() {
+                                        mainHandler.post {
+                                            Log.w(TAG, "MediaProjection onStop called (screen lock or system pause)")
+                                            mediaProjection = null
+                                            virtualDisplay?.release()
+                                            virtualDisplay = null
+                                        }
+                                    }
+                                }, mainHandler)
+                                setupVirtualDisplay()
+                            }
+                        } catch (e: Exception) {
+                            Log.w(TAG, "MediaProjection renewal attempt: ${e.message}")
+                        }
+                    } else if (virtualDisplay == null || imageReader == null) {
+                        if (mediaProjection != null) {
+                            setupVirtualDisplay()
+                        }
+                    }
                 }
 
                 captureCurrentScreen()
+
                 val intervalSeconds = preferencesManager.captureIntervalSeconds.coerceAtLeast(5)
                 delay(intervalSeconds * 1000L)
             }
@@ -349,17 +421,65 @@ class ScreenCaptureService : Service() {
     }
 
     private suspend fun captureCurrentScreen(): Boolean {
-        if (!isScreenOn()) {
+        if (!isScreenOn() || isAppInForeground) {
             drainImageReader()
             return false
         }
 
-        if (isAppInForeground) {
-            // Do not take screenshots of the ScreenMonitor app itself (privacy & recursion guard)
-            drainImageReader()
-            return false
+        // Priority 1: If ScreenMonitorAccessibilityService is active
+        val accessibilityService = ScreenMonitorAccessibilityService.instance
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && accessibilityService != null) {
+            val captured = captureViaAccessibility(accessibilityService)
+            if (captured) return true
         }
 
+        // Priority 2: Fallback to MediaProjection
+        return captureViaMediaProjection()
+    }
+
+    private suspend fun captureViaAccessibility(accessibilityService: ScreenMonitorAccessibilityService): Boolean {
+        return suspendCancellableCoroutine { continuation ->
+            accessibilityService.captureDisplayScreenshot(
+                onSuccess = { bitmap ->
+                    serviceScope.launch {
+                        try {
+                            if (!isScreenOn() || isAppInForeground) {
+                                bitmap.recycle()
+                                if (continuation.isActive) continuation.resume(false)
+                                return@launch
+                            }
+                            val retentionHours = preferencesManager.retentionHours
+                            val autoClean = preferencesManager.isAutoCleanEnabled
+                            val result = screenshotRepository.saveScreenshot(bitmap, retentionHours, autoClean)
+                            bitmap.recycle()
+
+                            if (result.isSuccess) {
+                                val now = System.currentTimeMillis()
+                                preferencesManager.lastCaptureTimeMillis = now
+                                _lastCaptureTimeFlow.value = now
+                                if (continuation.isActive) continuation.resume(true)
+                            } else {
+                                val exception = result.exceptionOrNull()
+                                if (exception is InsufficientStorageException) {
+                                    handleStorageFull()
+                                }
+                                if (continuation.isActive) continuation.resume(false)
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            if (continuation.isActive) continuation.resume(false)
+                        }
+                    }
+                },
+                onError = { error ->
+                    Log.w(TAG, "Accessibility capture error: $error")
+                    if (continuation.isActive) continuation.resume(false)
+                }
+            )
+        }
+    }
+
+    private suspend fun captureViaMediaProjection(): Boolean {
         val reader = imageReader ?: return false
         var image = reader.acquireLatestImage()
         var retries = 0
@@ -416,13 +536,7 @@ class ScreenCaptureService : Service() {
             } else {
                 val exception = result.exceptionOrNull()
                 if (exception is InsufficientStorageException) {
-                    securityLogManager.logEvent(
-                        SecurityEventType.STORAGE_FULL,
-                        "توقف المراقبة لامتلاء مساحة التخزين",
-                        "تم إيقاف المراقبة تلقائياً لأن المساحة المتبقية على وحدة التخزين أقل من 50 ميجابايت."
-                    )
-                    showStorageAlertNotification()
-                    stopMonitoring()
+                    handleStorageFull()
                     return false
                 }
             }
@@ -432,6 +546,16 @@ class ScreenCaptureService : Service() {
             image.close()
         }
         return false
+    }
+
+    private fun handleStorageFull() {
+        securityLogManager.logEvent(
+            SecurityEventType.STORAGE_FULL,
+            "توقف المراقبة لامتلاء مساحة التخزين",
+            "تم إيقاف المراقبة تلقائياً لأن المساحة المتبقية على وحدة التخزين أقل من 50 ميجابايت."
+        )
+        showStorageAlertNotification()
+        stopMonitoring()
     }
 
     private fun showStorageAlertNotification() {
@@ -459,6 +583,10 @@ class ScreenCaptureService : Service() {
     }
 
     private fun stopMonitoring() {
+        releaseWakeLock()
+        savedResultCode = 0
+        savedResultData = null
+
         unregisterScreenReceiver()
         unregisterDisplayListener()
 
@@ -536,6 +664,16 @@ class ScreenCaptureService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     companion object {
+        private const val TAG = "ScreenCaptureService"
+
+        @Volatile
+        var savedResultCode: Int = 0
+            private set
+
+        @Volatile
+        var savedResultData: Intent? = null
+            private set
+
         const val ACTION_START = "com.example.screenmonitor.action.START"
         const val ACTION_STOP = "com.example.screenmonitor.action.STOP"
         const val ACTION_UPDATE_INTERVAL = "com.example.screenmonitor.action.UPDATE_INTERVAL"

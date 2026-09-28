@@ -89,7 +89,9 @@ import com.example.screenmonitor.data.SecurityEvent
 import com.example.screenmonitor.data.SecurityEventType
 import com.example.screenmonitor.data.SecurityLogManager
 import com.example.screenmonitor.data.SecurityManager
+import android.os.Build
 import com.example.screenmonitor.service.ScreenCaptureService
+import com.example.screenmonitor.service.ScreenMonitorAccessibilityService
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -442,6 +444,107 @@ fun MainDashboardScreen(
                             Icon(imageVector = Icons.Default.Stop, contentDescription = null, modifier = Modifier.size(20.dp))
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(text = "إيقاف المراقبة", fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+            }
+
+            // Lock-Proof Ultra Engine Card (Accessibility Service)
+            val isAccessibilityEnabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+                    ScreenMonitorAccessibilityService.isServiceEnabled(context)
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (isAccessibilityEnabled)
+                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.25f)
+                    else
+                        MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.35f)
+                ),
+                border = BorderStroke(
+                    1.dp,
+                    if (isAccessibilityEnabled)
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                    else
+                        MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f)
+                )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(42.dp)
+                            .clip(CircleShape)
+                            .background(
+                                if (isAccessibilityEnabled)
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                                else
+                                    MaterialTheme.colorScheme.secondary.copy(alpha = 0.15f)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Shield,
+                            contentDescription = null,
+                            tint = if (isAccessibilityEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier.size(22.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(14.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "محرك الحماية الفائقة 24/7",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(
+                                        if (isAccessibilityEnabled)
+                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                                        else
+                                            MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)
+                                    )
+                                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                            ) {
+                                Text(
+                                    text = if (isAccessibilityEnabled) "محصّن" else "موصى به",
+                                    color = if (isAccessibilityEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(3.dp))
+                        Text(
+                            text = if (isAccessibilityEnabled)
+                                "خدمة الوصول مفعلة بنجاح، المراقبة تعمل باستمرار دون انقطاع حتى مع قفل الهاتف."
+                            else
+                                "فعّل خدمة الوصول لضمان استمرار المراقبة بصمت وعدم توقفها عند إطفاء أو قفل الشاشة.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        if (!isAccessibilityEnabled) {
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Button(
+                                onClick = {
+                                    ScreenMonitorAccessibilityService.openAccessibilitySettings(context)
+                                },
+                                shape = RoundedCornerShape(10.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                                modifier = Modifier.height(36.dp)
+                            ) {
+                                Text("تفعيل الحماية ضد القفل ➔", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            }
                         }
                     }
                 }

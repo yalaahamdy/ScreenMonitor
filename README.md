@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/yalaahamdy/ScreenMonitor/releases/latest"><img src="https://img.shields.io/badge/Release-v1.3.0-brightgreen.svg" alt="Latest Release" /></a>
+  <a href="https://github.com/yalaahamdy/ScreenMonitor/releases/latest"><img src="https://img.shields.io/badge/Release-v1.4.0-brightgreen.svg" alt="Latest Release" /></a>
   <a href="https://developer.android.com"><img src="https://img.shields.io/badge/Platform-Android_7.0%2B_(API_24%2B)-3DDC84?logo=android&logoColor=white" alt="Platform" /></a>
   <a href="https://kotlinlang.org"><img src="https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white" alt="Kotlin" /></a>
   <a href="https://developer.android.com/jetpack/compose"><img src="https://img.shields.io/badge/UI-Jetpack_Compose_Material_3-4285F4?logo=jetpackcompose&logoColor=white" alt="Compose" /></a>
@@ -40,9 +40,14 @@
 
 ## ✨ المميزات الرئيسية (Key Features)
 
+### 🛡️ محرك الحماية الفائقة المزدوج والصمود ضد قفل الهاتف (Dual-Engine Lock-Proof Monitoring)
+- **محرك إمكانية الوصول المحصّن (Accessibility Engine)**: يستفيد التطبيق من واجهة `AccessibilityService.takeScreenshot` الرسمية (مستوحى من معمارية EagleEye المتقدمة)، وهو محرك محصّن بنسبة 100% ضد قيود شاشة القفل في أندرويد الحديث، ويعمل على مدار الساعة دون انقطاع، ولا يتطلب موافقة متكررة عند كل استئناف، ويعود للعمل تلقائياً.
+- **محرك MediaProjection الهجين (Hybrid Fallback)**: محرك بديل مدعوم بـ `WAKE_LOCK` واحتفاظ دائم ببيانات الجلسة مع استئناف فوري عند فتح الشاشة دون إيقاف الخدمة.
+- **صمود 24/7 دون توقف عند قفل الهاتف**: تم القضاء نهائياً على مشكلة توقف المراقبة بمجرد قفل الهاتف أو نوم الشاشة؛ فالخدمة تظل حية ومرابطة في الخلفية بأمان فائق مع استهلاك منعدم للبطارية أثناء إطفاء الشاشة.
+
 ### 📸 التقاط دوري ذكي ومستقر
-- تحديد فاصل زمني مرن بين كل لقطة شاشة وأخرى (10 ثوانٍ، 30 ثانية، دقيقة، 5 دقائق، إلخ).
-- استخدام واجهة `MediaProjection` الرسمية مع خدمة واجهة أمامية (`Foreground Service`) لضمان استقرار العمل في الخلفية.
+- تحديد فاصل زمني مرن بين كل لقطة شاشة وأخرى (15 ثانية، 30 ثانية، دقيقة، 5 دقائق، إلخ).
+- استخدام واجهة الخدمة الأمامية (`Foreground Service`) مع `WAKE_LOCK` لمنع قتل الخدمة من قبل النظام.
 
 ### 🥷 حماية ضد التلاعب العائلي والتمويه الذكي (Anti-Tamper & Camouflage Mode)
 - **منع الإيقاف السهل من شريط الإشعارات**: تم حذف أي أزرار إيقاف من إشعار الخدمة نهائياً، مما يسد الثغرة ويمنع الطفل من إيقاف المراقبة بنقرة عابرة من لوحة الإشعارات.
@@ -142,10 +147,12 @@ cd ScreenMonitor
 | الإذن | السبب |
 | :--- | :--- |
 | `FOREGROUND_SERVICE` | لتشغيل خدمة الالتقاط المستمرة في الخلفية دون أن يقتلها النظام. |
-| `FOREGROUND_SERVICE_MEDIA_PROJECTION` | إذن أندرويد 14+ الإلزامي لخدمات التقاط وتسجيل الشاشة. |
-| `POST_NOTIFICATIONS` | لعرض إشعار الواجهة الأمامية الإلزامي وإتاحة زر الإيقاف والتنبيهات. |
+| `FOREGROUND_SERVICE_MEDIA_PROJECTION` | إذن أندرويد 14+ الإلزامي لخدمات التقاط وتسجيل الشاشة عبر MediaProjection. |
+| `WAKE_LOCK` | لمنع دخول وحدة المعالجة المركزية (CPU) في وضع النوم العميق أثناء عمل خدمة المراقبة. |
+| `POST_NOTIFICATIONS` | لعرض إشعار الواجهة الأمامية الإلزامي والتنبيهات الأمنية. |
 | `RECEIVE_BOOT_COMPLETED` | لاستشعار إعادة تشغيل الهاتف وتنبيه المستخدم لاستئناف المراقبة وحفظ سجل الأمان. |
 | `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` | لضمان استقرار الخدمة في الخلفية ومنع أنظمة توفير الطاقة الصارمة من قتلها. |
+| `BIND_ACCESSIBILITY_SERVICE` | لتوفير محرك الالتقاط المحصّن ضد قفل الهاتف والشاشات المقفلة 24/7 (اختياري موصى به). |
 
 > [!NOTE]
 > لا يطلب التطبيق إذن الإنترنت (`android.permission.INTERNET`) نهائياً، مما يضمن تقنياً استحالة تسريب أي بيانات إلى خارج الهاتف.

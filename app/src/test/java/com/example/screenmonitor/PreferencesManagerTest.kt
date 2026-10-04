@@ -23,7 +23,7 @@ class PreferencesManagerTest {
         assertEquals(PreferencesManager.DEFAULT_INTERVAL_SECONDS, preferencesManager.captureIntervalSeconds)
         assertEquals(PreferencesManager.DEFAULT_RETENTION_HOURS, preferencesManager.retentionHours)
         assertTrue(preferencesManager.isAutoCleanEnabled)
-        assertFalse(preferencesManager.isMonitoringActive)
+        assertTrue(preferencesManager.isMonitoringActive)
     }
 
     @Test
@@ -40,6 +40,8 @@ class PreferencesManagerTest {
 
     @Test
     fun updateMonitoringState_persistsCorrectly() {
+        preferencesManager.isMonitoringActive = false
+        assertFalse(preferencesManager.isMonitoringActive)
         preferencesManager.isMonitoringActive = true
         assertTrue(preferencesManager.isMonitoringActive)
     }

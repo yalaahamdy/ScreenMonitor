@@ -34,6 +34,7 @@ import com.example.screenmonitor.data.PreferencesManager
 import com.example.screenmonitor.data.ScreenshotRepository
 import com.example.screenmonitor.data.SecurityEventType
 import com.example.screenmonitor.data.SecurityLogManager
+import com.example.screenmonitor.receiver.WatchdogAlarmReceiver
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -140,15 +141,18 @@ class ScreenCaptureService : Service() {
                     startMonitoring(resultCode, resultData)
                 } else {
                     val accessibilityInstance = ScreenMonitorAccessibilityService.instance
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && accessibilityInstance != null) {
+                    val isAccessEnabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+                            (accessibilityInstance != null || ScreenMonitorAccessibilityService.isServiceEnabled(this))
+
+                    if (isAccessEnabled) {
                         startMonitoring(0, null)
-                    } else {
-                        stopMonitoring()
+                    } else if (preferencesManager.isMonitoringActive) {
+                        startMonitoring(0, null)
                     }
                 }
             }
             ACTION_STOP -> {
-                stopMonitoring()
+                stopMonitoring(isExplicitUserAction = true)
             }
             ACTION_UPDATE_INTERVAL -> {
                 if (preferencesManager.isMonitoringActive) {
@@ -164,11 +168,9 @@ class ScreenCaptureService : Service() {
                 if (preferencesManager.isMonitoringActive) {
                     if (savedResultCode != 0 && savedResultData != null) {
                         startMonitoring(savedResultCode, savedResultData)
-                    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && ScreenMonitorAccessibilityService.instance != null) {
+                    } else {
                         startMonitoring(0, null)
                     }
-                } else {
-                    stopSelf()
                 }
             }
         }
@@ -367,52 +369,56 @@ class ScreenCaptureService : Service() {
         captureJob = serviceScope.launch {
             delay(1000L)
             while (isActive) {
-                if (!preferencesManager.isMonitoringActive) {
-                    break
-                }
+                try {
+                    if (!preferencesManager.isMonitoringActive) {
+                        break
+                    }
 
-                if (!isScreenOn()) {
-                    drainImageReader()
-                    delay(2500L)
-                    continue
-                }
+                    if (!isScreenOn()) {
+                        drainImageReader()
+                        delay(2500L)
+                        continue
+                    }
 
-                // Check Priority 1: Native Accessibility Service (Lock-Proof Engine)
-                val accessibilityInstance = ScreenMonitorAccessibilityService.instance
-                val isAccessibilityActive = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && accessibilityInstance != null
+                    // Check Priority 1: Native Accessibility Service (Lock-Proof Engine)
+                    val accessibilityInstance = ScreenMonitorAccessibilityService.instance
+                    val isAccessibilityActive = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && accessibilityInstance != null
 
-                if (!isAccessibilityActive) {
-                    // Priority 2: MediaProjection Engine
-                    val code = savedResultCode
-                    val data = savedResultData
-                    if (mediaProjection == null && data != null && code != 0) {
-                        try {
-                            val newProj = mediaProjectionManager.getMediaProjection(code, data)
-                            if (newProj != null) {
-                                mediaProjection = newProj
-                                newProj.registerCallback(object : MediaProjection.Callback() {
-                                    override fun onStop() {
-                                        mainHandler.post {
-                                            Log.w(TAG, "MediaProjection onStop called (screen lock or system pause)")
-                                            mediaProjection = null
-                                            virtualDisplay?.release()
-                                            virtualDisplay = null
+                    if (!isAccessibilityActive) {
+                        // Priority 2: MediaProjection Engine
+                        val code = savedResultCode
+                        val data = savedResultData
+                        if (mediaProjection == null && data != null && code != 0) {
+                            try {
+                                val newProj = mediaProjectionManager.getMediaProjection(code, data)
+                                if (newProj != null) {
+                                    mediaProjection = newProj
+                                    newProj.registerCallback(object : MediaProjection.Callback() {
+                                        override fun onStop() {
+                                            mainHandler.post {
+                                                Log.w(TAG, "MediaProjection onStop called (screen lock or system pause)")
+                                                mediaProjection = null
+                                                virtualDisplay?.release()
+                                                virtualDisplay = null
+                                            }
                                         }
-                                    }
-                                }, mainHandler)
+                                    }, mainHandler)
+                                    setupVirtualDisplay()
+                                }
+                            } catch (e: Exception) {
+                                Log.w(TAG, "MediaProjection renewal attempt: ${e.message}")
+                            }
+                        } else if (virtualDisplay == null || imageReader == null) {
+                            if (mediaProjection != null) {
                                 setupVirtualDisplay()
                             }
-                        } catch (e: Exception) {
-                            Log.w(TAG, "MediaProjection renewal attempt: ${e.message}")
-                        }
-                    } else if (virtualDisplay == null || imageReader == null) {
-                        if (mediaProjection != null) {
-                            setupVirtualDisplay()
                         }
                     }
-                }
 
-                captureCurrentScreen()
+                    captureCurrentScreen()
+                } catch (t: Throwable) {
+                    Log.e(TAG, "تم احتواء خطأ في دورة الالتقاط لمنع توقف الخدمة: ${t.message}")
+                }
 
                 val intervalSeconds = preferencesManager.captureIntervalSeconds.coerceAtLeast(5)
                 delay(intervalSeconds * 1000L)
@@ -555,7 +561,7 @@ class ScreenCaptureService : Service() {
             "تم إيقاف المراقبة تلقائياً لأن المساحة المتبقية على وحدة التخزين أقل من 50 ميجابايت."
         )
         showStorageAlertNotification()
-        stopMonitoring()
+        stopMonitoring(isExplicitUserAction = false)
     }
 
     private fun showStorageAlertNotification() {
@@ -582,7 +588,7 @@ class ScreenCaptureService : Service() {
         manager.notify(NOTIFICATION_ID_STORAGE_ALERT, notification)
     }
 
-    private fun stopMonitoring() {
+    private fun stopMonitoring(isExplicitUserAction: Boolean = false) {
         releaseWakeLock()
         savedResultCode = 0
         savedResultData = null
@@ -604,8 +610,10 @@ class ScreenCaptureService : Service() {
         mediaProjection?.stop()
         mediaProjection = null
 
-        preferencesManager.isMonitoringActive = false
-        preferencesManager.wasMonitoringBeforeReboot = false
+        if (isExplicitUserAction) {
+            preferencesManager.isMonitoringActive = false
+            preferencesManager.wasMonitoringBeforeReboot = false
+        }
         _isMonitoringFlow.value = false
 
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
@@ -655,10 +663,22 @@ class ScreenCaptureService : Service() {
             .build()
     }
 
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        Log.w(TAG, "تم رصد إزالة التطبيق من قائمة المهام الحديثة (Task Removed) - جدولة إحياء فوري")
+        if (preferencesManager.isMonitoringActive) {
+            WatchdogAlarmReceiver.scheduleImmediateWakeup(applicationContext)
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-        stopMonitoring()
+        stopMonitoring(isExplicitUserAction = false)
         serviceScope.cancel()
+        if (preferencesManager.isMonitoringActive) {
+            Log.w(TAG, "ScreenCaptureService تم إنهاؤه والمراقبة نشطة - جدولة إحياء فوري عبر Watchdog")
+            WatchdogAlarmReceiver.scheduleImmediateWakeup(applicationContext)
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder? = null

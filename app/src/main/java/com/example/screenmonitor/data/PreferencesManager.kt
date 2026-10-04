@@ -21,7 +21,7 @@ class PreferencesManager(
         set(value) = prefs.edit().putBoolean(KEY_AUTO_CLEAN_ENABLED, value).apply()
 
     var isMonitoringActive: Boolean
-        get() = prefs.getBoolean(KEY_MONITORING_ACTIVE, false)
+        get() = prefs.getBoolean(KEY_MONITORING_ACTIVE, true)
         set(value) = prefs.edit().putBoolean(KEY_MONITORING_ACTIVE, value).apply()
 
     var wasMonitoringBeforeReboot: Boolean

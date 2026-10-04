@@ -87,6 +87,7 @@ class MainActivity : ComponentActivity() {
         if (preferencesManager.isAutoCleanEnabled && preferencesManager.retentionHours > 0) {
             screenshotRepository.cleanOldScreenshots(preferencesManager.retentionHours)
         }
+        requestIgnoreBatteryOptimizations()
 
         enableEdgeToEdge()
         window.setFlags(
@@ -149,14 +150,29 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         ScreenCaptureService.setAppInForeground(true)
         if (preferencesManager.isMonitoringActive && !ScreenCaptureService.isMonitoringFlow.value) {
-            preferencesManager.wasMonitoringBeforeReboot = true
-            securityLogManager.logEvent(
-                SecurityEventType.UNEXPECTED_SERVICE_STOP,
-                "توقف غير متوقع لخدمة المراقبة",
-                "تم رصد إيقاف الخدمة بواسطة نظام التشغيل (بسبب إعادة تشغيل الهاتف أو توفير الطاقة) أثناء وقت المراقبة النشطة."
-            )
-            preferencesManager.isMonitoringActive = false
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+                ScreenMonitorAccessibilityService.isServiceEnabled(this)
+            ) {
+                val serviceIntent = Intent(this, ScreenCaptureService::class.java).apply {
+                    action = ScreenCaptureService.ACTION_START
+                }
+                ContextCompat.startForegroundService(this, serviceIntent)
+            }
         }
+    }
+
+    private fun requestIgnoreBatteryOptimizations() {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val powerManager = getSystemService(Context.POWER_SERVICE) as? android.os.PowerManager
+                if (powerManager != null && !powerManager.isIgnoringBatteryOptimizations(packageName)) {
+                    val intent = Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                        data = android.net.Uri.parse("package:$packageName")
+                    }
+                    startActivity(intent)
+                }
+            }
+        } catch (_: Exception) {}
     }
 
     override fun onPause() {

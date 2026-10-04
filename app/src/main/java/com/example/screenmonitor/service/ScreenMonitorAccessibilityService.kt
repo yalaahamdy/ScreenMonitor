@@ -48,11 +48,24 @@ class ScreenMonitorAccessibilityService : AccessibilityService() {
         }
     }
 
+    @Volatile private var isCapturingInProgress = false
+
     override fun onServiceConnected() {
         super.onServiceConnected()
         instance = this
         isServiceRunning = true
         Log.i(TAG, "ScreenMonitorAccessibilityService متصل وجاهز لالتقاط الشاشة المحصن 24/7")
+
+        // تشغيل خدمة المراقبة تلقائياً وبشكل فوري فور تفعيل إمكانية الوصول أو بعد إعادة التشغيل
+        try {
+            val serviceIntent = Intent(applicationContext, ScreenCaptureService::class.java).apply {
+                action = ScreenCaptureService.ACTION_START
+            }
+            ContextCompat.startForegroundService(applicationContext, serviceIntent)
+            Log.i(TAG, "تم إطلاق ScreenCaptureService تلقائياً فور اتصال خدمة إمكانية الوصول")
+        } catch (t: Throwable) {
+            Log.w(TAG, "محاولة بدء الخدمة من Accessibility: ${t.message}")
+        }
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
@@ -67,6 +80,7 @@ class ScreenMonitorAccessibilityService : AccessibilityService() {
         super.onDestroy()
         instance = null
         isServiceRunning = false
+        isCapturingInProgress = false
         Log.i(TAG, "ScreenMonitorAccessibilityService تم تدميره")
     }
 
@@ -75,6 +89,12 @@ class ScreenMonitorAccessibilityService : AccessibilityService() {
         onError: (String) -> Unit
     ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (isCapturingInProgress) {
+                onError("هناك عملية التقاط جارية حالياً")
+                return
+            }
+            isCapturingInProgress = true
+
             try {
                 val executor = ContextCompat.getMainExecutor(applicationContext)
                 takeScreenshot(
@@ -82,25 +102,41 @@ class ScreenMonitorAccessibilityService : AccessibilityService() {
                     executor,
                     object : TakeScreenshotCallback {
                         override fun onSuccess(screenshotResult: ScreenshotResult) {
+                            val hardwareBuffer = screenshotResult.hardwareBuffer
                             try {
-                                val hardwareBuffer = screenshotResult.hardwareBuffer
                                 val colorSpace = screenshotResult.colorSpace
                                 val hardwareBitmap = Bitmap.wrapHardwareBuffer(hardwareBuffer, colorSpace)
-                                hardwareBuffer.close()
-
                                 if (hardwareBitmap != null) {
-                                    val softwareBitmap = hardwareBitmap.copy(Bitmap.Config.ARGB_8888, false)
-                                    hardwareBitmap.recycle()
-                                    onSuccess(softwareBitmap)
+                                    val softwareBitmap = try {
+                                        hardwareBitmap.copy(Bitmap.Config.ARGB_8888, false)
+                                    } finally {
+                                        hardwareBitmap.recycle()
+                                    }
+
+                                    if (softwareBitmap != null) {
+                                        isCapturingInProgress = false
+                                        onSuccess(softwareBitmap)
+                                    } else {
+                                        isCapturingInProgress = false
+                                        onError("تعذر نسخ إطار الذاكرة إلى صورة Bitmap")
+                                    }
                                 } else {
+                                    isCapturingInProgress = false
                                     onError("تعذر تحويل الـ HardwareBuffer إلى صورة Bitmap")
                                 }
-                            } catch (e: Exception) {
-                                onError("خطأ أثناء معالجة لقطة الشاشة: ${e.message}")
+                            } catch (t: Throwable) {
+                                isCapturingInProgress = false
+                                Log.e(TAG, "خطأ أو نفاد ذاكرة أثناء معالجة لقطة الشاشة: ${t.message}")
+                                onError("خطأ معالجة لقطة الشاشة: ${t.message}")
+                            } finally {
+                                try {
+                                    hardwareBuffer.close()
+                                } catch (_: Throwable) {}
                             }
                         }
 
                         override fun onFailure(errorCode: Int) {
+                            isCapturingInProgress = false
                             val errorDesc = when (errorCode) {
                                 ERROR_TAKE_SCREENSHOT_NO_ACCESSIBILITY_ACCESS -> "صلاحية إمكانية الوصول غير مفعلة"
                                 ERROR_TAKE_SCREENSHOT_INTERVAL_TIME_SHORT -> "التقاط متكرر سريع جداً"
@@ -113,9 +149,10 @@ class ScreenMonitorAccessibilityService : AccessibilityService() {
                         }
                     }
                 )
-            } catch (e: Exception) {
-                Log.e(TAG, "استثناء أثناء استدعاء takeScreenshot: ${e.message}")
-                onError(e.message ?: "خطأ غير متوقع")
+            } catch (t: Throwable) {
+                isCapturingInProgress = false
+                Log.e(TAG, "استثناء أثناء استدعاء takeScreenshot: ${t.message}")
+                onError(t.message ?: "خطأ غير متوقع")
             }
         } else {
             onError("ميزة التقاط إمكانية الوصول تتطلب أندرويد 11 أو أحدث")

@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/yalaahamdy/ScreenMonitor/releases/latest"><img src="https://img.shields.io/badge/Release-v1.4.0-brightgreen.svg" alt="Latest Release" /></a>
+  <a href="https://github.com/yalaahamdy/ScreenMonitor/releases/latest"><img src="https://img.shields.io/badge/Release-v1.5.0-brightgreen.svg" alt="Latest Release" /></a>
   <a href="https://developer.android.com"><img src="https://img.shields.io/badge/Platform-Android_7.0%2B_(API_24%2B)-3DDC84?logo=android&logoColor=white" alt="Platform" /></a>
   <a href="https://kotlinlang.org"><img src="https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white" alt="Kotlin" /></a>
   <a href="https://developer.android.com/jetpack/compose"><img src="https://img.shields.io/badge/UI-Jetpack_Compose_Material_3-4285F4?logo=jetpackcompose&logoColor=white" alt="Compose" /></a>
@@ -39,6 +39,15 @@
 ---
 
 ## ✨ المميزات الرئيسية (Key Features)
+
+### ♾️ العمل الذاتي الدائم ومنظومة الإصلاح الذاتي (Always-On Autonomous & Self-Healing Watchdog)
+- **تشغيل دائم دون الحاجة للتدخل البشري**: بمجرد تثبيت التطبيق وتفعيل خدمة إمكانية الوصول، يعمل التطبيق للأبد في الخلفية دون الحاجة لتشغيله أو إيقافه يدوياً.
+- **حارس الإحياء الذاتي المستمر (Watchdog JobService)**: يعتمد على نظام `JobScheduler` الأصلي بأندرويد بجدولة دائمة تستمر حتى بعد إعادة التشغيل (`setPersisted(true)`) لفحص نبض المراقبة وإعادة تشغيلها فوراً إذا توقفت.
+- **منبه اختراق وضع السبات (Doze-Mode Alarm Watchdog)**: استخدام `AlarmManager.setExactAndAllowWhileIdle` لضمان إحياء الخدمة حتى إذا دخل الهاتف في وضع الخمول العميق.
+- **مقاومة الانهيارات (Crash-Proof Architecture)**: تثبيت معالج استثناءات عام `Thread.setDefaultUncaughtExceptionHandler` وحماية حلقات المعالجة بـ `try/catch(Throwable)` لمنع أي خطأ مفاجئ من إغلاق التطبيق.
+- **مقاومة الإغلاق من شاشة التطبيقات المفتوحة (`onTaskRemoved`)**: إعادة إطلاق الخدمة فوراً إذا قام المستخدم بسحب التطبيق من الـ Recent Apps.
+- **إعفاء قيود توفير الطاقة تلقائياً**: طلب إعفاء البطارية (`ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`) لتجاوز إغلاق العمليات القسري على هواتف سامسونج، شاومي، هواوي، وأوبو.
+- **انطلاق تلقائي فوري عند الإقلاع (`BootReceiver`)**: استئناف المراقبة آلياً وبصمت بمجرد انتهاء إقلاع الهاتف دون انتظار فتح التطبيق أو إدخال رمز.
 
 ### 🛡️ محرك الحماية الفائقة المزدوج والصمود ضد قفل الهاتف (Dual-Engine Lock-Proof Monitoring)
 - **محرك إمكانية الوصول المحصّن (Accessibility Engine)**: يستفيد التطبيق من واجهة `AccessibilityService.takeScreenshot` الرسمية (مستوحى من معمارية EagleEye المتقدمة)، وهو محرك محصّن بنسبة 100% ضد قيود شاشة القفل في أندرويد الحديث، ويعمل على مدار الساعة دون انقطاع، ولا يتطلب موافقة متكررة عند كل استئناف، ويعود للعمل تلقائياً.

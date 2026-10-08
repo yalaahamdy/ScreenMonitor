@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ============================================================
+         ScreenGuard — five luxury dark themes.
+         Theme.ScreenGuard (base) = Midnight Prestige.
+         Each variant re-maps the sg_* tokens AND the Material 3
+         color roles, so widgets and custom drawables follow theme.
+         ============================================================ -->
+
+    <style name="Theme.ScreenGuard" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- sg tokens: Midnight Prestige -->
+        <item name="sgCanvas">@color/bg</item>
+        <item name="sgHeader">@color/header</item>
+        <item name="sgSurface">@color/surface</item>
+        <item name="sgSurfaceElev">@color/surface_elev</item>
+        <item name="sgSurfaceAlt">@color/surface_alt</item>
+        <item name="sgOutline">@color/outline</item>
+        <item name="sgOutlineStrong">@color/outline_strong</item>
+        <item name="sgDivider">@color/divider</item>
+        <item name="sgAccent">@color/gold</item>
+        <item name="sgAccentSoft">@color/gold_soft</item>
+        <item name="sgAccentDeep">@color/gold_deep</item>
+        <item name="sgOnAccent">@color/on_gold</item>
+        <item name="sgAccentContainer">@color/gold_container</item>
+        <item name="sgAccentHairline">@color/gold_hairline</item>
+        <item name="sgTextPrimary">@color/text_primary</item>
+        <item name="sgTextSecondary">@color/text_secondary</item>
+        <item name="sgTextTertiary">@color/text_tertiary</item>
+        <item name="sgKeyBg">@color/key_bg</item>
+
+        <!-- Material 3 color roles -->
+        <item name="colorPrimary">@color/gold</item>
+        <item name="colorOnPrimary">@color/on_gold</item>
+        <item name="colorPrimaryContainer">@color/gold_container</item>
+        <item name="colorOnPrimaryContainer">@color/gold_soft</item>
+        <item name="colorSecondary">@color/gold_soft</item>
+        <item name="colorOnSecondary">@color/on_gold</item>
+        <item name="colorSecondaryContainer">@color/gold_container</item>
+        <item name="colorOnSecondaryContainer">@color/gold_soft</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary</item>
+        <item name="colorOutline">@color/outline</item>
+        <item name="colorError">@color/danger</item>
+        <item name="android:colorBackground">@color/bg</item>
+        <item name="colorOnBackground">@color/text_primary</item>
+
+        <item name="android:statusBarColor">@color/bg</item>
+        <item name="android:navigationBarColor">@color/bg</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:windowBackground">@color/bg</item>
+
+        <item name="android:colorControlActivated">@color/gold</item>
+        <item name="android:colorControlNormal">@color/text_tertiary</item>
+        <item name="android:colorControlHighlight">#26D4B46A</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+
+        <item name="materialAlertDialogTheme">@style/ScreenGuard.Dialog</item>
+        <item name="switchStyle">@style/ScreenGuard.Switch</item>
+    </style>
+
+    <!-- ===================== Theme variants ===================== -->
+
+    <style name="Theme.ScreenGuard.MidnightPrestige">
+        <item name="android:colorControlHighlight">#26D4B46A</item>
+    </style>
+
+    <style name="Theme.ScreenGuard.EmeraldVault">
+        <item name="sgCanvas">@color/em_canvas</item>
+        <item name="sgHeader">@color/em_header</item>
+        <item name="sgSurface">@color/em_surface</item>
+        <item name="sgSurfaceElev">@color/em_surface_elev</item>
+        <item name="sgSurfaceAlt">@color/em_surface_alt</item>
+        <item name="sgOutline">@color/em_outline</item>
+        <item name="sgOutlineStrong">@color/em_outline_strong</item>
+        <item name="sgDivider">@color/em_divider</item>
+        <item name="sgAccent">@color/em_accent</item>
+        <item name="sgAccentSoft">@color/em_accent_soft</item>
+        <item name="sgAccentDeep">@color/em_accent_deep</item>
+        <item name="sgOnAccent">@color/em_on_accent</item>
+        <item name="sgAccentContainer">@color/em_accent_container</item>
+        <item name="sgAccentHairline">@color/em_accent_hairline</item>
+        <item name="sgTextPrimary">@color/em_text_primary</item>
+        <item name="sgTextSecondary">@color/em_text_secondary</item>
+        <item name="sgTextTertiary">@color/em_text_tertiary</item>
+        <item name="sgKeyBg">@color/em_key_bg</item>
+
+        <item name="colorPrimary">@color/em_accent</item>
+        <item name="colorOnPrimary">@color/em_on_accent</item>
+        <item name="colorPrimaryContainer">@color/em_accent_container</item>
+        <item name="colorOnPrimaryContainer">@color/em_accent_soft</item>
+        <item name="colorSecondary">@color/em_accent_soft</item>
+        <item name="colorOnSecondary">@color/em_on_accent</item>
+        <item name="colorSecondaryContainer">@color/em_accent_container</item>
+        <item name="colorOnSecondaryContainer">@color/em_accent_soft</item>
+        <item name="colorSurface">@color/em_surface</item>
+        <item name="colorOnSurface">@color/em_text_primary</item>
+        <item name="colorOnSurfaceVariant">@color/em_text_secondary</item>
+        <item name="colorOutline">@color/em_outline</item>
+        <item name="android:colorBackground">@color/em_canvas</item>
+        <item name="colorOnBackground">@color/em_text_primary</item>
+
+        <item name="android:statusBarColor">@color/em_canvas</item>
+        <item name="android:navigationBarColor">@color/em_canvas</item>
+        <item name="android:windowBackground">@color/em_canvas</item>
+
+        <item name="android:colorControlActivated">@color/em_accent</item>
+        <item name="android:colorControlNormal">@color/em_text_tertiary</item>
+        <item name="android:colorControlHighlight">#2646C79A</item>
+        <item name="android:textColor">@color/em_text_primary</item>
+        <item name="android:textColorSecondary">@color/em_text_secondary</item>
+    </style>
+
+    <style name="Theme.ScreenGuard.RoseAristocrat">
+        <item name="sgCanvas">@color/ra_canvas</item>
+        <item name="sgHeader">@color/ra_header</item>
+        <item name="sgSurface">@color/ra_surface</item>
+        <item name="sgSurfaceElev">@color/ra_surface_elev</item>
+        <item name="sgSurfaceAlt">@color/ra_surface_alt</item>
+        <item name="sgOutline">@color/ra_outline</item>
+        <item name="sgOutlineStrong">@color/ra_outline_strong</item>
+        <item name="sgDivider">@color/ra_divider</item>
+        <item name="sgAccent">@color/ra_accent</item>
+        <item name="sgAccentSoft">@color/ra_accent_soft</item>
+        <item name="sgAccentDeep">@color/ra_accent_deep</item>
+        <item name="sgOnAccent">@color/ra_on_accent</item>
+        <item name="sgAccentContainer">@color/ra_accent_container</item>
+        <item name="sgAccentHairline">@color/ra_accent_hairline</item>
+        <item name="sgTextPrimary">@color/ra_text_primary</item>
+        <item name="sgTextSecondary">@color/ra_text_secondary</item>
+        <item name="sgTextTertiary">@color/ra_text_tertiary</item>
+        <item name="sgKeyBg">@color/ra_key_bg</item>
+
+        <item name="colorPrimary">@color/ra_accent</item>
+        <item name="colorOnPrimary">@color/ra_on_accent</item>
+        <item name="colorPrimaryContainer">@color/ra_accent_container</item>
+        <item name="colorOnPrimaryContainer">@color/ra_accent_soft</item>
+        <item name="colorSecondary">@color/ra_accent_soft</item>
+        <item name="colorOnSecondary">@color/ra_on_accent</item>
+        <item name="colorSecondaryContainer">@color/ra_accent_container</item>
+        <item name="colorOnSecondaryContainer">@color/ra_accent_soft</item>
+        <item name="colorSurface">@color/ra_surface</item>
+        <item name="colorOnSurface">@color/ra_text_primary</item>
+        <item name="colorOnSurfaceVariant">@color/ra_text_secondary</item>
+        <item name="colorOutline">@color/ra_outline</item>
+        <item name="android:colorBackground">@color/ra_canvas</item>
+        <item name="colorOnBackground">@color/ra_text_primary</item>
+
+        <item name="android:statusBarColor">@color/ra_canvas</item>
+        <item name="android:navigationBarColor">@color/ra_canvas</item>
+        <item name="android:windowBackground">@color/ra_canvas</item>
+
+        <item name="android:colorControlActivated">@color/ra_accent</item>
+        <item name="android:colorControlNormal">@color/ra_text_tertiary</item>
+        <item name="android:colorControlHighlight">#26E2A78F</item>
+        <item name="android:textColor">@color/ra_text_primary</item>
+        <item name="android:textColorSecondary">@color/ra_text_secondary</item>
+    </style>
+
+    <style name="Theme.ScreenGuard.OnyxPlatinum">
+        <item name="sgCanvas">@color/op_canvas</item>
+        <item name="sgHeader">@color/op_header</item>
+        <item name="sgSurface">@color/op_surface</item>
+        <item name="sgSurfaceElev">@color/op_surface_elev</item>
+        <item name="sgSurfaceAlt">@color/op_surface_alt</item>
+        <item name="sgOutline">@color/op_outline</item>
+        <item name="sgOutlineStrong">@color/op_outline_strong</item>
+        <item name="sgDivider">@color/op_divider</item>
+        <item name="sgAccent">@color/op_accent</item>
+        <item name="sgAccentSoft">@color/op_accent_soft</item>
+        <item name="sgAccentDeep">@color/op_accent_deep</item>
+        <item name="sgOnAccent">@color/op_on_accent</item>
+        <item name="sgAccentContainer">@color/op_accent_container</item>
+        <item name="sgAccentHairline">@color/op_accent_hairline</item>
+        <item name="sgTextPrimary">@color/op_text_primary</item>
+        <item name="sgTextSecondary">@color/op_text_secondary</item>
+        <item name="sgTextTertiary">@color/op_text_tertiary</item>
+        <item name="sgKeyBg">@color/op_key_bg</item>
+
+        <item name="colorPrimary">@color/op_accent</item>
+        <item name="colorOnPrimary">@color/op_on_accent</item>
+        <item name="colorPrimaryContainer">@color/op_accent_container</item>
+        <item name="colorOnPrimaryContainer">@color/op_accent_soft</item>
+        <item name="colorSecondary">@color/op_accent_soft</item>
+        <item name="colorOnSecondary">@color/op_on_accent</item>
+        <item name="colorSecondaryContainer">@color/op_accent_container</item>
+        <item name="colorOnSecondaryContainer">@color/op_accent_soft</item>
+        <item name="colorSurface">@color/op_surface</item>
+        <item name="colorOnSurface">@color/op_text_primary</item>
+        <item name="colorOnSurfaceVariant">@color/op_text_secondary</item>
+        <item name="colorOutline">@color/op_outline</item>
+        <item name="android:colorBackground">@color/op_canvas</item>
+        <item name="colorOnBackground">@color/op_text_primary</item>
+
+        <item name="android:statusBarColor">@color/op_canvas</item>
+        <item name="android:navigationBarColor">@color/op_canvas</item>
+        <item name="android:windowBackground">@color/op_canvas</item>
+
+        <item name="android:colorControlActivated">@color/op_accent</item>
+        <item name="android:colorControlNormal">@color/op_text_tertiary</item>
+        <item name="android:colorControlHighlight">#26C6CCD8</item>
+        <item name="android:textColor">@color/op_text_primary</item>
+        <item name="android:textColorSecondary">@color/op_text_secondary</item>
+    </style>
+
+    <style name="Theme.ScreenGuard.SapphireCrown">
+        <item name="sgCanvas">@color/sc_canvas</item>
+        <item name="sgHeader">@color/sc_header</item>
+        <item name="sgSurface">@color/sc_surface</item>
+        <item name="sgSurfaceElev">@color/sc_surface_elev</item>
+        <item name="sgSurfaceAlt">@color/sc_surface_alt</item>
+        <item name="sgOutline">@color/sc_outline</item>
+        <item name="sgOutlineStrong">@color/sc_outline_strong</item>
+        <item name="sgDivider">@color/sc_divider</item>
+        <item name="sgAccent">@color/sc_accent</item>
+        <item name="sgAccentSoft">@color/sc_accent_soft</item>
+        <item name="sgAccentDeep">@color/sc_accent_deep</item>
+        <item name="sgOnAccent">@color/sc_on_accent</item>
+        <item name="sgAccentContainer">@color/sc_accent_container</item>
+        <item name="sgAccentHairline">@color/sc_accent_hairline</item>
+        <item name="sgTextPrimary">@color/sc_text_primary</item>
+        <item name="sgTextSecondary">@color/sc_text_secondary</item>
+        <item name="sgTextTertiary">@color/sc_text_tertiary</item>
+        <item name="sgKeyBg">@color/sc_key_bg</item>
+
+        <item name="colorPrimary">@color/sc_accent</item>
+        <item name="colorOnPrimary">@color/sc_on_accent</item>
+        <item name="colorPrimaryContainer">@color/sc_accent_container</item>
+        <item name="colorOnPrimaryContainer">@color/sc_accent_soft</item>
+        <item name="colorSecondary">@color/sc_accent_soft</item>
+        <item name="colorOnSecondary">@color/sc_on_accent</item>
+        <item name="colorSecondaryContainer">@color/sc_accent_container</item>
+        <item name="colorOnSecondaryContainer">@color/sc_accent_soft</item>
+        <item name="colorSurface">@color/sc_surface</item>
+        <item name="colorOnSurface">@color/sc_text_primary</item>
+        <item name="colorOnSurfaceVariant">@color/sc_text_secondary</item>
+        <item name="colorOutline">@color/sc_outline</item>
+        <item name="android:colorBackground">@color/sc_canvas</item>
+        <item name="colorOnBackground">@color/sc_text_primary</item>
+
+        <item name="android:statusBarColor">@color/sc_canvas</item>
+        <item name="android:navigationBarColor">@color/sc_canvas</item>
+        <item name="android:windowBackground">@color/sc_canvas</item>
+
+        <item name="android:colorControlActivated">@color/sc_accent</item>
+        <item name="android:colorControlNormal">@color/sc_text_tertiary</item>
+        <item name="android:colorControlHighlight">#267BA7E8</item>
+        <item name="android:textColor">@color/sc_text_primary</item>
+        <item name="android:textColorSecondary">@color/sc_text_secondary</item>
+    </style>
+
+    <!-- Immersive viewer: pure black chrome regardless of palette -->
+    <style name="Theme.ScreenGuard.Viewer">
+        <item name="android:statusBarColor">@color/viewer_bg</item>
+        <item name="android:navigationBarColor">@color/viewer_bg</item>
+        <item name="android:windowBackground">@color/viewer_bg</item>
+    </style>
+
+    <!-- Dialogs: themed surface, accent controls -->
+    <style name="ScreenGuard.Dialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorPrimary">?attr/sgAccent</item>
+        <item name="colorSurface">?attr/sgSurface</item>
+        <item name="colorOnSurface">?attr/sgTextPrimary</item>
+        <item name="colorOnSurfaceVariant">?attr/sgTextSecondary</item>
+        <item name="alertDialogStyle">@style/ScreenGuard.Dialog.Style</item>
+    </style>
+
+    <style name="ScreenGuard.Dialog.Style" parent="MaterialAlertDialog.Material3">
+        <item name="shapeAppearanceOverlay">@style/ScreenGuard.Dialog.Shape</item>
+        <item name="android:background">?attr/sgSurface</item>
+    </style>
+
+    <style name="ScreenGuard.Dialog.Shape" parent="ShapeAppearance.Material3.Corner.ExtraLarge">
+        <item name="cornerSize">24dp</item>
+    </style>
+
+    <style name="ScreenGuard.Switch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+        <item name="trackTint">@null</item>
+        <item name="thumbTint">@null</item>
+    </style>
+
+    <!-- ===================== Shared text styles ===================== -->
+
+    <!-- Uppercase accent section labels -->
+    <style name="SectionHeader">
+        <item name="android:textSize">11sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0.14</item>
+        <item name="android:textColor">?attr/sgAccent</item>
+    </style>
+
+    <style name="RowTitle">
+        <item name="android:textSize">15sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">?attr/sgTextPrimary</item>
+    </style>
+
+    <style name="RowSubtitle">
+        <item name="android:textSize">12.5sp</item>
+        <item name="android:textColor">?attr/sgTextSecondary</item>
+        <item name="android:lineSpacingExtra">2dp</item>
+    </style>
+
+    <!-- Serif display numeral -->
+    <style name="DisplayNumber">
+        <item name="android:textSize">40sp</item>
+        <item name="android:fontFamily">serif</item>
+        <item name="android:textColor">?attr/sgAccentSoft</item>
+    </style>
+
+    <!-- Serif screen titles -->
+    <style name="SerifTitle">
+        <item name="android:fontFamily">serif</item>
+        <item name="android:textColor">?attr/sgTextPrimary</item>
+    </style>
+
+    <!-- ===================== Buttons ===================== -->
+
+    <!-- Accent filled primary action -->
+    <style name="AppButton" parent="Widget.Material3.Button">
+        <item name="backgroundTint">?attr/sgAccent</item>
+        <item name="android:textColor">?attr/sgOnAccent</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:letterSpacing">0.06</item>
+        <item name="rippleColor">#33211907</item>
+    </style>
+
+    <!-- Elevated tonal action with accent hairline -->
+    <style name="AppTonalButton" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="backgroundTint">?attr/sgSurfaceElev</item>
+        <item name="android:textColor">?attr/sgAccentSoft</item>
+        <item name="strokeColor">?attr/sgAccentHairline</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="cornerRadius">14dp</item>
+        <item name="android:textSize">12.5sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:letterSpacing">0.04</item>
+    </style>
+
+    <!-- Keypad digit: dark coin with hairline -->
+    <style name="KeypadDigit" parent="Widget.Material3.Button">
+        <item name="backgroundTint">?attr/sgKeyBg</item>
+        <item name="android:textColor">?attr/sgTextPrimary</item>
+        <item name="android:textSize">23sp</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="cornerRadius">40dp</item>
+        <item name="strokeColor">?attr/sgOutlineStrong</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="rippleColor">#26D4B46A</item>
+        <item name="android:insetTop">4dp</item>
+        <item name="android:insetBottom">4dp</item>
+    </style>
+
+    <style name="KeypadIcon" parent="Widget.Material3.Button.IconButton">
+        <item name="backgroundTint">?attr/sgKeyBg</item>
+        <item name="iconTint">?attr/sgTextSecondary</item>
+        <item name="strokeColor">?attr/sgOutlineStrong</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="cornerRadius">40dp</item>
+        <item name="android:insetTop">4dp</item>
+        <item name="android:insetBottom">4dp</item>
+    </style>
+</resources>

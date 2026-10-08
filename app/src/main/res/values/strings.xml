@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ScreenGuard</string>
+
+    <!-- Notification / service -->
+    <string name="notif_title">Screen monitoring is active</string>
+    <string name="notif_text">ScreenGuard transparently protects this device</string>
+    <string name="accessibility_description">ScreenGuard takes periodic screenshots and captures newly opened apps so parents stay informed. Monitoring is always announced by a persistent notification and cannot be silenced without uninstalling the app.</string>
+    <string name="toast_captured">Screen captured</string>
+    <string name="admin_enabled_toast">Device admin enabled — uninstall is now blocked</string>
+    <string name="admin_disabled_toast">Device admin disabled</string>
+    <string name="admin_explanation">Device admin protection prevents ScreenGuard from being uninstalled without parental consent.</string>
+
+    <!-- Setup wizard -->
+    <string name="wizard_title">ScreenGuard</string>
+    <string name="wizard_subtitle">Transparent parental protection for this device</string>
+    <string name="step_notif_title">Notifications</string>
+    <string name="step_notif_desc">Allow ScreenGuard to show the permanent monitoring notice</string>
+    <string name="step_pin_title">Parental PIN</string>
+    <string name="step_pin_desc">Protects the gallery and settings with a 4-digit code</string>
+    <string name="step_acc_title">Accessibility Service</string>
+    <string name="step_acc_desc">Required to capture the screen securely</string>
+    <string name="step_admin_title">Device Admin</string>
+    <string name="step_admin_desc">Prevents the app from being uninstalled without consent</string>
+    <string name="step_battery_title">Battery Exemption</string>
+    <string name="step_battery_desc">Lets monitoring survive aggressive battery saving</string>
+    <string name="badge_done">DONE</string>
+    <string name="badge_pending">PENDING</string>
+    <string name="btn_set_up">Set Up</string>
+    <string name="btn_grant">Grant</string>
+    <string name="btn_open">Open</string>
+    <string name="wizard_finish">Finish Setup</string>
+    <string name="wizard_finish_hint">Everything can be adjusted later in Settings</string>
+    <string name="dialog_set_pin_title">Set Parental PIN</string>
+    <string name="et_pin_hint">4-digit PIN</string>
+    <string name="et_confirm_hint">Confirm PIN</string>
+    <string name="act_save">Save</string>
+    <string name="act_cancel">Cancel</string>
+    <string name="err_pin_length">PIN must be 4 digits</string>
+    <string name="err_pin_mismatch">PINs do not match</string>
+    <string name="pin_saved">Parental PIN saved</string>
+
+    <!-- Dashboard -->
+    <string name="dash_state_active">MONITORING</string>
+    <string name="dash_state_inactive">INACTIVE</string>
+    <string name="stat_label">SCREENSHOTS CAPTURED</string>
+    <string name="last_label">LAST CAPTURE</string>
+    <string name="never">Never</string>
+    <string name="just_now">Just now</string>
+    <string name="minutes_ago">%1$d min ago</string>
+    <string name="hours_ago">%1$d h ago</string>
+    <string name="days_ago">%1$d d ago</string>
+    <string name="key_title">Protection Status</string>
+    <string name="key_sub_all">All shields are up — monitoring is fully protected</string>
+    <string name="key_sub_partial">%1$d of 3 protections are active — complete setup</string>
+    <string name="section_protection">PROTECTION</string>
+    <string name="section_library">LIBRARY</string>
+    <string name="row_acc_title">Accessibility Service</string>
+    <string name="row_acc_sub">Captures the screen automatically</string>
+    <string name="row_admin_title">Device Admin</string>
+    <string name="row_admin_sub">Blocks uninstallation without consent</string>
+    <string name="row_battery_title">Battery Exemption</string>
+    <string name="row_battery_sub">Keeps monitoring alive at all times</string>
+    <string name="row_gallery_title">Screenshot Gallery</string>
+    <string name="row_gallery_sub">%1$d captures stored</string>
+    <string name="row_settings_title">Settings</string>
+    <string name="row_settings_sub">Intervals, storage and security</string>
+    <string name="btn_lock_now">Lock Screen Now</string>
+    <string name="lock_confirm_title">Lock Screen Now?</string>
+    <string name="lock_confirm_text">The device will lock immediately.</string>
+    <string name="act_lock">Lock</string>
+
+    <!-- PIN lock -->
+    <string name="pin_subtitle">Enter your parental PIN</string>
+    <string name="pin_error">Wrong PIN — try again</string>
+    <string name="pin_footer">Parental monitoring is active on this device</string>
+    <string name="key_backspace_desc">Delete last digit</string>
+
+    <!-- Gallery -->
+    <string name="gallery_title">Gallery</string>
+    <string name="gallery_count">%1$d</string>
+    <string name="menu_delete_all">Delete all</string>
+    <string name="btn_delete_all">Delete All</string>
+    <string name="delete_confirm_title">Delete All Captures?</string>
+    <string name="delete_confirm_text">All %1$d captures will be permanently removed.</string>
+    <string name="act_delete">Delete</string>
+    <string name="deleted_toast">%1$d captures deleted</string>
+    <string name="gallery_empty_title">No screenshots yet</string>
+    <string name="gallery_empty_sub">Captures will appear here once monitoring starts</string>
+
+    <!-- Viewer -->
+    <string name="viewer_position">%1$d / %2$d</string>
+    <string name="viewer_deleted">Capture deleted</string>
+    <string name="viewer_back_desc">Back to gallery</string>
+    <string name="viewer_delete_desc">Delete this capture</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="section_capture">CAPTURE BEHAVIOR</string>
+    <string name="section_storage">STORAGE</string>
+    <string name="section_security">SECURITY</string>
+    <string name="section_about">ABOUT</string>
+    <string name="capture_interval_label">Capture interval</string>
+    <string name="capture_interval_sub">Minutes between automatic captures</string>
+    <string name="unit_minutes">minutes</string>
+    <string name="et_interval_hint">e.g. 5</string>
+    <string name="rb_5">5 min</string>
+    <string name="rb_10">10 min</string>
+    <string name="rb_15">15 min</string>
+    <string name="rb_30">30 min</string>
+    <string name="sw_app_open">Capture on app open</string>
+    <string name="sw_app_open_sub">Snap every newly opened app</string>
+    <string name="sw_toast">Capture toast</string>
+    <string name="sw_toast_sub">Brief notice when a capture is taken</string>
+    <string name="max_label">Maximum stored captures</string>
+    <string name="max_sub">Oldest captures are removed automatically</string>
+    <string name="unit_captures">captures</string>
+    <string name="et_max_hint">e.g. 200</string>
+    <string name="row_change_pin_title">Change PIN</string>
+    <string name="row_change_pin_sub">Requires your current PIN</string>
+    <string name="about_version">Version</string>
+    <string name="dialog_change_pin_title">Change PIN</string>
+    <string name="et_current_hint">Current PIN</string>
+    <string name="et_new_hint">New PIN</string>
+    <string name="et_confirm_new_hint">Confirm new PIN</string>
+    <string name="err_current_pin">Current PIN is incorrect</string>
+    <string name="pin_changed">PIN changed successfully</string>
+
+    <!-- Appearance -->
+    <string name="section_appearance">APPEARANCE</string>
+    <string name="theme_midnight">Midnight Prestige</string>
+    <string name="theme_midnight_sub">Champagne gold over midnight navy</string>
+    <string name="theme_emerald">Emerald Vault</string>
+    <string name="theme_emerald_sub">Royal emerald with soft golden veils</string>
+    <string name="theme_rose">Rose Aristocrat</string>
+    <string name="theme_rose_sub">Rose gold on bordeaux velvet</string>
+    <string name="theme_onyx">Onyx Platinum</string>
+    <string name="theme_onyx_sub">Polished platinum over black onyx</string>
+    <string name="theme_sapphire">Sapphire Crown</string>
+    <string name="theme_sapphire_sub">Ice sapphire on deep royal blue</string>
+
+    <!-- Language -->
+    <string name="section_language">LANGUAGE</string>
+    <string name="lang_system">System default</string>
+    <string name="lang_english">English</string>
+    <string name="lang_arabic">العربية</string>
+
+    <!-- Diagnostics (localized labels) -->
+    <string name="diag_status">STATUS</string>
+    <string name="diag_library">LIBRARY</string>
+    <string name="diag_system">SYSTEM</string>
+    <string name="diag_accessibility">Accessibility service</string>
+    <string name="diag_device_admin">Device admin</string>
+    <string name="diag_battery">Battery exemption</string>
+    <string name="diag_active">ACTIVE</string>
+    <string name="diag_off">OFF</string>
+    <string name="diag_granted">GRANTED</string>
+    <string name="diag_missing">MISSING</string>
+    <string name="diag_captures">Captures stored</string>
+    <string name="diag_disk">Disk used</string>
+    <string name="diag_folder">Storage folder</string>
+    <string name="diag_last">Last capture</string>
+    <string name="diag_app_version">App version</string>
+    <string name="diag_android">Android</string>
+</resources>

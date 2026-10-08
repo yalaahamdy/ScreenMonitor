@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ============================================================
+         ScreenGuard theme attributes — every theme-dependent color
+         is declared here and resolved at inflation time, so the
+         five luxury palettes can be swapped at runtime.
+         ============================================================ -->
+    <attr name="sgCanvas" format="color" />
+    <attr name="sgHeader" format="color" />
+    <attr name="sgSurface" format="color" />
+    <attr name="sgSurfaceElev" format="color" />
+    <attr name="sgSurfaceAlt" format="color" />
+    <attr name="sgOutline" format="color" />
+    <attr name="sgOutlineStrong" format="color" />
+    <attr name="sgDivider" format="color" />
+
+    <attr name="sgAccent" format="color" />
+    <attr name="sgAccentSoft" format="color" />
+    <attr name="sgAccentDeep" format="color" />
+    <attr name="sgOnAccent" format="color" />
+    <attr name="sgAccentContainer" format="color" />
+    <attr name="sgAccentHairline" format="color" />
+
+    <attr name="sgTextPrimary" format="color" />
+    <attr name="sgTextSecondary" format="color" />
+    <attr name="sgTextTertiary" format="color" />
+
+    <attr name="sgKeyBg" format="color" />
+</resources>

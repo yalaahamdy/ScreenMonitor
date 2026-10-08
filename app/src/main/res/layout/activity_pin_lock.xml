@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/sgCanvas">
+
+    <!-- Crest + title block -->
+    <LinearLayout
+        android:id="@+id/pinHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/keypadBlock"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed">
+
+        <FrameLayout
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:background="@drawable/bg_glass_circle">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/ic_shield" />
+        </FrameLayout>
+
+        <TextView
+            style="@style/SerifTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:textSize="22sp"
+            android:text="@string/app_name" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:textSize="13sp"
+            android:textColor="?attr/sgTextSecondary"
+            android:text="@string/pin_subtitle" />
+
+        <com.screenguard.app.PinDotsView
+            android:id="@+id/pinDots"
+            android:layout_width="170dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="26dp" />
+
+        <TextView
+            android:id="@+id/tvError"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textSize="13sp"
+            android:textColor="@color/danger"
+            android:visibility="invisible"
+            android:text="@string/pin_error" />
+    </LinearLayout>
+
+    <!-- Keypad -->
+    <LinearLayout
+        android:id="@+id/keypadBlock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/tvFooter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pinHeader"
+        app:layout_constraintVertical_bias="0.62">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button android:id="@+id/key1" style="@style/KeypadDigit" android:layout_width="76dp" android:layout_height="58dp" android:layout_margin="7dp" android:text="1" />
+            <Button android:id="@+id/key2" style="@style/KeypadDigit" android:layout_width="76dp" android:layout_height="58dp" android:layout_margin="7dp" android:text="2" />
+            <Button android:id="@+id/key3" style="@style/KeypadDigit" android:layout_width="76dp" android:layout_height="58dp" android:layout_margin="7dp" android:text="3" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button android:id="@+id/key4" style="@style/KeypadDigit" android:layout_width="76dp" android:layout_height="58dp" android:layout_margin="7dp" android:text="4" />
+            <Button android:id="@+id/key5" style="@style/KeypadDigit" android:layout_width="76dp" android:layout_height="58dp" android:layout_margin="7dp" android:text="5" />
+            <Button android:id="@+id/key6" style="@style/KeypadDigit" android:layout_width="76dp" android:layout_height="58dp" android:layout_margin="7dp" android:text="6" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button android:id="@+id/key7" style="@style/KeypadDigit" android:layout_width="76dp" android:layout_height="58dp" android:layout_margin="7dp" android:text="7" />
+            <Button android:id="@+id/key8" style="@style/KeypadDigit" android:layout_width="76dp" android:layout_height="58dp" android:layout_margin="7dp" android:text="8" />
+            <Button android:id="@+id/key9" style="@style/KeypadDigit" android:layout_width="76dp" android:layout_height="58dp" android:layout_margin="7dp" android:text="9" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Space
+                android:layout_width="76dp"
+                android:layout_height="58dp"
+                android:layout_margin="7dp" />
+
+            <Button android:id="@+id/key0" style="@style/KeypadDigit" android:layout_width="76dp" android:layout_height="58dp" android:layout_margin="7dp" android:text="0" />
+
+            <ImageButton
+                android:id="@+id/keyBackspace"
+                style="@style/KeypadIcon"
+                android:layout_width="76dp"
+                android:layout_height="58dp"
+                android:layout_margin="7dp"
+                android:contentDescription="@string/key_backspace_desc"
+                android:src="@drawable/ic_backspace" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvFooter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="26dp"
+        android:textSize="11sp"
+        android:textColor="?attr/sgTextTertiary"
+        android:text="@string/pin_footer"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

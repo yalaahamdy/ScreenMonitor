@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ============================================================
+         ScreenGuard — five permanent-dark luxury palettes.
+         Every palette exposes the SAME token set; themes map the
+         tokens to sg_* attributes. Shared semantics stay neutral.
+         ============================================================ -->
+
+    <!-- ========== Palette 1 · Midnight Prestige (default) ========== -->
+    <color name="bg">#0A0E18</color>
+    <color name="header">#0D1424</color>
+    <color name="surface">#121A2C</color>
+    <color name="surface_elev">#18233B</color>
+    <color name="surface_alt">#0F1626</color>
+    <color name="outline">#232F49</color>
+    <color name="outline_strong">#324268</color>
+    <color name="divider">#1D2740</color>
+    <color name="gold">#D4B46A</color>
+    <color name="gold_soft">#E9D8AC</color>
+    <color name="gold_deep">#8F7440</color>
+    <color name="on_gold">#211907</color>
+    <color name="gold_container">#2A2312</color>
+    <color name="gold_hairline">#808F7440</color>
+    <color name="text_primary">#F1EDE2</color>
+    <color name="text_secondary">#9AA6BF</color>
+    <color name="text_tertiary">#6B7893</color>
+    <color name="key_bg">#151D31</color>
+
+    <!-- ========== Palette 2 · Emerald Vault ========== -->
+    <color name="em_canvas">#06120E</color>
+    <color name="em_header">#081914</color>
+    <color name="em_surface">#0D211B</color>
+    <color name="em_surface_elev">#122B23</color>
+    <color name="em_surface_alt">#0A1A15</color>
+    <color name="em_outline">#1E3A30</color>
+    <color name="em_outline_strong">#2B5346</color>
+    <color name="em_divider">#193028</color>
+    <color name="em_accent">#46C79A</color>
+    <color name="em_accent_soft">#BEE8D6</color>
+    <color name="em_accent_deep">#2C7A5D</color>
+    <color name="em_on_accent">#06231A</color>
+    <color name="em_accent_container">#122B20</color>
+    <color name="em_accent_hairline">#802C7A5D</color>
+    <color name="em_text_primary">#EDF3EF</color>
+    <color name="em_text_secondary">#97B5A8</color>
+    <color name="em_text_tertiary">#648275</color>
+    <color name="em_key_bg">#10241E</color>
+
+    <!-- ========== Palette 3 · Rose Aristocrat ========== -->
+    <color name="ra_canvas">#150910</color>
+    <color name="ra_header">#1B0C15</color>
+    <color name="ra_surface">#211019</color>
+    <color name="ra_surface_elev">#2B1622</color>
+    <color name="ra_surface_alt">#1A0D14</color>
+    <color name="ra_outline">#3A2230</color>
+    <color name="ra_outline_strong">#543449</color>
+    <color name="ra_divider">#301D28</color>
+    <color name="ra_accent">#E2A78F</color>
+    <color name="ra_accent_soft">#F7DCCB</color>
+    <color name="ra_accent_deep">#96604B</color>
+    <color name="ra_on_accent">#2A140C</color>
+    <color name="ra_accent_container">#2E1B13</color>
+    <color name="ra_accent_hairline">#8096604B</color>
+    <color name="ra_text_primary">#F5EEE9</color>
+    <color name="ra_text_secondary">#BCA5A2</color>
+    <color name="ra_text_tertiary">#8A726F</color>
+    <color name="ra_key_bg">#251219</color>
+
+    <!-- ========== Palette 4 · Onyx Platinum ========== -->
+    <color name="op_canvas">#09090B</color>
+    <color name="op_header">#0D0D10</color>
+    <color name="op_surface">#141419</color>
+    <color name="op_surface_elev">#1B1B21</color>
+    <color name="op_surface_alt">#101014</color>
+    <color name="op_outline">#26262E</color>
+    <color name="op_outline_strong">#393944</color>
+    <color name="op_divider">#1F1F26</color>
+    <color name="op_accent">#C6CCD8</color>
+    <color name="op_accent_soft">#EDF0F5</color>
+    <color name="op_accent_deep">#6E7686</color>
+    <color name="op_on_accent">#12151C</color>
+    <color name="op_accent_container">#1D2129</color>
+    <color name="op_accent_hairline">#806E7686</color>
+    <color name="op_text_primary">#F0F1F4</color>
+    <color name="op_text_secondary">#A3A7B1</color>
+    <color name="op_text_tertiary">#71757F</color>
+    <color name="op_key_bg">#17171D</color>
+
+    <!-- ========== Palette 5 · Sapphire Crown ========== -->
+    <color name="sc_canvas">#070E1F</color>
+    <color name="sc_header">#0A1228</color>
+    <color name="sc_surface">#0E1832</color>
+    <color name="sc_surface_elev">#132042</color>
+    <color name="sc_surface_alt">#0B1429</color>
+    <color name="sc_outline">#1E2E55</color>
+    <color name="sc_outline_strong">#2C4478</color>
+    <color name="sc_divider">#182646</color>
+    <color name="sc_accent">#7BA7E8</color>
+    <color name="sc_accent_soft">#C8DCF7</color>
+    <color name="sc_accent_deep">#416CA6</color>
+    <color name="sc_on_accent">#081426</color>
+    <color name="sc_accent_container">#14203C</color>
+    <color name="sc_accent_hairline">#80416CA6</color>
+    <color name="sc_text_primary">#EEF2F9</color>
+    <color name="sc_text_secondary">#9BAAC4</color>
+    <color name="sc_text_tertiary">#68778F</color>
+    <color name="sc_key_bg">#101B36</color>
+
+    <!-- ========== Shared semantics (quiet, work on every canvas) ========== -->
+    <color name="success_text">#7FD6A4</color>
+    <color name="success_container">#132A1F</color>
+    <color name="danger">#F0938C</color>
+    <color name="danger_container">#331B1C</color>
+
+    <!-- Security chrome / immersive -->
+    <color name="glass">#26FFFFFF</color>
+    <color name="viewer_bg">#000000</color>
+    <color name="header_chip">#29FFFFFF</color>
+    <color name="header_icon_circle">#29FFFFFF</color>
+</resources>

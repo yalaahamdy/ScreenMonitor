@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Flat brand header (light) / quiet surface header (dark). No gradients. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="?attr/sgHeader" />
+    <corners android:bottomLeftRadius="26dp" android:bottomRightRadius="26dp" />
+</shape>

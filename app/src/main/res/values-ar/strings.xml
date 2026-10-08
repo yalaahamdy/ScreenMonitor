@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ScreenGuard</string>
+
+    <!-- Notification / service -->
+    <string name="notif_title">مراقبة الشاشة نشطة</string>
+    <string name="notif_text">يحمي ScreenGuard هذا الجهاز بشفافية</string>
+    <string name="accessibility_description">يلتقط ScreenGuard لقطات شاشة دورية ويصوّر التطبيقات المفتوحة حديثاً ليبقى الوالدان على اطّلاع. تُعلَن المراقبة دائماً من خلال إشعار دائم ولا يمكن كتمها دون إلغاء تثبيت التطبيق.</string>
+    <string name="toast_captured">تم التقاط الشاشة</string>
+    <string name="admin_enabled_toast">تم تفعيل حماية مسؤول الجهاز — أصبح إلغاء التثبيت محظوراً</string>
+    <string name="admin_disabled_toast">تم تعطيل مسؤول الجهاز</string>
+    <string name="admin_explanation">تمنع حماية مسؤول الجهاز إلغاء تثبيت ScreenGuard دون موافقة الوالدين.</string>
+
+    <!-- Setup wizard -->
+    <string name="wizard_title">ScreenGuard</string>
+    <string name="wizard_subtitle">حماية أبوية شفافة لهذا الجهاز</string>
+    <string name="step_notif_title">الإشعارات</string>
+    <string name="step_notif_desc">اسمح لـ ScreenGuard بإظهار إشعار المراقبة الدائم</string>
+    <string name="step_pin_title">الرمز السري للوالدين</string>
+    <string name="step_pin_desc">يحمي المعرض والإعدادات برمز من 4 أرقام</string>
+    <string name="step_acc_title">خدمة إمكانية الوصول</string>
+    <string name="step_acc_desc">مطلوبة لالتقاط الشاشة بأمان</string>
+    <string name="step_admin_title">مسؤول الجهاز</string>
+    <string name="step_admin_desc">يمنع إلغاء تثبيت التطبيق دون موافقة</string>
+    <string name="step_battery_title">استثناء البطارية</string>
+    <string name="step_battery_desc">يتيح للمراقبة الاستمرار رغم تدابير توفير الطاقة</string>
+    <string name="badge_done">تم</string>
+    <string name="badge_pending">معلّق</string>
+    <string name="btn_set_up">إعداد</string>
+    <string name="btn_grant">منح</string>
+    <string name="btn_open">فتح</string>
+    <string name="wizard_finish">إتمام الإعداد</string>
+    <string name="wizard_finish_hint">يمكن تعديل كل شيء لاحقاً من الإعدادات</string>
+    <string name="dialog_set_pin_title">تعيين الرمز السري للوالدين</string>
+    <string name="et_pin_hint">رمز من 4 أرقام</string>
+    <string name="et_confirm_hint">تأكيد الرمز</string>
+    <string name="act_save">حفظ</string>
+    <string name="act_cancel">إلغاء</string>
+    <string name="err_pin_length">يجب أن يتكوّن الرمز من 4 أرقام</string>
+    <string name="err_pin_mismatch">الرمزان غير متطابقين</string>
+    <string name="pin_saved">تم حفظ الرمز السري للوالدين</string>
+
+    <!-- Dashboard -->
+    <string name="dash_state_active">مراقبة جارية</string>
+    <string name="dash_state_inactive">متوقفة</string>
+    <string name="stat_label">لقطات الشاشة الملتقطة</string>
+    <string name="last_label">آخر لقطة</string>
+    <string name="never">أبداً</string>
+    <string name="just_now">الآن</string>
+    <string name="minutes_ago">قبل %1$d دقيقة</string>
+    <string name="hours_ago">قبل %1$d ساعة</string>
+    <string name="days_ago">قبل %1$d يوم</string>
+    <string name="key_title">حالة الحماية</string>
+    <string name="key_sub_all">جميع الدروع مرفوعة — المراقبة محمية بالكامل</string>
+    <string name="key_sub_partial">%1$d من 3 حمايات نشطة — أكمل الإعداد</string>
+    <string name="section_protection">الحماية</string>
+    <string name="section_library">المكتبة</string>
+    <string name="row_acc_title">خدمة إمكانية الوصول</string>
+    <string name="row_acc_sub">تلتقط الشاشة تلقائياً</string>
+    <string name="row_admin_title">مسؤول الجهاز</string>
+    <string name="row_admin_sub">يمنع إلغاء التثبيت دون موافقة</string>
+    <string name="row_battery_title">استثناء البطارية</string>
+    <string name="row_battery_sub">يُبقي المراقبة فعّالة في كل الأوقات</string>
+    <string name="row_gallery_title">معرض لقطات الشاشة</string>
+    <string name="row_gallery_sub">%1$d لقطة محفوظة</string>
+    <string name="row_settings_title">الإعدادات</string>
+    <string name="row_settings_sub">الفترات والتخزين والأمان</string>
+    <string name="btn_lock_now">قفل الشاشة الآن</string>
+    <string name="lock_confirm_title">قفل الشاشة الآن؟</string>
+    <string name="lock_confirm_text">سيُقفل الجهاز فوراً.</string>
+    <string name="act_lock">قفل</string>
+
+    <!-- PIN lock -->
+    <string name="pin_subtitle">أدخل الرمز السري للوالدين</string>
+    <string name="pin_error">رمز خاطئ — حاول مجدداً</string>
+    <string name="pin_footer">مراقبة الوالدين نشطة على هذا الجهاز</string>
+    <string name="key_backspace_desc">حذف الرقم الأخير</string>
+
+    <!-- Gallery -->
+    <string name="gallery_title">المعرض</string>
+    <string name="gallery_count">%1$d</string>
+    <string name="menu_delete_all">حذف الكل</string>
+    <string name="btn_delete_all">حذف الكل</string>
+    <string name="delete_confirm_title">حذف كل اللقطات؟</string>
+    <string name="delete_confirm_text">ستُحذف جميع اللقطات (%1$d) نهائياً.</string>
+    <string name="act_delete">حذف</string>
+    <string name="deleted_toast">تم حذف %1$d لقطة</string>
+    <string name="gallery_empty_title">لا لقطات بعد</string>
+    <string name="gallery_empty_sub">ستظهر اللقطات هنا بمجرد بدء المراقبة</string>
+
+    <!-- Viewer -->
+    <string name="viewer_position">%1$d / %2$d</string>
+    <string name="viewer_deleted">تم حذف اللقطة</string>
+    <string name="viewer_back_desc">عودة إلى المعرض</string>
+    <string name="viewer_delete_desc">حذف هذه اللقطة</string>
+
+    <!-- Settings -->
+    <string name="settings_title">الإعدادات</string>
+    <string name="section_capture">سلوك الالتقاط</string>
+    <string name="section_storage">التخزين</string>
+    <string name="section_security">الأمان</string>
+    <string name="section_about">حول التطبيق</string>
+    <string name="capture_interval_label">فترة الالتقاط</string>
+    <string name="capture_interval_sub">الوقت بالدقائق بين كل لقطة شاشة تلقائية</string>
+    <string name="unit_minutes">دقيقة</string>
+    <string name="et_interval_hint">مثال: 5</string>
+    <string name="rb_5">5 دقائق</string>
+    <string name="rb_10">10 دقائق</string>
+    <string name="rb_15">15 دقيقة</string>
+    <string name="rb_30">30 دقيقة</string>
+    <string name="sw_app_open">التقاط عند فتح تطبيق</string>
+    <string name="sw_app_open_sub">التقط كل تطبيق يُفتح حديثاً</string>
+    <string name="sw_toast">تنبيه الالتقاط</string>
+    <string name="sw_toast_sub">إشعار موجز عند كل لقطة</string>
+    <string name="max_label">الحد الأقصى للقطات المحفوظة</string>
+    <string name="max_sub">تُحذف أقدم اللقطات تلقائياً</string>
+    <string name="unit_captures">صورة</string>
+    <string name="et_max_hint">مثال: 200</string>
+    <string name="row_change_pin_title">تغيير الرمز السري</string>
+    <string name="row_change_pin_sub">يتطلب رمزك الحالي</string>
+    <string name="about_version">الإصدار</string>
+    <string name="dialog_change_pin_title">تغيير الرمز السري</string>
+    <string name="et_current_hint">الرمز الحالي</string>
+    <string name="et_new_hint">الرمز الجديد</string>
+    <string name="et_confirm_new_hint">تأكيد الرمز الجديد</string>
+    <string name="err_current_pin">الرمز الحالي غير صحيح</string>
+    <string name="pin_changed">تم تغيير الرمز بنجاح</string>
+
+    <!-- Appearance -->
+    <string name="section_appearance">المظهر</string>
+    <string name="theme_midnight">Midnight Prestige</string>
+    <string name="theme_midnight_sub">ذهبي شامبانيا على كحلي منتصف الليل</string>
+    <string name="theme_emerald">Emerald Vault</string>
+    <string name="theme_emerald_sub">زمردي ملكي بحجُب ذهبية ناعمة</string>
+    <string name="theme_rose">Rose Aristocrat</string>
+    <string name="theme_rose_sub">ذهب وردي على مخمل عنّابي</string>
+    <string name="theme_onyx">Onyx Platinum</string>
+    <string name="theme_onyx_sub">بلاتيني مصقول على أونيكس أسود</string>
+    <string name="theme_sapphire">Sapphire Crown</string>
+    <string name="theme_sapphire_sub">ياقوت ثلجي على أزرق ملكي عميق</string>
+
+    <!-- Language -->
+    <string name="section_language">اللغة</string>
+    <string name="lang_system">لغة النظام</string>
+    <string name="lang_english">English</string>
+    <string name="lang_arabic">العربية</string>
+
+    <!-- Diagnostics -->
+    <string name="diag_status">الحالة</string>
+    <string name="diag_library">المكتبة</string>
+    <string name="diag_system">النظام</string>
+    <string name="diag_accessibility">خدمة إمكانية الوصول</string>
+    <string name="diag_device_admin">مسؤول الجهاز</string>
+    <string name="diag_battery">استثناء البطارية</string>
+    <string name="diag_active">نشطة</string>
+    <string name="diag_off">متوقفة</string>
+    <string name="diag_granted">ممنوح</string>
+    <string name="diag_missing">غير موجود</string>
+    <string name="diag_captures">اللقطات المحفوظة</string>
+    <string name="diag_disk">المساحة المستخدمة</string>
+    <string name="diag_folder">مجلد التخزين</string>
+    <string name="diag_last">آخر لقطة</string>
+    <string name="diag_app_version">إصدار التطبيق</string>
+    <string name="diag_android">أندرويد</string>
+</resources>

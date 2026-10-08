@@ -48,7 +48,7 @@ class DashboardActivity : BaseActivity() {
             }
         }
         findViewById<View>(R.id.rowGallery).setOnClickListener {
-            startActivity(Intent(this, PinLockActivity::class.java))
+            startActivity(Intent(this, GalleryActivity::class.java))
         }
         findViewById<View>(R.id.rowSettings).setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))

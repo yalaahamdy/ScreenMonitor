@@ -50,12 +50,34 @@ class PinLockActivity : BaseActivity() {
         }
     }
 
+    companion object {
+        const val EXTRA_TARGET = "extra_target"
+        const val TARGET_GALLERY = "target_gallery"
+        const val TARGET_DASHBOARD = "target_dashboard"
+        const val TARGET_SETTINGS = "target_settings"
+    }
+
     private fun verify() {
         val pin = entry.toString()
         if (PinManager.verify(this, pin)) {
             dots.state = PinDotsView.STATE_SUCCESS
-            startActivity(Intent(this, GalleryActivity::class.java))
-            finish()
+            PinManager.unlockSession()
+            dots.postDelayed({
+                val target = intent.getStringExtra(EXTRA_TARGET)
+                val nextIntent = when (target) {
+                    TARGET_GALLERY -> Intent(this, GalleryActivity::class.java)
+                    TARGET_SETTINGS -> Intent(this, SettingsActivity::class.java)
+                    else -> {
+                        if (Prefs.isSetupComplete(this)) {
+                            Intent(this, DashboardActivity::class.java)
+                        } else {
+                            Intent(this, MainActivity::class.java)
+                        }
+                    }
+                }
+                startActivity(nextIntent)
+                finish()
+            }, 200)
         } else {
             dots.state = PinDotsView.STATE_ERROR
             tvError.visibility = TextView.VISIBLE
@@ -66,6 +88,12 @@ class PinLockActivity : BaseActivity() {
                 tvError.visibility = TextView.INVISIBLE
             }, 550)
         }
+    }
+
+    override fun onBackPressed() {
+        // Prevent bypassing the gate by pressing back
+        moveTaskToBack(true)
+        finishAffinity()
     }
 
     private fun vibrate() {

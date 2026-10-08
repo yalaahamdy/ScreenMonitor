@@ -11,6 +11,51 @@ object PinManager {
     private const val KEY_HASH = "pin_hash"
     private const val KEY_SALT = "pin_salt"
 
+    const val AUTO_LOCK_GRACE_MS = 15_000L
+
+    @Volatile
+    private var sessionUnlocked: Boolean = false
+
+    @Volatile
+    private var backgroundTimestamp: Long = 0L
+
+    fun isSessionUnlocked(): Boolean {
+        if (!sessionUnlocked) return false
+        if (backgroundTimestamp > 0L) {
+            val elapsed = System.currentTimeMillis() - backgroundTimestamp
+            if (elapsed > AUTO_LOCK_GRACE_MS) {
+                sessionUnlocked = false
+                backgroundTimestamp = 0L
+                return false
+            }
+        }
+        return true
+    }
+
+    fun unlockSession() {
+        sessionUnlocked = true
+        backgroundTimestamp = 0L
+    }
+
+    fun lockSession() {
+        sessionUnlocked = false
+        backgroundTimestamp = 0L
+    }
+
+    fun onAppEnteredBackground() {
+        backgroundTimestamp = System.currentTimeMillis()
+    }
+
+    fun onAppEnteredForeground() {
+        if (backgroundTimestamp > 0L) {
+            val elapsed = System.currentTimeMillis() - backgroundTimestamp
+            if (elapsed > AUTO_LOCK_GRACE_MS) {
+                sessionUnlocked = false
+            }
+            backgroundTimestamp = 0L
+        }
+    }
+
     private fun sp(ctx: Context) = ctx.getSharedPreferences(FILE, Context.MODE_PRIVATE)
 
     fun hasPin(ctx: Context): Boolean = sp(ctx).contains(KEY_HASH)
@@ -27,6 +72,7 @@ object PinManager {
             .putString(KEY_SALT, salt)
             .putString(KEY_HASH, sha256(salt + pin))
             .apply()
+        unlockSession()
     }
 
     fun verify(ctx: Context, pin: String): Boolean {

@@ -47,4 +47,8 @@ object Prefs {
     // ---- UI generation: bumped on theme/language change ----
     fun uiVersion(ctx: Context): Int = prefs(ctx).getInt("ui_version", 0)
     fun bumpUiVersion(ctx: Context) = prefs(ctx).edit().putInt("ui_version", uiVersion(ctx) + 1).apply()
+
+    // ---- Setup wizard completion status ----
+    fun isSetupComplete(ctx: Context): Boolean = prefs(ctx).getBoolean("setup_complete", false)
+    fun setSetupComplete(ctx: Context, v: Boolean) = prefs(ctx).edit().putBoolean("setup_complete", v).apply()
 }

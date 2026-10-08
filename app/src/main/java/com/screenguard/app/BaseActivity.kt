@@ -31,7 +31,18 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (Prefs.uiVersion(this) != uiVersionAtCreate) recreate()
+        if (Prefs.uiVersion(this) != uiVersionAtCreate) {
+            recreate()
+            return
+        }
+        if (this !is PinLockActivity && PinManager.hasPin(this) && !PinManager.isSessionUnlocked()) {
+            val lockIntent = android.content.Intent(this, PinLockActivity::class.java).apply {
+                flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            startActivity(lockIntent)
+            finish()
+            return
+        }
     }
 
     /** Resolve a themed color attribute (accent, surfaces, text…) to ARGB. */

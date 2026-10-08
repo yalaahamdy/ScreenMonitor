@@ -40,7 +40,9 @@ Monitoring is always announced by a permanent system notification and cannot be 
   - **Onyx Platinum** (Polished platinum on dark onyx)
   - **Sapphire Crown** (Ice sapphire on deep royal blue)
 - **🌍 In-App Language Switching**: Instant runtime switching between **System Default**, **English**, and **العربية (Arabic)** without needing to change system language.
-- **🔒 PIN-Protected Security**: Gallery and Settings are secured with salted SHA-256 PIN authentication.
+- **🔒 Universal Parental PIN Gate**: The entire app (Dashboard, Settings, Gallery, and Setup) is locked behind a mandatory Parental PIN (Salted SHA-256). Any attempt to open the app or resume from background immediately presents the PIN gatekeeper with zero bypass capability.
+- **🛡️ Real-Time Anti-Tamper Protection**: Prevents unauthorized stopping of permissions or accessibility service from Android System Settings when the session is locked.
+- **⏳ Auto-Lock & Session Inactivity**: The app automatically re-locks whenever minimized or sent to the background, preventing children from accessing controls if the device is handed over.
 - **🛡️ Anti-Uninstall Defense**: Device Administrator integration blocks unauthorized app removal.
 - **📦 Intelligent Storage Quota**: Customizable max-storage quota (e.g. 50, 200, 1000 captures) with automatic rolling cleanup.
 - **⚡ Fast JPEG Engine**: Crisp 90% quality JPEG compression saving in under 50ms and cutting disk usage by 85%.

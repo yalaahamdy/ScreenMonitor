@@ -34,6 +34,27 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Prefs.init(this)
+
+        if (intent.action == Intent.ACTION_MAIN && intent.hasCategory(Intent.CATEGORY_LAUNCHER)) {
+            // Explicit app launch: lock session immediately
+            PinManager.lockSession()
+        }
+
+        if (PinManager.hasPin(this)) {
+            if (!PinManager.isSessionUnlocked()) {
+                val lockIntent = Intent(this, PinLockActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                }
+                startActivity(lockIntent)
+                finish()
+                return
+            } else if (Prefs.isSetupComplete(this)) {
+                startActivity(Intent(this, DashboardActivity::class.java))
+                finish()
+                return
+            }
+        }
+
         setContentView(R.layout.activity_main)
 
         findViewById<Button>(R.id.btnNotif).setOnClickListener {
@@ -41,7 +62,13 @@ class MainActivity : BaseActivity() {
                 notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
-        findViewById<Button>(R.id.btnPin).setOnClickListener { showSetPinDialog() }
+        findViewById<Button>(R.id.btnPin).setOnClickListener {
+            if (PinManager.hasPin(this)) {
+                showChangePinDialog()
+            } else {
+                showSetPinDialog()
+            }
+        }
         findViewById<Button>(R.id.btnAcc).setOnClickListener {
             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
         }
@@ -71,7 +98,9 @@ class MainActivity : BaseActivity() {
             }
         }
         findViewById<Button>(R.id.btnFinish).setOnClickListener {
+            Prefs.setSetupComplete(this, true)
             startActivity(Intent(this, DashboardActivity::class.java))
+            finish()
         }
     }
 
@@ -150,6 +179,40 @@ class MainActivity : BaseActivity() {
                     else -> {
                         PinManager.setPin(this, pin)
                         Toast.makeText(this, R.string.pin_saved, Toast.LENGTH_SHORT).show()
+                        refresh()
+                    }
+                }
+            }
+            .setNegativeButton(R.string.act_cancel, null)
+            .show()
+    }
+
+    private fun showChangePinDialog() {
+        val view = LayoutInflater.from(this).inflate(R.layout.dialog_change_pin, null, false)
+        val etCurrent = view.findViewById<EditText>(R.id.etCurrent)
+        val etNew = view.findViewById<EditText>(R.id.etNew)
+        val etConfirm = view.findViewById<EditText>(R.id.etConfirm)
+        listOf(etCurrent, etNew, etConfirm).forEach {
+            it.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle(R.string.dialog_change_pin_title)
+            .setView(view)
+            .setPositiveButton(R.string.act_save) { _, _ ->
+                val current = etCurrent.text?.toString().orEmpty()
+                val newPin = etNew.text?.toString().orEmpty()
+                val confirm = etConfirm.text?.toString().orEmpty()
+                when {
+                    !PinManager.verify(this, current) ->
+                        Toast.makeText(this, R.string.err_current_pin, Toast.LENGTH_SHORT).show()
+                    newPin.length != 4 || !newPin.all { c -> c.isDigit() } ->
+                        Toast.makeText(this, R.string.err_pin_length, Toast.LENGTH_SHORT).show()
+                    newPin != confirm ->
+                        Toast.makeText(this, R.string.err_pin_mismatch, Toast.LENGTH_SHORT).show()
+                    else -> {
+                        PinManager.changePin(this, current, newPin)
+                        Toast.makeText(this, R.string.pin_changed, Toast.LENGTH_SHORT).show()
                         refresh()
                     }
                 }

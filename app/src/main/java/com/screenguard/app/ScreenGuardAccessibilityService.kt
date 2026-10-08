@@ -164,12 +164,35 @@ class ScreenGuardAccessibilityService : AccessibilityService() {
         if (event == null || event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
         val pkg = event.packageName?.toString() ?: return
         if (pkg.isBlank()) return
+
+        checkTamperAttempt(event, pkg)
+
         if (IGNORED_PREFIXES.any { pkg.startsWith(it) }) return
         if (pkg.contains("launcher", ignoreCase = true)) return
 
         if (Prefs.captureOnAppOpen(this) && pkg != lastForegroundApp) {
             lastForegroundApp = pkg
             capture("app-open")
+        }
+    }
+
+    private fun checkTamperAttempt(event: AccessibilityEvent, pkg: String) {
+        if (!PinManager.hasPin(this) || !Prefs.isSetupComplete(this) || PinManager.isSessionUnlocked()) {
+            return
+        }
+        if (pkg.contains("settings", ignoreCase = true) || pkg.contains("packageinstaller", ignoreCase = true)) {
+            val textBuilder = StringBuilder()
+            event.text?.forEach { textBuilder.append(it).append(" ") }
+            event.contentDescription?.let { textBuilder.append(it).append(" ") }
+            val fullText = textBuilder.toString()
+            val appName = getString(R.string.app_name)
+            if (fullText.contains("ScreenGuard", ignoreCase = true) || (appName.isNotBlank() && fullText.contains(appName, ignoreCase = true))) {
+                performGlobalAction(GLOBAL_ACTION_HOME)
+                val lockIntent = Intent(this, PinLockActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                }
+                startActivity(lockIntent)
+            }
         }
     }
 

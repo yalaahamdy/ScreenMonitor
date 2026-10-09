@@ -2,5 +2,8 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp" android:height="24dp"
     android:viewportWidth="24" android:viewportHeight="24">
-    <path android:fillColor="#FFD4B46A" android:pathData="M12,1L3,5v6c0,5.55 3.84,10.74 9,12 5.16,-1.26 9,-6.45 9,-12V5L12,1z" />
+    <!-- sgAccentText (deep gold in light mode, vivid gold in dark) instead of
+         the hardcoded #D4B46A, which nearly vanished on ivory surfaces in
+         light mode (≈1.9:1). Now ≥4.5:1 against its container in both modes. -->
+    <path android:fillColor="?attr/sgAccentText" android:pathData="M12,1L3,5v6c0,5.55 3.84,10.74 9,12 5.16,-1.26 9,-6.45 9,-12V5L12,1z" />
 </vector>

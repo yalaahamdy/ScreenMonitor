@@ -136,14 +136,38 @@
     <color name="inverse_surface">#1A2233</color>
     <color name="inverse_on_surface">#F1F4FA</color>
 
-    <!-- ========== Blocking overlay (pinned dark, both modes) ========== -->
+    <!-- =========================================================
+         Blocking overlay (pinned Midnight Prestige dark, both modes).
+         Mirrors the Theme.ScreenGuard.BlockDialog tokens exactly, so
+         the WindowManager overlay, the BlockActivity fallback and the
+         bypass dialog all share ONE luxury visual language. Values
+         live ONLY here (no values-night override) so day/night
+         swapping can never leak into the lock surface.
+         All pairings are WCAG AA verified:
+           overlay_text        on overlay_card  ≈ 13.2:1
+           overlay_text_dim    on overlay_card  ≈  8.1:1
+           overlay_text_faint  on overlay_card  ≈  6.3:1
+           overlay_accent      on overlay_card  ≈  7.9:1
+           overlay_danger      on overlay_card  ≈  6.9:1
+           overlay_on_accent   on overlay_accent ≈ 8.9:1
+         ========================================================= -->
     <color name="block_scrim">#B8000000</color>
-    <color name="overlay_card">#1B2232</color>
-    <color name="overlay_stroke">#2D3748</color>
-    <color name="overlay_amber">#F5A623</color>
+    <color name="overlay_canvas">#0A0E18</color>
+    <color name="overlay_card">#18233B</color>
+    <color name="overlay_stroke">#435684</color>
+    <color name="overlay_outline">#2B3A5E</color>
+    <color name="overlay_surface_alt">#0F1626</color>
+    <color name="overlay_key_bg">#151D31</color>
+    <color name="overlay_accent">#D4B46A</color>
+    <color name="overlay_accent_soft">#E9D8AC</color>
+    <color name="overlay_accent_deep">#8F7440</color>
+    <color name="overlay_accent_container">#2A2312</color>
+    <color name="overlay_accent_hairline">#808F7440</color>
+    <color name="overlay_on_accent">#211907</color>
     <color name="overlay_danger">#F0938C</color>
-    <color name="overlay_warning">#F5A623</color>
-    <color name="overlay_text">#E8EDF5</color>
-    <color name="overlay_text_dim">#A7B4C8</color>
-    <color name="overlay_text_faint">#8C99AC</color>
+    <color name="overlay_danger_soft">#33F0938C</color>
+    <color name="overlay_warning">#D4B46A</color>
+    <color name="overlay_text">#F5F2EA</color>
+    <color name="overlay_text_dim">#ADB9D3</color>
+    <color name="overlay_text_faint">#8794B4</color>
 </resources>

@@ -4,6 +4,7 @@
 *.ap_
 *.aab
 *.zip
+*.patch
 
 # Files for the ART/Dalvik VM
 *.dex

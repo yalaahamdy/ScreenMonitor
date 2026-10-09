@@ -101,13 +101,14 @@ object BlockOverlayManager {
                 val appIcon = appInfoManager.getAppIcon(packageName)
 
                 // 1. الحاوية الرئيسية معتمة بنسبة 100% لتغطية التطبيق بالكامل
+                //    (لون كانفس ثيم منتصف الليل الفاخر نفسه المستخدم في شاشة الحجب الاحتياطية)
                 val rootView = FrameLayout(context).apply {
-                    setBackgroundColor(Color.parseColor("#0A0E17")) // تعتيم كامل 100% يحجب التطبيق المحظور خلفه
+                    setBackgroundColor(clr(context, R.color.overlay_canvas)) // تعتيم كامل 100% يحجب التطبيق المحظور خلفه
                     isClickable = true
                     isFocusable = true
                 }
 
-                // 2. كرت الحظر المركزي الأنيق
+                // 2. كرت الحظر المركزي — سطح فاخر بحد ذهبي خفيف مطابق لـ bg_block_card
                 val cardLayout = LinearLayout(context).apply {
                     orientation = LinearLayout.VERTICAL
                     gravity = Gravity.CENTER_HORIZONTAL
@@ -116,8 +117,8 @@ object BlockOverlayManager {
 
                     background = GradientDrawable().apply {
                         cornerRadius = dpToPx(context, 24).toFloat()
-                        setColor(Color.parseColor("#1B2232"))
-                        setStroke(dpToPx(context, 1), Color.parseColor("#2D3748"))
+                        setColor(clr(context, R.color.overlay_card))
+                        setStroke(dpToPx(context, 1), clr(context, R.color.overlay_stroke))
                     }
 
                     isClickable = true
@@ -129,20 +130,22 @@ object BlockOverlayManager {
                     FrameLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
                     gravity = Gravity.CENTER
-                    val marginH = dpToPx(context, 28)
-                    setMargins(marginH, 0, marginH, 0)
+                    // هوامش ضيقة عمودياً/أفقياً لتناسب الشاشات الصغيرة ومنطقة تقسيم الشاشة
+                    val marginH = dpToPx(context, 20)
+                    val marginV = dpToPx(context, 24)
+                    setMargins(marginH, marginV, marginH, marginV)
                 }
 
-                // شارة الحظر العلوية
+                // شارة الحظر العلوية — قرمزي ناعم مشتق من overlay_danger (مطابق لشاشة الحجب الاحتياطية)
                 val badgeContainer = FrameLayout(context).apply {
-                    val size = dpToPx(context, 60)
+                    val size = dpToPx(context, 64)
                     layoutParams = LinearLayout.LayoutParams(size, size).apply {
                         gravity = Gravity.CENTER_HORIZONTAL
                         bottomMargin = dpToPx(context, 12)
                     }
                     background = GradientDrawable().apply {
                         shape = GradientDrawable.OVAL
-                        setColor(Color.argb(38, 245, 158, 11))
+                        setColor(clr(context, R.color.overlay_danger_soft))
                     }
                 }
 
@@ -151,8 +154,8 @@ object BlockOverlayManager {
                     layoutParams = FrameLayout.LayoutParams(iconSize, iconSize).apply {
                         gravity = Gravity.CENTER
                     }
-                    setImageResource(android.R.drawable.ic_lock_idle_lock)
-                    setColorFilter(Color.parseColor("#F59E0B"))
+                    setImageResource(R.drawable.ic_block)
+                    setColorFilter(clr(context, R.color.overlay_danger))
                 }
                 badgeContainer.addView(badgeIcon)
                 cardLayout.addView(badgeContainer)
@@ -160,8 +163,9 @@ object BlockOverlayManager {
                 // عنوان التنبيه بدون إيموجي
                 val titleView = TextView(context).apply {
                     text = Str.get(R.string.overlay_title)
-                    setTextColor(Color.parseColor("#F59E0B"))
+                    setTextColor(clr(context, R.color.overlay_danger))
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+                    letterSpacing = 0.08f
                     typeface = Typeface.DEFAULT_BOLD
                     gravity = Gravity.CENTER
                     setPadding(0, 0, 0, dpToPx(context, 16))
@@ -186,7 +190,7 @@ object BlockOverlayManager {
                 // اسم التطبيق المحظور
                 val appNameView = TextView(context).apply {
                     text = appName
-                    setTextColor(Color.WHITE)
+                    setTextColor(clr(context, R.color.overlay_text))
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, 20f)
                     typeface = Typeface.DEFAULT_BOLD
                     gravity = Gravity.CENTER
@@ -195,7 +199,7 @@ object BlockOverlayManager {
                 if (isPipMode) {
                     val pipBadge = TextView(context).apply {
                         text = Str.get(R.string.overlay_pip_badge)
-                        setTextColor(Color.parseColor("#F59E0B"))
+                        setTextColor(clr(context, R.color.overlay_accent))
                         setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
                         typeface = Typeface.DEFAULT_BOLD
                         gravity = Gravity.CENTER
@@ -204,8 +208,8 @@ object BlockOverlayManager {
                         setPadding(hPad, vPad, hPad, vPad)
                         background = GradientDrawable().apply {
                             cornerRadius = dpToPx(context, 8).toFloat()
-                            setColor(Color.parseColor("#261B0B"))
-                            setStroke(dpToPx(context, 1), Color.parseColor("#D97706"))
+                            setColor(clr(context, R.color.overlay_accent_container))
+                            setStroke(dpToPx(context, 1), clr(context, R.color.overlay_accent_deep))
                         }
                         layoutParams = LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -221,7 +225,7 @@ object BlockOverlayManager {
                 // سبب الحظر
                 val reasonView = TextView(context).apply {
                     text = reason
-                    setTextColor(Color.parseColor("#A0AEC0"))
+                    setTextColor(clr(context, R.color.overlay_text_dim))
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
                     gravity = Gravity.CENTER
                     setPadding(0, 0, 0, dpToPx(context, 16))
@@ -237,7 +241,7 @@ object BlockOverlayManager {
                         setPadding(nextPad, nextPad, nextPad, nextPad)
                         background = GradientDrawable().apply {
                             cornerRadius = dpToPx(context, 12).toFloat()
-                            setColor(Color.parseColor("#151D2A"))
+                            setColor(clr(context, R.color.overlay_surface_alt))
                         }
                         layoutParams = LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT,
@@ -249,13 +253,13 @@ object BlockOverlayManager {
 
                     val nextLabel = TextView(context).apply {
                         text = Str.get(R.string.overlay_next_available)
-                        setTextColor(Color.parseColor("#A0AEC0"))
+                        setTextColor(clr(context, R.color.overlay_text_dim))
                         setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
                         gravity = Gravity.CENTER
                     }
                     val nextTime = TextView(context).apply {
                         text = nextAvailable
-                        setTextColor(Color.parseColor("#63B3ED"))
+                        setTextColor(clr(context, R.color.overlay_accent))
                         setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
                         typeface = Typeface.DEFAULT_BOLD
                         gravity = Gravity.CENTER
@@ -266,19 +270,19 @@ object BlockOverlayManager {
                     cardLayout.addView(nextLayout)
                 }
 
-                // زر العودة للشاشة الرئيسية
+                // زر العودة للشاشة الرئيسية — زر ذهبي أساسي مطابق لنمط AppButton في التطبيق
                 val homeButton = Button(context).apply {
                     text = Str.get(R.string.overlay_home)
-                    setTextColor(Color.WHITE)
+                    setTextColor(clr(context, R.color.overlay_on_accent))
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
                     typeface = Typeface.DEFAULT_BOLD
                     background = GradientDrawable().apply {
                         cornerRadius = dpToPx(context, 14).toFloat()
-                        setColor(Color.parseColor("#3182CE"))
+                        setColor(clr(context, R.color.overlay_accent))
                     }
                     layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
-                        dpToPx(context, 50)
+                        dpToPx(context, 52)
                     ).apply {
                         bottomMargin = dpToPx(context, 10)
                     }
@@ -309,20 +313,20 @@ object BlockOverlayManager {
                     }
                 }
 
-                // زر إظهار خيارات التخطي المؤقت
+                // زر إظهار خيارات التخطي المؤقت — زر نغمي بحد ذهبي مطابق لنمط AppTonalButton
                 val bypassBtn = Button(context).apply {
                     text = Str.get(R.string.overlay_bypass_button)
-                    setTextColor(Color.parseColor("#F59E0B"))
+                    setTextColor(clr(context, R.color.overlay_accent))
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
                     typeface = Typeface.DEFAULT_BOLD
                     background = GradientDrawable().apply {
                         cornerRadius = dpToPx(context, 14).toFloat()
-                        setColor(Color.parseColor("#231E15"))
-                        setStroke(dpToPx(context, 1), Color.parseColor("#B45309"))
+                        setColor(clr(context, R.color.overlay_surface_alt))
+                        setStroke(dpToPx(context, 1), clr(context, R.color.overlay_accent_hairline))
                     }
                     layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
-                        dpToPx(context, 48)
+                        dpToPx(context, 50)
                     )
                 }
 
@@ -335,8 +339,8 @@ object BlockOverlayManager {
                     setPadding(pPad, pPad, pPad, pPad)
                     background = GradientDrawable().apply {
                         cornerRadius = dpToPx(context, 18).toFloat()
-                        setColor(Color.parseColor("#151D2A"))
-                        setStroke(dpToPx(context, 1), Color.parseColor("#2D3748"))
+                        setColor(clr(context, R.color.overlay_surface_alt))
+                        setStroke(dpToPx(context, 1), clr(context, R.color.overlay_outline))
                     }
                     layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
@@ -360,7 +364,7 @@ object BlockOverlayManager {
 
                 val panelTitle = TextView(context).apply {
                     text = Str.get(R.string.overlay_bypass_button)
-                    setTextColor(Color.parseColor("#F59E0B"))
+                    setTextColor(clr(context, R.color.overlay_accent))
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
                     typeface = Typeface.DEFAULT_BOLD
                     gravity = Gravity.CENTER
@@ -370,7 +374,7 @@ object BlockOverlayManager {
 
                 val panelSubtitle = TextView(context).apply {
                     text = Str.get(R.string.overlay_bypass_subtitle)
-                    setTextColor(Color.parseColor("#94A3B8"))
+                    setTextColor(clr(context, R.color.overlay_text_faint))
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, 11.5f)
                     gravity = Gravity.CENTER
                     setPadding(0, 0, 0, dpToPx(context, 10))
@@ -379,7 +383,7 @@ object BlockOverlayManager {
 
                 // بطاقة عرض المدة المحددة بشكل بارز وأنيق
                 val durationBadge = TextView(context).apply {
-                    setTextColor(Color.parseColor("#FBBF24"))
+                    setTextColor(clr(context, R.color.overlay_accent_soft))
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.5f)
                     typeface = Typeface.DEFAULT_BOLD
                     gravity = Gravity.CENTER
@@ -388,8 +392,8 @@ object BlockOverlayManager {
                     setPadding(hPad, vPad, hPad, vPad)
                     background = GradientDrawable().apply {
                         cornerRadius = dpToPx(context, 12).toFloat()
-                        setColor(Color.parseColor("#241D12"))
-                        setStroke(dpToPx(context, 1), Color.parseColor("#D97706"))
+                        setColor(clr(context, R.color.overlay_accent_container))
+                        setStroke(dpToPx(context, 1), clr(context, R.color.overlay_accent_deep))
                     }
                     layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -428,6 +432,10 @@ object BlockOverlayManager {
                 // شريط التمرير الأفقي للخيارات الشائعة
                 val scrollPresets = HorizontalScrollView(context).apply {
                     isHorizontalScrollBarEnabled = false
+                    // حشوة جانبية حتى لا تلتصق أول شريحة بحدود الشاشات الصغيرة
+                    val hPad = dpToPx(context, 2)
+                    setPadding(hPad, 0, hPad, 0)
+                    clipToPadding = false
                     layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
@@ -462,12 +470,22 @@ object BlockOverlayManager {
                         val isSel = (mins == selectedMinutes)
                         btn.background = GradientDrawable().apply {
                             cornerRadius = dpToPx(context, 8).toFloat()
-                            setColor(if (isSel) Color.parseColor("#2563EB") else Color.parseColor("#1E293B"))
+                            // محدد: حاوية ذهبية بحد ذهبي (مطابق لـ bg_chip_selected)
+                            // غير محدد: خلفية مفاتيح بحد ناعم
                             if (isSel) {
-                                setStroke(dpToPx(context, 1), Color.parseColor("#60A5FA"))
+                                setColor(clr(context, R.color.overlay_accent_container))
+                                setStroke(dpToPx(context, 1), clr(context, R.color.overlay_accent))
+                            } else {
+                                setColor(clr(context, R.color.overlay_key_bg))
+                                setStroke(dpToPx(context, 1), clr(context, R.color.overlay_outline))
                             }
                         }
-                        btn.setTextColor(if (isSel) Color.WHITE else Color.parseColor("#94A3B8"))
+                        btn.setTextColor(
+                            clr(
+                                context,
+                                if (isSel) R.color.overlay_accent else R.color.overlay_text_dim
+                            )
+                        )
                     }
                 }
 
@@ -483,13 +501,13 @@ object BlockOverlayManager {
                         text = label
                         setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
                         typeface = Typeface.DEFAULT_BOLD
-                        setTextColor(Color.parseColor("#E2E8F0"))
+                        setTextColor(clr(context, R.color.overlay_text))
                         background = GradientDrawable().apply {
                             cornerRadius = dpToPx(context, 8).toFloat()
-                            setColor(Color.parseColor("#1E293B"))
-                            setStroke(dpToPx(context, 1), Color.parseColor("#334155"))
+                            setColor(clr(context, R.color.overlay_key_bg))
+                            setStroke(dpToPx(context, 1), clr(context, R.color.overlay_outline))
                         }
-                        layoutParams = LinearLayout.LayoutParams(0, dpToPx(context, 34), 1f).apply {
+                        layoutParams = LinearLayout.LayoutParams(0, dpToPx(context, 40), 1f).apply {
                             val m = dpToPx(context, 3)
                             setMargins(m, 0, m, 0)
                         }
@@ -511,7 +529,7 @@ object BlockOverlayManager {
                         typeface = Typeface.DEFAULT_BOLD
                         layoutParams = LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.WRAP_CONTENT,
-                            dpToPx(context, 34)
+                            dpToPx(context, 40)
                         ).apply {
                             val m = dpToPx(context, 3)
                             setMargins(m, 0, m, 0)
@@ -541,14 +559,14 @@ object BlockOverlayManager {
                 // تنبيه الأمان
                 val securityNotice = TextView(context).apply {
                     text = Str.get(R.string.overlay_bypass_security_note)
-                    setTextColor(Color.parseColor("#8C99AC"))
+                    setTextColor(clr(context, R.color.overlay_text_faint))
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
                     gravity = Gravity.CENTER
                     val nPad = dpToPx(context, 6)
                     setPadding(nPad, nPad, nPad, nPad)
                     background = GradientDrawable().apply {
                         cornerRadius = dpToPx(context, 8).toFloat()
-                        setColor(Color.parseColor("#0F172A"))
+                        setColor(clr(context, R.color.overlay_canvas))
                     }
                     layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
@@ -570,7 +588,7 @@ object BlockOverlayManager {
 
                 val cancelDurationBtn = Button(context).apply {
                     text = Str.get(R.string.action_cancel)
-                    setTextColor(Color.parseColor("#94A3B8"))
+                    setTextColor(clr(context, R.color.overlay_text_faint))
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
                     background = GradientDrawable().apply {
                         cornerRadius = dpToPx(context, 10).toFloat()
@@ -585,12 +603,12 @@ object BlockOverlayManager {
 
                 val proceedToPinBtn = Button(context).apply {
                     text = Str.get(R.string.overlay_continue_to_pin)
-                    setTextColor(Color.WHITE)
+                    setTextColor(clr(context, R.color.overlay_on_accent))
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
                     typeface = Typeface.DEFAULT_BOLD
                     background = GradientDrawable().apply {
                         cornerRadius = dpToPx(context, 10).toFloat()
-                        setColor(Color.parseColor("#D97706"))
+                        setColor(clr(context, R.color.overlay_accent))
                     }
                     layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 2f)
                 }
@@ -614,7 +632,7 @@ object BlockOverlayManager {
 
                 val pinTitle = TextView(context).apply {
                     text = Str.get(R.string.overlay_pin_step_title)
-                    setTextColor(Color.parseColor("#F59E0B"))
+                    setTextColor(clr(context, R.color.overlay_accent))
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
                     typeface = Typeface.DEFAULT_BOLD
                     gravity = Gravity.CENTER
@@ -623,7 +641,7 @@ object BlockOverlayManager {
                 pinStepLayout.addView(pinTitle)
 
                 val pinSubtitle = TextView(context).apply {
-                    setTextColor(Color.parseColor("#CBD5E0"))
+                    setTextColor(clr(context, R.color.overlay_text_dim))
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, 11.5f)
                     gravity = Gravity.CENTER
                     setPadding(0, 0, 0, dpToPx(context, 10))
@@ -650,17 +668,17 @@ object BlockOverlayManager {
                         }
                         background = GradientDrawable().apply {
                             shape = GradientDrawable.OVAL
-                            setColor(Color.parseColor("#334155"))
+                            setColor(clr(context, R.color.overlay_outline))
                         }
                     }
                 }
                 dotViews.forEach { dotsContainer.addView(it) }
                 pinStepLayout.addView(dotsContainer)
 
-                // نص رسالة الخطأ
+                // نص رسالة الخطأ — قرمزي ناعم بتباين 7:1 على البطاقة (بدلاً من #EF4444 بتباين 4.2:1)
                 val pinErrorView = TextView(context).apply {
-                    setTextColor(Color.parseColor("#EF4444"))
-                    setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+                    setTextColor(clr(context, R.color.overlay_danger))
+                    setTextSize(TypedValue.COMPLEX_UNIT_SP, 12.5f)
                     typeface = Typeface.DEFAULT_BOLD
                     gravity = Gravity.CENTER
                     visibility = View.GONE
@@ -687,11 +705,11 @@ object BlockOverlayManager {
                     dotViews.forEachIndexed { index, dot ->
                         val gd = dot.background as? GradientDrawable ?: GradientDrawable().apply { shape = GradientDrawable.OVAL }
                         if (isError) {
-                            gd.setColor(Color.parseColor("#EF4444"))
+                            gd.setColor(clr(context, R.color.overlay_danger))
                         } else if (index < enteredPin.length) {
-                            gd.setColor(Color.parseColor("#F59E0B"))
+                            gd.setColor(clr(context, R.color.overlay_accent))
                         } else {
-                            gd.setColor(Color.parseColor("#334155"))
+                            gd.setColor(clr(context, R.color.overlay_outline))
                         }
                         dot.background = gd
                     }
@@ -774,15 +792,23 @@ object BlockOverlayManager {
                     rowKeys.forEach { key ->
                         val keyBtn = Button(context).apply {
                             text = key
-                            setTextColor(if (key == Str.get(R.string.keypad_clear) || key == Str.get(R.string.keypad_delete)) Color.parseColor("#94A3B8") else Color.WHITE)
+                            setTextColor(
+                                clr(
+                                    context,
+                                    if (key == Str.get(R.string.keypad_clear) || key == Str.get(R.string.keypad_delete))
+                                        R.color.overlay_text_dim else R.color.overlay_text
+                                )
+                            )
                             setTextSize(TypedValue.COMPLEX_UNIT_SP, if (key.length > 1) 12f else 16f)
                             typeface = Typeface.DEFAULT_BOLD
+                            // مطابق لنمط KeypadDigit: خلفية sgKeyBg وحد sgOutlineStrong، بارتفاع 48dp
+                            // لتلبية الحد الأدنى لهدف اللمس (48dp) من إرشادات Material
                             background = GradientDrawable().apply {
                                 cornerRadius = dpToPx(context, 10).toFloat()
-                                setColor(Color.parseColor("#1E293B"))
-                                setStroke(dpToPx(context, 1), Color.parseColor("#334155"))
+                                setColor(clr(context, R.color.overlay_key_bg))
+                                setStroke(dpToPx(context, 1), clr(context, R.color.overlay_stroke))
                             }
-                            layoutParams = LinearLayout.LayoutParams(0, dpToPx(context, 40), 1f).apply {
+                            layoutParams = LinearLayout.LayoutParams(0, dpToPx(context, 48), 1f).apply {
                                 val m = dpToPx(context, 3)
                                 setMargins(m, 0, m, 0)
                             }
@@ -811,7 +837,7 @@ object BlockOverlayManager {
 
                 val backToDurationBtn = Button(context).apply {
                     text = Str.get(R.string.overlay_edit_duration)
-                    setTextColor(Color.parseColor("#94A3B8"))
+                    setTextColor(clr(context, R.color.overlay_text_faint))
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, 12.5f)
                     background = GradientDrawable().apply {
                         cornerRadius = dpToPx(context, 8).toFloat()
@@ -829,7 +855,7 @@ object BlockOverlayManager {
 
                 val cancelPinBtn = Button(context).apply {
                     text = Str.get(R.string.action_cancel)
-                    setTextColor(Color.parseColor("#94A3B8"))
+                    setTextColor(clr(context, R.color.overlay_text_faint))
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, 12.5f)
                     background = GradientDrawable().apply {
                         cornerRadius = dpToPx(context, 8).toFloat()
@@ -892,19 +918,19 @@ object BlockOverlayManager {
                 bypassContainer.addView(bypassPanel)
                 cardLayout.addView(bypassContainer)
 
-                // زر إدارة القيود
+                // زر إدارة القيود — زر محدد بحد مطابق لحد البطاقة
                 val settingsButton = Button(context).apply {
                     text = Str.get(R.string.overlay_manage_restrictions)
-                    setTextColor(Color.parseColor("#CBD5E0"))
+                    setTextColor(clr(context, R.color.overlay_text_dim))
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
                     background = GradientDrawable().apply {
                         cornerRadius = dpToPx(context, 14).toFloat()
                         setColor(Color.TRANSPARENT)
-                        setStroke(dpToPx(context, 1), Color.parseColor("#4A5568"))
+                        setStroke(dpToPx(context, 1), clr(context, R.color.overlay_stroke))
                     }
                     layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
-                        dpToPx(context, 46)
+                        dpToPx(context, 48)
                     )
                     setOnClickListener {
                         dismissInternal()
@@ -951,12 +977,23 @@ object BlockOverlayManager {
                     }
                 }
 
-                // وضع الكرت داخل ScrollView لضمان ظهوره كاملاً دون اقتصاص حتى في الشاشات الصغيرة أو المنقسمة
+                // وضع الكرت داخل ScrollView لضمان ظهوره كاملاً دون اقتصاص حتى في الشاشات الصغيرة أو المنقسمة.
+                // إطار توسيط وسيط: مع fillViewport يتم مدّ الإطار (وليس البطاقة) لملء الشاشة،
+                // فتبقى البطاقة بالحجم الطبيعي وموسّطة، وعند تجاوزها الشاشة تتمرر بدل قصّها.
+                val centeringFrame = FrameLayout(context)
+                centeringFrame.addView(cardLayout, cardParams)
+
                 val scrollView = ScrollView(context).apply {
                     isFillViewport = true
                     isVerticalScrollBarEnabled = false
                 }
-                scrollView.addView(cardLayout, cardParams)
+                scrollView.addView(
+                    centeringFrame,
+                    FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.WRAP_CONTENT
+                    )
+                )
                 rootView.addView(
                     scrollView,
                     FrameLayout.LayoutParams(
@@ -1085,4 +1122,7 @@ object BlockOverlayManager {
             context.resources.displayMetrics
         ).toInt()
     }
+
+    /** Resolve a pinned lock-surface color resource (Midnight Prestige tokens). */
+    private fun clr(context: Context, res: Int): Int = context.getColor(res)
 }

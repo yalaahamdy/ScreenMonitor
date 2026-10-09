@@ -358,36 +358,38 @@
     <!-- ============================================================
          Block fallback activity — PINNED DARK in both modes so the
          lock screen keeps its authority day and night (matches the
-         WindowManager overlay, which is always dark). All tokens are
-         literal hex so day/night color swapping cannot leak in.
+         WindowManager overlay, which is always dark). Tokens point at
+         the overlay_* color resources (defined ONLY in values/, never
+         in values-night) so the fallback screen, the floating overlay
+         and the bypass dialog can never drift apart.
          ============================================================ -->
     <style name="Theme.ScreenGuard.BlockDialog">
-        <item name="sgCanvas">#0A0E18</item>
+        <item name="sgCanvas">@color/overlay_canvas</item>
         <item name="sgHeader">#0D1424</item>
         <item name="sgSurface">#121A2C</item>
-        <item name="sgSurfaceElev">#18233B</item>
-        <item name="sgSurfaceAlt">#0F1626</item>
-        <item name="sgOutline">#2B3A5E</item>
-        <item name="sgOutlineStrong">#435684</item>
+        <item name="sgSurfaceElev">@color/overlay_card</item>
+        <item name="sgSurfaceAlt">@color/overlay_surface_alt</item>
+        <item name="sgOutline">@color/overlay_outline</item>
+        <item name="sgOutlineStrong">@color/overlay_stroke</item>
         <item name="sgDivider">#273356</item>
-        <item name="sgAccent">#D4B46A</item>
-        <item name="sgAccentSoft">#E9D8AC</item>
-        <item name="sgAccentDeep">#8F7440</item>
-        <item name="sgOnAccent">#211907</item>
-        <item name="sgAccentContainer">#2A2312</item>
-        <item name="sgAccentHairline">#808F7440</item>
-        <item name="sgAccentText">#D4B46A</item>
+        <item name="sgAccent">@color/overlay_accent</item>
+        <item name="sgAccentSoft">@color/overlay_accent_soft</item>
+        <item name="sgAccentDeep">@color/overlay_accent_deep</item>
+        <item name="sgOnAccent">@color/overlay_on_accent</item>
+        <item name="sgAccentContainer">@color/overlay_accent_container</item>
+        <item name="sgAccentHairline">@color/overlay_accent_hairline</item>
+        <item name="sgAccentText">@color/overlay_accent</item>
         <item name="sgRipple">#26D4B46A</item>
-        <item name="sgTextPrimary">#F5F2EA</item>
-        <item name="sgTextSecondary">#ADB9D3</item>
-        <item name="sgTextTertiary">#8794B4</item>
-        <item name="sgKeyBg">#151D31</item>
-        <item name="colorPrimary">#D4B46A</item>
-        <item name="colorOnPrimary">#211907</item>
+        <item name="sgTextPrimary">@color/overlay_text</item>
+        <item name="sgTextSecondary">@color/overlay_text_dim</item>
+        <item name="sgTextTertiary">@color/overlay_text_faint</item>
+        <item name="sgKeyBg">@color/overlay_key_bg</item>
+        <item name="colorPrimary">@color/overlay_accent</item>
+        <item name="colorOnPrimary">@color/overlay_on_accent</item>
         <item name="colorSurface">#121A2C</item>
-        <item name="colorOnSurface">#F5F2EA</item>
-        <item name="colorOnSurfaceVariant">#ADB9D3</item>
-        <item name="android:colorBackground">#0A0E18</item>
+        <item name="colorOnSurface">@color/overlay_text</item>
+        <item name="colorOnSurfaceVariant">@color/overlay_text_dim</item>
+        <item name="android:colorBackground">@color/overlay_canvas</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowNoTitle">true</item>

@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Danger-tinted oval derived from overlay_danger (#F0938C) at 20% alpha,
+     so the badge and its icon always share the same hue family. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
-    <solid android:color="#26EF5350" />
+    <solid android:color="@color/overlay_danger_soft" />
 </shape>

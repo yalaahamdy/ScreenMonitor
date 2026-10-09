@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- ScrollView root: the two-step bypass dialog is taller than many small
+     phones (and any phone in landscape); without scrolling its buttons get
+     clipped. The ScrollView lets the full dialog stay reachable. -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="20dp"
-    android:layout_marginEnd="20dp"
-    android:background="@drawable/bg_block_card"
-    android:orientation="vertical"
-    android:padding="22dp">
+    android:overScrollMode="never"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_block_card"
+        android:orientation="vertical"
+        android:padding="22dp">
 
     <!-- Title -->
     <LinearLayout
@@ -85,43 +96,43 @@
                 android:id="@+id/btnMinus15"
                 style="@style/AppTonalButton"
                 android:layout_width="0dp"
-                android:layout_height="36dp"
+                android:layout_height="44dp"
                 android:layout_marginEnd="4dp"
                 android:layout_weight="1"
                 android:padding="0dp"
-                android:textSize="11sp"
+                android:textSize="12sp"
                 android:text="@string/dur_short_minus_15m" />
 
             <Button
                 android:id="@+id/btnMinus1"
                 style="@style/AppTonalButton"
                 android:layout_width="0dp"
-                android:layout_height="36dp"
+                android:layout_height="44dp"
                 android:layout_marginEnd="4dp"
                 android:layout_weight="1"
                 android:padding="0dp"
-                android:textSize="11sp"
+                android:textSize="12sp"
                 android:text="@string/dur_short_minus_1m" />
 
             <Button
                 android:id="@+id/btnPlus1"
                 style="@style/AppTonalButton"
                 android:layout_width="0dp"
-                android:layout_height="36dp"
+                android:layout_height="44dp"
                 android:layout_marginEnd="4dp"
                 android:layout_weight="1"
                 android:padding="0dp"
-                android:textSize="11sp"
+                android:textSize="12sp"
                 android:text="@string/dur_short_plus_1m" />
 
             <Button
                 android:id="@+id/btnPlus15"
                 style="@style/AppTonalButton"
                 android:layout_width="0dp"
-                android:layout_height="36dp"
+                android:layout_height="44dp"
                 android:layout_weight="1"
                 android:padding="0dp"
-                android:textSize="11sp"
+                android:textSize="12sp"
                 android:text="@string/dur_short_plus_15m" />
         </LinearLayout>
 
@@ -136,55 +147,55 @@
                 android:id="@+id/preset1"
                 style="@style/AppTonalButton"
                 android:layout_width="0dp"
-                android:layout_height="34dp"
+                android:layout_height="40dp"
                 android:layout_marginEnd="3dp"
                 android:layout_weight="1"
                 android:padding="0dp"
-                android:textSize="11sp"
+                android:textSize="12sp"
                 android:text="@string/dur_short_1m" />
 
             <Button
                 android:id="@+id/preset5"
                 style="@style/AppTonalButton"
                 android:layout_width="0dp"
-                android:layout_height="34dp"
+                android:layout_height="40dp"
                 android:layout_marginEnd="3dp"
                 android:layout_weight="1"
                 android:padding="0dp"
-                android:textSize="11sp"
+                android:textSize="12sp"
                 android:text="@string/dur_short_5m" />
 
             <Button
                 android:id="@+id/preset15"
                 style="@style/AppTonalButton"
                 android:layout_width="0dp"
-                android:layout_height="34dp"
+                android:layout_height="40dp"
                 android:layout_marginEnd="3dp"
                 android:layout_weight="1"
                 android:padding="0dp"
-                android:textSize="11sp"
+                android:textSize="12sp"
                 android:text="@string/dur_short_15m" />
 
             <Button
                 android:id="@+id/preset30"
                 style="@style/AppTonalButton"
                 android:layout_width="0dp"
-                android:layout_height="34dp"
+                android:layout_height="40dp"
                 android:layout_marginEnd="3dp"
                 android:layout_weight="1"
                 android:padding="0dp"
-                android:textSize="11sp"
+                android:textSize="12sp"
                 android:text="@string/dur_short_30m" />
 
             <Button
                 android:id="@+id/preset60"
                 style="@style/AppTonalButton"
                 android:layout_width="0dp"
-                android:layout_height="34dp"
+                android:layout_height="40dp"
                 android:layout_marginEnd="3dp"
                 android:layout_weight="1"
                 android:padding="0dp"
-                android:textSize="11sp"
+                android:textSize="12sp"
                 android:text="@string/dur_short_1h" />
         </LinearLayout>
 
@@ -198,32 +209,32 @@
                 android:id="@+id/preset120"
                 style="@style/AppTonalButton"
                 android:layout_width="0dp"
-                android:layout_height="34dp"
+                android:layout_height="40dp"
                 android:layout_marginEnd="3dp"
                 android:layout_weight="1"
                 android:padding="0dp"
-                android:textSize="11sp"
+                android:textSize="12sp"
                 android:text="@string/dur_short_2h" />
 
             <Button
                 android:id="@+id/preset180"
                 style="@style/AppTonalButton"
                 android:layout_width="0dp"
-                android:layout_height="34dp"
+                android:layout_height="40dp"
                 android:layout_marginEnd="3dp"
                 android:layout_weight="1"
                 android:padding="0dp"
-                android:textSize="11sp"
+                android:textSize="12sp"
                 android:text="@string/dur_short_3h" />
 
             <Button
                 android:id="@+id/preset300"
                 style="@style/AppTonalButton"
                 android:layout_width="0dp"
-                android:layout_height="34dp"
+                android:layout_height="40dp"
                 android:layout_weight="1"
                 android:padding="0dp"
-                android:textSize="11sp"
+                android:textSize="12sp"
                 android:text="@string/dur_short_5h" />
 
             <View
@@ -238,7 +249,7 @@
             android:layout_marginTop="12dp"
             android:text="@string/overlay_bypass_security_note"
             android:textColor="?attr/sgTextTertiary"
-            android:textSize="11sp" />
+            android:textSize="12sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -307,33 +318,37 @@
             android:orientation="vertical">
 
             <LinearLayout style="@style/BypassKeyRow">
-                <Button android:id="@+id/key1" style="@style/KeypadDigit" android:text="1" />
-                <Button android:id="@+id/key2" style="@style/KeypadDigit" android:text="2" />
-                <Button android:id="@+id/key3" style="@style/KeypadDigit" android:text="3" />
+                <Button android:id="@+id/key1" style="@style/KeypadDigit" android:layout_width="0dp" android:layout_weight="1" android:text="1" />
+                <Button android:id="@+id/key2" style="@style/KeypadDigit" android:layout_width="0dp" android:layout_weight="1" android:text="2" />
+                <Button android:id="@+id/key3" style="@style/KeypadDigit" android:layout_width="0dp" android:layout_weight="1" android:text="3" />
             </LinearLayout>
 
             <LinearLayout style="@style/BypassKeyRow">
-                <Button android:id="@+id/key4" style="@style/KeypadDigit" android:text="4" />
-                <Button android:id="@+id/key5" style="@style/KeypadDigit" android:text="5" />
-                <Button android:id="@+id/key6" style="@style/KeypadDigit" android:text="6" />
+                <Button android:id="@+id/key4" style="@style/KeypadDigit" android:layout_width="0dp" android:layout_weight="1" android:text="4" />
+                <Button android:id="@+id/key5" style="@style/KeypadDigit" android:layout_width="0dp" android:layout_weight="1" android:text="5" />
+                <Button android:id="@+id/key6" style="@style/KeypadDigit" android:layout_width="0dp" android:layout_weight="1" android:text="6" />
             </LinearLayout>
 
             <LinearLayout style="@style/BypassKeyRow">
-                <Button android:id="@+id/key7" style="@style/KeypadDigit" android:text="7" />
-                <Button android:id="@+id/key8" style="@style/KeypadDigit" android:text="8" />
-                <Button android:id="@+id/key9" style="@style/KeypadDigit" android:text="9" />
+                <Button android:id="@+id/key7" style="@style/KeypadDigit" android:layout_width="0dp" android:layout_weight="1" android:text="7" />
+                <Button android:id="@+id/key8" style="@style/KeypadDigit" android:layout_width="0dp" android:layout_weight="1" android:text="8" />
+                <Button android:id="@+id/key9" style="@style/KeypadDigit" android:layout_width="0dp" android:layout_weight="1" android:text="9" />
             </LinearLayout>
 
             <LinearLayout style="@style/BypassKeyRow">
                 <Button
                     android:id="@+id/keyClearDummy"
                     style="@style/KeypadDigit"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:visibility="invisible"
                     android:text="0" />
-                <Button android:id="@+id/key0" style="@style/KeypadDigit" android:text="0" />
+                <Button android:id="@+id/key0" style="@style/KeypadDigit" android:layout_width="0dp" android:layout_weight="1" android:text="0" />
                 <ImageButton
                     android:id="@+id/keyBackspace"
                     style="@style/KeypadIcon"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:src="@drawable/ic_backspace"
                     android:contentDescription="@string/keypad_delete" />
             </LinearLayout>
@@ -364,4 +379,5 @@
                 android:text="@string/action_cancel" />
         </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+    </LinearLayout>
+</ScrollView>

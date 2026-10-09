@@ -8,25 +8,37 @@
     android:clickable="true"
     android:focusable="true">
 
+    <!-- match_parent + fillViewport: when the card is shorter than the
+         screen the inner FrameLayout stretches and keeps the card centered;
+         when it is taller (small phones or large font scale) it scrolls
+         instead of being clipped, so the action buttons always remain
+         reachable. The FrameLayout is required because fillViewport would
+         otherwise stretch the card itself to full height. -->
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_height="match_parent"
         android:fillViewport="true"
         android:overScrollMode="never">
 
-        <LinearLayout
-            android:id="@+id/blockCard"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:background="@drawable/bg_block_card"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:padding="24dp">
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/blockCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/bg_block_card"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:padding="24dp">
 
             <!-- Block badge -->
             <FrameLayout
@@ -49,8 +61,9 @@
                 android:layout_marginTop="12dp"
                 android:text="@string/overlay_title"
                 android:textColor="@color/overlay_danger"
-                android:textSize="15sp"
-                android:textStyle="bold" />
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08" />
 
             <!-- Blocked app identity -->
             <ImageView
@@ -147,5 +160,6 @@
                 android:layout_marginTop="10dp"
                 android:text="@string/overlay_manage_restrictions" />
         </LinearLayout>
+        </FrameLayout>
     </ScrollView>
 </FrameLayout>

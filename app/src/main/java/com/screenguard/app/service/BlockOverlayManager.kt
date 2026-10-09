@@ -34,7 +34,6 @@ import com.screenguard.app.R
 import com.screenguard.app.Str
 import com.screenguard.app.data.repository.AppInfoManager
 import com.screenguard.app.data.repository.AppRestrictionsRepository
-import com.screenguard.app.ui.block.BlockActivity
 
 /**
  * مدير النافذة العائمة فوق التطبيقات المحظورة
@@ -1061,7 +1060,7 @@ object BlockOverlayManager {
                     return@post
                 }
 
-                // خطة أمان بديلة: إذا تعذر إضافة النافذة العائمة فوق هذا التطبيق، نطلق شاشة الحظر الكاملة
+                // خطة أمان بديلة: إذا تعذر إضافة النافذة العائمة فوق هذا التطبيق، ننقل المستخدم للشاشة الرئيسية
                 try {
                     if (onHomeAction != null) {
                         onHomeAction.invoke()
@@ -1072,16 +1071,6 @@ object BlockOverlayManager {
                         }
                         context.startActivity(homeIntent)
                     }
-                    val blockIntent = BlockActivity.createIntent(
-                        context = context,
-                        packageName = packageName,
-                        appName = appName,
-                        reason = reason,
-                        nextAvailable = nextAvailable,
-                        consumedMinutes = 0,
-                        allowedMinutes = 0
-                    )
-                    context.startActivity(blockIntent)
                 } catch (ex: Exception) {}
             }
         }

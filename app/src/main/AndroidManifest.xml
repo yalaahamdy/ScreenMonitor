@@ -56,15 +56,6 @@
         <activity android:name=".ui.restrictions.AddEditRestrictionActivity" android:exported="false" />
         <activity android:name=".ui.restrictions.AppSelectionActivity" android:exported="false" />
 
-        <!-- Transparent fallback block screen (separate task so it never merges
-             with the blocked app's task and cannot be escaped with back) -->
-        <activity
-            android:name=".ui.block.BlockActivity"
-            android:excludeFromRecents="true"
-            android:exported="false"
-            android:launchMode="singleInstance"
-            android:taskAffinity="com.screenguard.app.blockoverlay"
-            android:theme="@style/Theme.ScreenGuard.BlockDialog" />
 
         <!-- Unified engine: capture (screenshots) + restrictions (blocking) -->
         <service

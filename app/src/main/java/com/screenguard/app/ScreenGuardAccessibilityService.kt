@@ -34,7 +34,6 @@ import com.screenguard.app.data.repository.AppInfoManager
 import com.screenguard.app.data.repository.AppRestrictionsRepository
 import com.screenguard.app.security.BootResilienceManager
 import com.screenguard.app.service.BlockOverlayManager
-import com.screenguard.app.ui.block.BlockActivity
 
 /**
  * The unified heart of ScreenGuard.
@@ -523,25 +522,6 @@ class ScreenGuardAccessibilityService : AccessibilityService() {
                     performGlobalAction(GLOBAL_ACTION_BACK)
 
                     val appName = AppInfoManager.getInstance(this).getAppName(pkgName)
-                    val blockIntent = BlockActivity.createIntent(
-                        context = this,
-                        packageName = pkgName,
-                        appName = appName,
-                        reason = eval.detailedReasonText,
-                        nextAvailable = eval.nextAvailableText,
-                        consumedMinutes = eval.consumedMinutes,
-                        allowedMinutes = eval.allowedMinutes
-                    ).apply {
-                        addFlags(
-                            Intent.FLAG_ACTIVITY_NEW_TASK or
-                            Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                            Intent.FLAG_ACTIVITY_SINGLE_TOP
-                        )
-                    }
-                    try {
-                        startActivity(blockIntent)
-                    } catch (e: Exception) {}
-
                     BlockOverlayManager.show(
                         context = this,
                         packageName = pkgName,
@@ -572,18 +552,16 @@ class ScreenGuardAccessibilityService : AccessibilityService() {
                     startActivity(lockIntent)
                 } catch (e: Exception) {}
             } else {
-                val intent = BlockActivity.createIntent(
+                BlockOverlayManager.show(
                     context = this,
                     packageName = packageName,
                     appName = getString(R.string.app_name),
                     reason = Str.get(R.string.tamper_block_reason),
                     nextAvailable = Str.get(R.string.tamper_block_next),
-                    consumedMinutes = 0,
-                    allowedMinutes = 0
+                    onHomeAction = {
+                        performGlobalAction(GLOBAL_ACTION_HOME)
+                    }
                 )
-                try {
-                    startActivity(intent)
-                } catch (e: Exception) {}
             }
             return
         }
@@ -847,27 +825,6 @@ class ScreenGuardAccessibilityService : AccessibilityService() {
                 performGlobalAction(GLOBAL_ACTION_HOME)
             }
             val windowBounds = if (isPip) null else getAppWindowBounds(targetPackage)
-
-            if (isSettings) {
-                val blockIntent = BlockActivity.createIntent(
-                    context = this,
-                    packageName = targetPackage,
-                    appName = appName,
-                    reason = evaluation.detailedReasonText,
-                    nextAvailable = evaluation.nextAvailableText,
-                    consumedMinutes = evaluation.consumedMinutes,
-                    allowedMinutes = evaluation.allowedMinutes
-                ).apply {
-                    addFlags(
-                        Intent.FLAG_ACTIVITY_NEW_TASK or
-                        Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                        Intent.FLAG_ACTIVITY_SINGLE_TOP
-                    )
-                }
-                try {
-                    startActivity(blockIntent)
-                } catch (e: Exception) {}
-            }
 
             // Full-cover floating window (TYPE_ACCESSIBILITY_OVERLAY)
             BlockOverlayManager.show(

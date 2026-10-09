@@ -28,7 +28,7 @@ import com.screenguard.app.data.model.AppRestriction
 import com.screenguard.app.data.model.isSettingsPackage
 import com.screenguard.app.data.repository.AppInfoManager
 import com.screenguard.app.data.repository.AppRestrictionsRepository
-import com.screenguard.app.ui.block.BlockActivity
+import com.screenguard.app.MainTabsActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -297,27 +297,11 @@ class AppBlockerService : Service() {
                 } catch (e: Exception) {}
             }
 
-            val blockIntent = BlockActivity.createIntent(
-                context = this,
-                packageName = topPackage,
-                appName = appName,
-                reason = evaluation.detailedReasonText,
-                nextAvailable = evaluation.nextAvailableText,
-                consumedMinutes = evaluation.consumedMinutes,
-                allowedMinutes = evaluation.allowedMinutes
-            ).apply {
-                addFlags(
-                    Intent.FLAG_ACTIVITY_NEW_TASK or
-                    Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                    Intent.FLAG_ACTIVITY_SINGLE_TOP
-                )
+            val notifIntent = Intent(this, MainTabsActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             }
 
-            try {
-                startActivity(blockIntent)
-            } catch (e: Exception) {}
-
-            showBlockNotification(blockIntent, appName, evaluation.detailedReasonText)
+            showBlockNotification(notifIntent, appName, evaluation.detailedReasonText)
 
             if (canDrawOverlay) {
                 // Show the floating shield directly above the blocked app

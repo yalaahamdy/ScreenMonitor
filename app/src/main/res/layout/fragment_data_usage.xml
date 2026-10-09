@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/swipeRefreshData"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Period selector -->
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:id="@+id/dataPeriodChips"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/dataChipToday"
+                        style="@style/SGPeriodChip"
+                        android:text="@string/period_today" />
+
+                    <TextView
+                        android:id="@+id/dataChipYesterday"
+                        style="@style/SGPeriodChip"
+                        android:text="@string/period_yesterday" />
+
+                    <TextView
+                        android:id="@+id/dataChipWeek"
+                        style="@style/SGPeriodChip"
+                        android:text="@string/period_week" />
+
+                    <TextView
+                        android:id="@+id/dataChipMonth"
+                        style="@style/SGPeriodChip"
+                        android:text="@string/period_month" />
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <!-- Network filter chips -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/filterAll"
+                    style="@style/SGPeriodChip"
+                    android:text="@string/net_filter_all" />
+
+                <TextView
+                    android:id="@+id/filterMobile"
+                    style="@style/SGPeriodChip"
+                    android:text="@string/net_filter_mobile" />
+
+                <TextView
+                    android:id="@+id/filterWifi"
+                    style="@style/SGPeriodChip"
+                    android:text="@string/net_filter_wifi" />
+            </LinearLayout>
+
+            <!-- Overview hero -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_header_card"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/data_total_usage"
+                    android:textColor="?attr/sgTextSecondary"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/tvDataTotal"
+                    style="@style/DisplayNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="@string/em_dash"
+                    android:textSize="36sp" />
+
+                <!-- Mobile ratio row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:contentDescription="@string/net_filter_mobile"
+                        android:src="@drawable/ic_network"
+                        app:tint="@color/accent_purple" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="@string/net_filter_mobile"
+                        android:textColor="?attr/sgTextSecondary"
+                        android:textSize="12sp" />
+
+                    <ProgressBar
+                        android:id="@+id/progressMobile"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="0dp"
+                        android:layout_height="6dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="12dp"
+                        android:layout_weight="1"
+                        android:progressDrawable="@drawable/progress_bar_style" />
+
+                    <TextView
+                        android:id="@+id/tvMobileTotal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="?attr/sgTextPrimary"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- WiFi ratio row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:contentDescription="@string/net_filter_wifi"
+                        android:src="@drawable/ic_network"
+                        app:tint="@color/accent_blue" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="@string/net_filter_wifi"
+                        android:textColor="?attr/sgTextSecondary"
+                        android:textSize="12sp" />
+
+                    <ProgressBar
+                        android:id="@+id/progressWifi"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="0dp"
+                        android:layout_height="6dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="12dp"
+                        android:layout_weight="1"
+                        android:progressDrawable="@drawable/progress_bar_style" />
+
+                    <TextView
+                        android:id="@+id/tvWifiTotal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="?attr/sgTextPrimary"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Top consumers -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="@string/data_top_apps"
+                style="@style/RowTitle" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/dataAppList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:nestedScrollingEnabled="false"
+                android:overScrollMode="never" />
+
+            <LinearLayout
+                android:id="@+id/dataEmptyState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="40dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:contentDescription="@string/data_empty"
+                    android:src="@drawable/ic_network"
+                    app:tint="?attr/sgTextTertiary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center"
+                    android:text="@string/data_empty"
+                    android:textColor="?attr/sgTextTertiary"
+                    android:textSize="13sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

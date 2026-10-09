@@ -1,17 +1,17 @@
-# ScreenGuard (ScreenMonitor) — Transparent Parental Screen Monitoring
+# ScreenGuard (ScreenMonitor) v3.2.0 — Unified Parental Control & Screen Protection 🛡️
 
 <p align="center">
   <img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" width="128" height="128" alt="ScreenGuard App Icon" />
 </p>
 
 <p align="center">
-  <b>Transparent, offline, ethical parental screen monitoring for Android 11+ (API 30–34).</b>
+  <b>The all-in-one transparent, offline parental screen monitoring & app usage controller for Android 11+ (API 30–34).</b>
 </p>
 
 <p align="center">
-  <a href="#key-features">Key Features</a> •
+  <a href="#whats-new-in-v320">What's New in v3.2</a> •
+  <a href="#core-features">Core Features</a> •
   <a href="#luxury-themes">Luxury Themes</a> •
-  <a href="#quick-start">Quick Start</a> •
   <a href="#architecture">Architecture</a> •
   <a href="#releases">Releases</a> •
   <a href="#privacy--ethics">Privacy</a>
@@ -19,63 +19,88 @@
 
 ---
 
-## What is ScreenGuard?
+## 🌟 What is ScreenGuard v3.2.0?
 
-**ScreenGuard** is an open-source, transparent parental control tool designed to protect children on Android devices. It takes periodic, silent screenshots of the child's screen without annoying media projection consent prompts, keeping parents informed while respecting device transparency.
+**ScreenGuard v3.2.0** is the ultimate unified parental control application, seamlessly merging **ScreenMonitor** (intelligent stealth screen capture, luxury themes, parental PIN gate) with **Muraqib / App-Usage-Tracker-Controller** (screen-time analytics, data usage statistics, and real-time app restriction engine) into a single, cohesive, high-performance app.
 
-Monitoring is always announced by a permanent system notification and cannot be hidden or stopped silently. All screenshots remain strictly on-device in app-private storage.
-
----
-
-## Key Features
-
-- **⚡ Instant & Reliable Capture**: Built on Android Accessibility `takeScreenshot()` (API 30+) with zero prompt spam.
-- **🕒 Free Custom Intervals**: Set any custom capture interval in minutes (1, 5, 10, 15, 60...) freely.
-- **🌙 Smart Screen-Wake & Doze Detection**: Automatically detects screen activation (`ACTION_SCREEN_ON` & `ACTION_USER_PRESENT`) and triggers overdue captures immediately upon wake-up.
-- **🚀 App-Open Snapping**: Snaps newly foregrounded apps so parents see what was just opened.
-- **🎨 5 Luxury Palettes**: Five dark prestige themes selectable in-app:
-  - **Midnight Prestige** (Champagne gold over midnight navy)
-  - **Emerald Vault** (Royal emerald with golden accents)
-  - **Rose Aristocrat** (Rose gold on bordeaux velvet)
-  - **Onyx Platinum** (Polished platinum on dark onyx)
-  - **Sapphire Crown** (Ice sapphire on deep royal blue)
-- **🌍 In-App Language Switching**: Instant runtime switching between **System Default**, **English**, and **العربية (Arabic)** without needing to change system language.
-- **🔒 Universal Parental PIN Gate**: The entire app (Dashboard, Settings, Gallery, and Setup) is locked behind a mandatory Parental PIN (Salted SHA-256). Any attempt to open the app or resume from background immediately presents the PIN gatekeeper with zero bypass capability.
-- **🛡️ Real-Time Anti-Tamper Protection**: Prevents unauthorized stopping of permissions or accessibility service from Android System Settings when the session is locked.
-- **⏳ Auto-Lock & Session Inactivity**: The app automatically re-locks whenever minimized or sent to the background, preventing children from accessing controls if the device is handed over.
-- **🛡️ Anti-Uninstall Defense**: Device Administrator integration blocks unauthorized app removal.
-- **📦 Intelligent Storage Quota**: Customizable max-storage quota (e.g. 50, 200, 1000 captures) with automatic rolling cleanup.
-- **⚡ Fast JPEG Engine**: Crisp 90% quality JPEG compression saving in under 50ms and cutting disk usage by 85%.
-- **📴 100% Offline & Private**: Zero internet permissions (`android.permission.INTERNET` is completely omitted). No data ever leaves the device.
+Everything runs 100% on-device with **zero internet permissions**, completely respecting user privacy.
 
 ---
 
-## Setup Guide (Child's Device)
+## 🆕 What's New in v3.2.0 (Merged Suite)
 
-1. **Download & Install**: Grab `ScreenGuard-release.apk` from the [Releases](https://github.com/yalaahamdy/ScreenMonitor/releases) tab.
-2. **Notification Permission**: Grant notifications so the permanent transparency notice is displayed.
-3. **Set Parent PIN**: Choose a 4-digit secret PIN protecting the gallery and settings.
-4. **Enable Accessibility Service**:
-   - Navigate to *Settings → Accessibility → ScreenGuard Monitoring Service* and switch to **ON**.
-   - *(Android 13+ note)*: If greyed out, go to *App Info → ⋮ (top right) → Allow restricted settings*.
-5. **Activate Device Admin**: Grants anti-tamper and instantaneous lock capabilities.
-6. **Exempt from Battery Optimization**: Prevents aggressive background kills.
-7. **Done**: Monitoring begins immediately with a persistent status notification.
+### 1. 🧭 Unified 4-Tab Bottom Navigation (`MainTabsActivity`)
+- **🏠 Home**: Quick overview of device protection shields, active screen time, recent captures, and one-tap lock.
+- **📊 Analytics**: Hourly 24-column interactive usage bar chart, time-of-day distribution (Morning, Afternoon, Evening, Night), app launch counts, and comparative statistics.
+- **🌐 Data Usage**: Full breakdown of Wi-Fi vs. Mobile data consumption per app and system total.
+- **🚫 Restrictions**: Real-time app blocker, daily/weekly usage limits, group quotas, and scheduled time windows.
+
+### 2. ⚡ Two-Tier App Restriction & Blocker Engine
+- **Instant Blocking**: Zero-delay blocking via Accessibility Service + 1.2s polling fallback service.
+- **Custom Usage Quotas**: Daily/weekly usage allowances per app or shared group quotas.
+- **Allowed Schedules**: Configure active days and multiple allowed time windows.
+- **Split-Screen Shield & PiP Interception**: Precise covering of blocked apps in multi-window or picture-in-picture mode.
+- **PIN-Protected Temporary Bypass**: 1–300 minutes temporary grace with automatic expiration surviving reboots.
+
+### 3. 🎯 Active Screen Usage-Duration Capture Engine
+- Captures are triggered by actual active foreground screen usage (default: 10 active minutes) rather than arbitrary clock time.
+- Optional secondary triggers: screen wake, app open, periodic timer.
+- Zero battery waste during deep sleep (Doze Mode).
+- High-speed 90% quality JPEG engine with automatic rolling storage quota (auto-prune).
+
+### 4. 🔒 Universal Security & Anti-Tamper Defense
+- **Mandatory App-Entry PIN Gate**: App launch and background resume immediately require the 4-digit salted SHA-256 PIN.
+- **Security Question Recovery**: Safe PIN recovery with security question and brute-force lockout (5 failed attempts = 30s lockout).
+- **Auto-Lock on Background**: Immediate session lock upon minimizing or leaving the app.
+- **Anti-Tamper Shield**: Intercepts attempts to disable Accessibility or Device Admin from system settings when locked.
+- **Safe Mode Audit & Clock-Rollback Detection**: Detects attempts to bypass restrictions by rebooting into safe mode or changing system clock.
+
+### 5. 💾 JSON Backup & Restore
+- Full export and import of all restrictions and app settings verified with SHA-256 checksums.
 
 ---
 
-## Tech Stack & Architecture
+## 🎨 5 Luxury Palettes
 
-- **Language**: Kotlin 1.9+, Java 17
-- **Target SDK**: Android 34 (UpsideDownCake) | **Min SDK**: Android 30 (Android 11)
-- **Capture Mechanism**: `AccessibilityService.takeScreenshot()` with `android:canTakeScreenshot="true"`.
-- **Foreground Service**: `specialUse` foreground service ensuring non-killable status and watchdog alerts.
-- **Theme Engine**: Dynamic `BaseActivity` with runtime attribute resolution (`attrs.xml` + `ThemeHelper`).
-- **Localization Engine**: Dynamic configuration wrapping via `LocaleHelper`.
+ScreenGuard includes five distinct prestige themes selectable at runtime:
+- 🌌 **Midnight Prestige**: Champagne gold on deep midnight navy
+- 🌲 **Emerald Vault**: Royal emerald with golden accents
+- 🍷 **Rose Aristocrat**: Rose gold on bordeaux velvet
+- 🪙 **Onyx Platinum**: Polished platinum on dark onyx
+- 👑 **Sapphire Crown**: Ice sapphire on deep royal blue
 
 ---
 
-## Building from Source
+## 🌍 Complete Bilingual Support (English & Arabic)
+
+- Full runtime in-app language switching between **English**, **العربية (Arabic)**, and **System Default**.
+- Comprehensive Right-to-Left (RTL) layout optimization across all tabs, dialogs, and charts.
+
+---
+
+## 📲 Quick Setup (Child's Device)
+
+1. **Install APK**: Download `ScreenGuard-v3.2.0.apk` from the [Releases](https://github.com/yalaahamdy/ScreenMonitor/releases) tab.
+2. **Notification Permission**: Displays the permanent parental transparency banner.
+3. **Set Parent PIN**: Choose a secret 4-digit PIN with a recovery security question.
+4. **Enable Accessibility Service**: Powers screen capture, instant blocking, and anti-tamper shields.
+5. **Activate Device Admin**: Prevents unauthorized app uninstallation and enables instant screen lock.
+6. **Battery Optimization Exemption**: Ensures uninterrupted monitoring without OS kills.
+7. **Usage Access Permission**: Enables screen-time analytics and usage limits.
+
+---
+
+## 🏗️ Architecture & Tech Stack
+
+- **Target SDK**: Android 34 | **Min SDK**: Android 30 (Android 11+)
+- **Languages**: Kotlin 1.9+, Java 17
+- **UI Framework**: Native XML Views, Custom Canvas Charts (`HourlyUsageBarChartView`, `TimeOfDayDistributionView`), Bottom Navigation + ViewPager2 / Fragments.
+- **Security**: Salted SHA-256 with dual legacy migration support.
+- **Permissions**: Zero internet permission (`android.permission.INTERNET` is omitted).
+
+---
+
+## 🔨 Building from Source
 
 ```bash
 # Clone the repository
@@ -84,19 +109,17 @@ cd ScreenMonitor
 
 # Build Release APK
 ./gradlew assembleRelease
+# On Windows:
+.\gradlew.bat assembleRelease
 ```
 
-The signed release APK will be located at:
+Signed release APK output:
 `app/build/outputs/apk/release/app-release.apk`
 
 ---
 
-## Privacy & Ethics
+## ⚖️ License & Ethics
 
-ScreenGuard is engineered strictly for **parental monitoring of minors with full transparency**. It complies with transparency guidelines by never running covertly: a persistent notification is visible at all times while the service is active.
-
----
-
-## License
-
-ScreenGuard is released under the [MIT License](LICENSE).
+- ScreenGuard code is licensed under the **MIT License**.
+- App-Usage-Tracker-Controller components under **Apache License 2.0**.
+- Strictly designed for **transparent, ethical parental guidance of minors**.

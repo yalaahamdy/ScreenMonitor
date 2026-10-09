@@ -24,10 +24,15 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(ThemeHelper.themeRes(this))
+        if (useRuntimeTheme()) {
+            setTheme(ThemeHelper.themeRes(this))
+        }
         super.onCreate(savedInstanceState)
         uiVersionAtCreate = Prefs.uiVersion(this)
     }
+
+    /** Overridden by transparent/overlay-style activities that must keep their manifest theme. */
+    protected open fun useRuntimeTheme(): Boolean = true
 
     override fun onResume() {
         super.onResume()

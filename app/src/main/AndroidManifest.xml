@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Capture + monitoring -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
@@ -8,6 +10,24 @@
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- Restrictions engine (usage analytics + real-time blocking) -->
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
+    <!-- Required for NetworkStatsManager queries to return data on many devices -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
 
     <application
         android:name=".ScreenGuardApp"
@@ -27,12 +47,26 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".DashboardActivity" android:exported="false" />
+        <activity android:name=".MainTabsActivity" android:exported="false" />
         <activity android:name=".PinLockActivity" android:exported="false" />
         <activity android:name=".GalleryActivity" android:exported="false" />
         <activity android:name=".ViewerActivity" android:exported="false" />
         <activity android:name=".SettingsActivity" android:exported="false" />
+        <activity android:name=".ui.detail.AppDetailActivity" android:exported="false" />
+        <activity android:name=".ui.restrictions.AddEditRestrictionActivity" android:exported="false" />
+        <activity android:name=".ui.restrictions.AppSelectionActivity" android:exported="false" />
 
+        <!-- Transparent fallback block screen (separate task so it never merges
+             with the blocked app's task and cannot be escaped with back) -->
+        <activity
+            android:name=".ui.block.BlockActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleInstance"
+            android:taskAffinity="com.screenguard.app.blockoverlay"
+            android:theme="@style/Theme.ScreenGuard.BlockDialog" />
+
+        <!-- Unified engine: capture (screenshots) + restrictions (blocking) -->
         <service
             android:name=".ScreenGuardAccessibilityService"
             android:exported="false"
@@ -47,7 +81,17 @@
                 android:resource="@xml/accessibility_service_config" />
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="Transparent parental control screen monitoring" />
+                android:value="Transparent parental control: screen monitoring and app usage limits" />
+        </service>
+
+        <!-- Fallback enforcement poller -->
+        <service
+            android:name=".service.AppBlockerService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="app_usage_limiter" />
         </service>
 
         <receiver
@@ -59,15 +103,34 @@
                 android:resource="@xml/device_admin" />
             <intent-filter>
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+                <action android:name="android.app.action.DEVICE_ADMIN_DISABLE_REQUESTED" />
+                <action android:name="android.app.action.DEVICE_ADMIN_DISABLED" />
             </intent-filter>
         </receiver>
 
+        <!-- Boot resilience: restart services, restore bypass timers, safe-mode audit -->
         <receiver
             android:name=".BootReceiver"
+            android:directBootAware="true"
+            android:enabled="true"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
+
+        <!-- Backup share support -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 </manifest>

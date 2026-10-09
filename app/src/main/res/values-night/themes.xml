@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ============================================================
+         ScreenGuard — DARK theme definitions (values-night).
+         The five luxury palettes, v3.2.0 contrast-tuned:
+           * tertiary/secondary text lifted to WCAG-safe levels
+           * outlines/dividers perceptibly stronger
+           * full Material 3 color-role mapping (containers, inverse,
+             surface container tones) so every widget follows theme
+           * new tokens: sgAccentText (accent safe for text),
+             sgRipple (accent-tinted ripple)
+         The light counterparts live in values/themes.xml.
+         ============================================================ -->
+
+    <style name="Theme.ScreenGuard" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- sg tokens: Midnight Prestige -->
+        <item name="sgCanvas">@color/bg</item>
+        <item name="sgHeader">@color/header</item>
+        <item name="sgSurface">@color/surface</item>
+        <item name="sgSurfaceElev">@color/surface_elev</item>
+        <item name="sgSurfaceAlt">@color/surface_alt</item>
+        <item name="sgOutline">@color/outline</item>
+        <item name="sgOutlineStrong">@color/outline_strong</item>
+        <item name="sgDivider">@color/divider</item>
+        <item name="sgAccent">@color/gold</item>
+        <item name="sgAccentSoft">@color/gold_soft</item>
+        <item name="sgAccentDeep">@color/gold_deep</item>
+        <item name="sgOnAccent">@color/on_gold</item>
+        <item name="sgAccentContainer">@color/gold_container</item>
+        <item name="sgAccentHairline">@color/gold_hairline</item>
+        <item name="sgAccentText">@color/gold</item>
+        <item name="sgRipple">#26D4B46A</item>
+        <item name="sgTextPrimary">@color/text_primary</item>
+        <item name="sgTextSecondary">@color/text_secondary</item>
+        <item name="sgTextTertiary">@color/text_tertiary</item>
+        <item name="sgKeyBg">@color/key_bg</item>
+
+        <!-- Material 3 color roles -->
+        <item name="colorPrimary">@color/gold</item>
+        <item name="colorOnPrimary">@color/on_gold</item>
+        <item name="colorPrimaryContainer">@color/gold_container</item>
+        <item name="colorOnPrimaryContainer">@color/gold_soft</item>
+        <item name="colorSecondary">@color/gold_soft</item>
+        <item name="colorOnSecondary">@color/on_gold</item>
+        <item name="colorSecondaryContainer">@color/gold_container</item>
+        <item name="colorOnSecondaryContainer">@color/gold_soft</item>
+        <item name="colorTertiary">@color/gold</item>
+        <item name="colorOnTertiary">@color/on_gold</item>
+        <item name="colorTertiaryContainer">@color/gold_container</item>
+        <item name="colorOnTertiaryContainer">@color/gold_soft</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary</item>
+        <item name="colorSurfaceVariant">@color/surface_alt</item>
+        <item name="colorSurfaceContainerLowest">@color/surface_alt</item>
+        <item name="colorSurfaceContainerLow">@color/surface</item>
+        <item name="colorSurfaceContainer">@color/surface</item>
+        <item name="colorSurfaceContainerHigh">@color/surface_elev</item>
+        <item name="colorSurfaceContainerHighest">@color/surface_elev</item>
+        <item name="colorSurfaceDim">@color/bg</item>
+        <item name="colorSurfaceBright">@color/surface_elev</item>
+        <item name="colorOutline">@color/outline</item>
+        <item name="colorOutlineVariant">@color/divider</item>
+        <item name="colorError">@color/danger</item>
+        <item name="colorOnError">@color/error_on</item>
+        <item name="colorErrorContainer">@color/danger_container</item>
+        <item name="colorOnErrorContainer">@color/danger</item>
+        <item name="android:colorBackground">@color/bg</item>
+        <item name="colorOnBackground">@color/text_primary</item>
+
+        <item name="android:statusBarColor">@color/bg</item>
+        <item name="android:navigationBarColor">@color/bg</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:windowBackground">@color/bg</item>
+
+        <item name="android:colorControlActivated">@color/gold</item>
+        <item name="android:colorControlNormal">@color/text_tertiary</item>
+        <item name="android:colorControlHighlight">#26D4B46A</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+
+        <item name="materialAlertDialogTheme">@style/ScreenGuard.Dialog</item>
+        <item name="switchStyle">@style/ScreenGuard.Switch</item>
+    </style>
+
+    <!-- ===================== Theme variants (dark) ===================== -->
+
+    <style name="Theme.ScreenGuard.MidnightPrestige">
+        <item name="android:colorControlHighlight">#26D4B46A</item>
+    </style>
+
+    <style name="Theme.ScreenGuard.EmeraldVault">
+        <item name="sgCanvas">@color/em_canvas</item>
+        <item name="sgHeader">@color/em_header</item>
+        <item name="sgSurface">@color/em_surface</item>
+        <item name="sgSurfaceElev">@color/em_surface_elev</item>
+        <item name="sgSurfaceAlt">@color/em_surface_alt</item>
+        <item name="sgOutline">@color/em_outline</item>
+        <item name="sgOutlineStrong">@color/em_outline_strong</item>
+        <item name="sgDivider">@color/em_divider</item>
+        <item name="sgAccent">@color/em_accent</item>
+        <item name="sgAccentSoft">@color/em_accent_soft</item>
+        <item name="sgAccentDeep">@color/em_accent_deep</item>
+        <item name="sgOnAccent">@color/em_on_accent</item>
+        <item name="sgAccentContainer">@color/em_accent_container</item>
+        <item name="sgAccentHairline">@color/em_accent_hairline</item>
+        <item name="sgAccentText">@color/em_accent</item>
+        <item name="sgRipple">#2646C79A</item>
+        <item name="sgTextPrimary">@color/em_text_primary</item>
+        <item name="sgTextSecondary">@color/em_text_secondary</item>
+        <item name="sgTextTertiary">@color/em_text_tertiary</item>
+        <item name="sgKeyBg">@color/em_key_bg</item>
+
+        <item name="colorPrimary">@color/em_accent</item>
+        <item name="colorOnPrimary">@color/em_on_accent</item>
+        <item name="colorPrimaryContainer">@color/em_accent_container</item>
+        <item name="colorOnPrimaryContainer">@color/em_accent_soft</item>
+        <item name="colorSecondary">@color/em_accent_soft</item>
+        <item name="colorOnSecondary">@color/em_on_accent</item>
+        <item name="colorSecondaryContainer">@color/em_accent_container</item>
+        <item name="colorOnSecondaryContainer">@color/em_accent_soft</item>
+        <item name="colorTertiary">@color/em_accent</item>
+        <item name="colorOnTertiary">@color/em_on_accent</item>
+        <item name="colorTertiaryContainer">@color/em_accent_container</item>
+        <item name="colorOnTertiaryContainer">@color/em_accent_soft</item>
+        <item name="colorSurface">@color/em_surface</item>
+        <item name="colorOnSurface">@color/em_text_primary</item>
+        <item name="colorOnSurfaceVariant">@color/em_text_secondary</item>
+        <item name="colorSurfaceVariant">@color/em_surface_alt</item>
+        <item name="colorSurfaceContainerLowest">@color/em_surface_alt</item>
+        <item name="colorSurfaceContainerLow">@color/em_surface</item>
+        <item name="colorSurfaceContainer">@color/em_surface</item>
+        <item name="colorSurfaceContainerHigh">@color/em_surface_elev</item>
+        <item name="colorSurfaceContainerHighest">@color/em_surface_elev</item>
+        <item name="colorSurfaceDim">@color/em_canvas</item>
+        <item name="colorSurfaceBright">@color/em_surface_elev</item>
+        <item name="colorOutline">@color/em_outline</item>
+        <item name="colorOutlineVariant">@color/em_divider</item>
+        <item name="android:colorBackground">@color/em_canvas</item>
+        <item name="colorOnBackground">@color/em_text_primary</item>
+
+        <item name="android:statusBarColor">@color/em_canvas</item>
+        <item name="android:navigationBarColor">@color/em_canvas</item>
+        <item name="android:windowBackground">@color/em_canvas</item>
+
+        <item name="android:colorControlActivated">@color/em_accent</item>
+        <item name="android:colorControlNormal">@color/em_text_tertiary</item>
+        <item name="android:colorControlHighlight">#2646C79A</item>
+        <item name="android:textColor">@color/em_text_primary</item>
+        <item name="android:textColorSecondary">@color/em_text_secondary</item>
+    </style>
+
+    <style name="Theme.ScreenGuard.RoseAristocrat">
+        <item name="sgCanvas">@color/ra_canvas</item>
+        <item name="sgHeader">@color/ra_header</item>
+        <item name="sgSurface">@color/ra_surface</item>
+        <item name="sgSurfaceElev">@color/ra_surface_elev</item>
+        <item name="sgSurfaceAlt">@color/ra_surface_alt</item>
+        <item name="sgOutline">@color/ra_outline</item>
+        <item name="sgOutlineStrong">@color/ra_outline_strong</item>
+        <item name="sgDivider">@color/ra_divider</item>
+        <item name="sgAccent">@color/ra_accent</item>
+        <item name="sgAccentSoft">@color/ra_accent_soft</item>
+        <item name="sgAccentDeep">@color/ra_accent_deep</item>
+        <item name="sgOnAccent">@color/ra_on_accent</item>
+        <item name="sgAccentContainer">@color/ra_accent_container</item>
+        <item name="sgAccentHairline">@color/ra_accent_hairline</item>
+        <item name="sgAccentText">@color/ra_accent</item>
+        <item name="sgRipple">#26E2A78F</item>
+        <item name="sgTextPrimary">@color/ra_text_primary</item>
+        <item name="sgTextSecondary">@color/ra_text_secondary</item>
+        <item name="sgTextTertiary">@color/ra_text_tertiary</item>
+        <item name="sgKeyBg">@color/ra_key_bg</item>
+
+        <item name="colorPrimary">@color/ra_accent</item>
+        <item name="colorOnPrimary">@color/ra_on_accent</item>
+        <item name="colorPrimaryContainer">@color/ra_accent_container</item>
+        <item name="colorOnPrimaryContainer">@color/ra_accent_soft</item>
+        <item name="colorSecondary">@color/ra_accent_soft</item>
+        <item name="colorOnSecondary">@color/ra_on_accent</item>
+        <item name="colorSecondaryContainer">@color/ra_accent_container</item>
+        <item name="colorOnSecondaryContainer">@color/ra_accent_soft</item>
+        <item name="colorTertiary">@color/ra_accent</item>
+        <item name="colorOnTertiary">@color/ra_on_accent</item>
+        <item name="colorTertiaryContainer">@color/ra_accent_container</item>
+        <item name="colorOnTertiaryContainer">@color/ra_accent_soft</item>
+        <item name="colorSurface">@color/ra_surface</item>
+        <item name="colorOnSurface">@color/ra_text_primary</item>
+        <item name="colorOnSurfaceVariant">@color/ra_text_secondary</item>
+        <item name="colorSurfaceVariant">@color/ra_surface_alt</item>
+        <item name="colorSurfaceContainerLowest">@color/ra_surface_alt</item>
+        <item name="colorSurfaceContainerLow">@color/ra_surface</item>
+        <item name="colorSurfaceContainer">@color/ra_surface</item>
+        <item name="colorSurfaceContainerHigh">@color/ra_surface_elev</item>
+        <item name="colorSurfaceContainerHighest">@color/ra_surface_elev</item>
+        <item name="colorSurfaceDim">@color/ra_canvas</item>
+        <item name="colorSurfaceBright">@color/ra_surface_elev</item>
+        <item name="colorOutline">@color/ra_outline</item>
+        <item name="colorOutlineVariant">@color/ra_divider</item>
+        <item name="android:colorBackground">@color/ra_canvas</item>
+        <item name="colorOnBackground">@color/ra_text_primary</item>
+
+        <item name="android:statusBarColor">@color/ra_canvas</item>
+        <item name="android:navigationBarColor">@color/ra_canvas</item>
+        <item name="android:windowBackground">@color/ra_canvas</item>
+
+        <item name="android:colorControlActivated">@color/ra_accent</item>
+        <item name="android:colorControlNormal">@color/ra_text_tertiary</item>
+        <item name="android:colorControlHighlight">#26E2A78F</item>
+        <item name="android:textColor">@color/ra_text_primary</item>
+        <item name="android:textColorSecondary">@color/ra_text_secondary</item>
+    </style>
+
+    <style name="Theme.ScreenGuard.OnyxPlatinum">
+        <item name="sgCanvas">@color/op_canvas</item>
+        <item name="sgHeader">@color/op_header</item>
+        <item name="sgSurface">@color/op_surface</item>
+        <item name="sgSurfaceElev">@color/op_surface_elev</item>
+        <item name="sgSurfaceAlt">@color/op_surface_alt</item>
+        <item name="sgOutline">@color/op_outline</item>
+        <item name="sgOutlineStrong">@color/op_outline_strong</item>
+        <item name="sgDivider">@color/op_divider</item>
+        <item name="sgAccent">@color/op_accent</item>
+        <item name="sgAccentSoft">@color/op_accent_soft</item>
+        <item name="sgAccentDeep">@color/op_accent_deep</item>
+        <item name="sgOnAccent">@color/op_on_accent</item>
+        <item name="sgAccentContainer">@color/op_accent_container</item>
+        <item name="sgAccentHairline">@color/op_accent_hairline</item>
+        <item name="sgAccentText">@color/op_accent</item>
+        <item name="sgRipple">#26C6CCD8</item>
+        <item name="sgTextPrimary">@color/op_text_primary</item>
+        <item name="sgTextSecondary">@color/op_text_secondary</item>
+        <item name="sgTextTertiary">@color/op_text_tertiary</item>
+        <item name="sgKeyBg">@color/op_key_bg</item>
+
+        <item name="colorPrimary">@color/op_accent</item>
+        <item name="colorOnPrimary">@color/op_on_accent</item>
+        <item name="colorPrimaryContainer">@color/op_accent_container</item>
+        <item name="colorOnPrimaryContainer">@color/op_accent_soft</item>
+        <item name="colorSecondary">@color/op_accent_soft</item>
+        <item name="colorOnSecondary">@color/op_on_accent</item>
+        <item name="colorSecondaryContainer">@color/op_accent_container</item>
+        <item name="colorOnSecondaryContainer">@color/op_accent_soft</item>
+        <item name="colorTertiary">@color/op_accent</item>
+        <item name="colorOnTertiary">@color/op_on_accent</item>
+        <item name="colorTertiaryContainer">@color/op_accent_container</item>
+        <item name="colorOnTertiaryContainer">@color/op_accent_soft</item>
+        <item name="colorSurface">@color/op_surface</item>
+        <item name="colorOnSurface">@color/op_text_primary</item>
+        <item name="colorOnSurfaceVariant">@color/op_text_secondary</item>
+        <item name="colorSurfaceVariant">@color/op_surface_alt</item>
+        <item name="colorSurfaceContainerLowest">@color/op_surface_alt</item>
+        <item name="colorSurfaceContainerLow">@color/op_surface</item>
+        <item name="colorSurfaceContainer">@color/op_surface</item>
+        <item name="colorSurfaceContainerHigh">@color/op_surface_elev</item>
+        <item name="colorSurfaceContainerHighest">@color/op_surface_elev</item>
+        <item name="colorSurfaceDim">@color/op_canvas</item>
+        <item name="colorSurfaceBright">@color/op_surface_elev</item>
+        <item name="colorOutline">@color/op_outline</item>
+        <item name="colorOutlineVariant">@color/op_divider</item>
+        <item name="android:colorBackground">@color/op_canvas</item>
+        <item name="colorOnBackground">@color/op_text_primary</item>
+
+        <item name="android:statusBarColor">@color/op_canvas</item>
+        <item name="android:navigationBarColor">@color/op_canvas</item>
+        <item name="android:windowBackground">@color/op_canvas</item>
+
+        <item name="android:colorControlActivated">@color/op_accent</item>
+        <item name="android:colorControlNormal">@color/op_text_tertiary</item>
+        <item name="android:colorControlHighlight">#26C6CCD8</item>
+        <item name="android:textColor">@color/op_text_primary</item>
+        <item name="android:textColorSecondary">@color/op_text_secondary</item>
+    </style>
+
+    <style name="Theme.ScreenGuard.SapphireCrown">
+        <item name="sgCanvas">@color/sc_canvas</item>
+        <item name="sgHeader">@color/sc_header</item>
+        <item name="sgSurface">@color/sc_surface</item>
+        <item name="sgSurfaceElev">@color/sc_surface_elev</item>
+        <item name="sgSurfaceAlt">@color/sc_surface_alt</item>
+        <item name="sgOutline">@color/sc_outline</item>
+        <item name="sgOutlineStrong">@color/sc_outline_strong</item>
+        <item name="sgDivider">@color/sc_divider</item>
+        <item name="sgAccent">@color/sc_accent</item>
+        <item name="sgAccentSoft">@color/sc_accent_soft</item>
+        <item name="sgAccentDeep">@color/sc_accent_deep</item>
+        <item name="sgOnAccent">@color/sc_on_accent</item>
+        <item name="sgAccentContainer">@color/sc_accent_container</item>
+        <item name="sgAccentHairline">@color/sc_accent_hairline</item>
+        <item name="sgAccentText">@color/sc_accent</item>
+        <item name="sgRipple">#267BA7E8</item>
+        <item name="sgTextPrimary">@color/sc_text_primary</item>
+        <item name="sgTextSecondary">@color/sc_text_secondary</item>
+        <item name="sgTextTertiary">@color/sc_text_tertiary</item>
+        <item name="sgKeyBg">@color/sc_key_bg</item>
+
+        <item name="colorPrimary">@color/sc_accent</item>
+        <item name="colorOnPrimary">@color/sc_on_accent</item>
+        <item name="colorPrimaryContainer">@color/sc_accent_container</item>
+        <item name="colorOnPrimaryContainer">@color/sc_accent_soft</item>
+        <item name="colorSecondary">@color/sc_accent_soft</item>
+        <item name="colorOnSecondary">@color/sc_on_accent</item>
+        <item name="colorSecondaryContainer">@color/sc_accent_container</item>
+        <item name="colorOnSecondaryContainer">@color/sc_accent_soft</item>
+        <item name="colorTertiary">@color/sc_accent</item>
+        <item name="colorOnTertiary">@color/sc_on_accent</item>
+        <item name="colorTertiaryContainer">@color/sc_accent_container</item>
+        <item name="colorOnTertiaryContainer">@color/sc_accent_soft</item>
+        <item name="colorSurface">@color/sc_surface</item>
+        <item name="colorOnSurface">@color/sc_text_primary</item>
+        <item name="colorOnSurfaceVariant">@color/sc_text_secondary</item>
+        <item name="colorSurfaceVariant">@color/sc_surface_alt</item>
+        <item name="colorSurfaceContainerLowest">@color/sc_surface_alt</item>
+        <item name="colorSurfaceContainerLow">@color/sc_surface</item>
+        <item name="colorSurfaceContainer">@color/sc_surface</item>
+        <item name="colorSurfaceContainerHigh">@color/sc_surface_elev</item>
+        <item name="colorSurfaceContainerHighest">@color/sc_surface_elev</item>
+        <item name="colorSurfaceDim">@color/sc_canvas</item>
+        <item name="colorSurfaceBright">@color/sc_surface_elev</item>
+        <item name="colorOutline">@color/sc_outline</item>
+        <item name="colorOutlineVariant">@color/sc_divider</item>
+        <item name="android:colorBackground">@color/sc_canvas</item>
+        <item name="colorOnBackground">@color/sc_text_primary</item>
+
+        <item name="android:statusBarColor">@color/sc_canvas</item>
+        <item name="android:navigationBarColor">@color/sc_canvas</item>
+        <item name="android:windowBackground">@color/sc_canvas</item>
+
+        <item name="android:colorControlActivated">@color/sc_accent</item>
+        <item name="android:colorControlNormal">@color/sc_text_tertiary</item>
+        <item name="android:colorControlHighlight">#267BA7E8</item>
+        <item name="android:textColor">@color/sc_text_primary</item>
+        <item name="android:textColorSecondary">@color/sc_text_secondary</item>
+    </style>
+</resources>

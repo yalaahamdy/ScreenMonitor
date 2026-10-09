@@ -3,4 +3,7 @@
     <files-path
         name="screenshots"
         path="screenshots/" />
+    <cache-path
+        name="backups"
+        path="backups/" />
 </paths>

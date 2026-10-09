@@ -70,7 +70,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="@string/step_notif_title"
                     android:src="@drawable/ic_bell"
-                    app:tint="?attr/sgAccent" />
+                    app:tint="?attr/sgAccentText" />
             </FrameLayout>
 
             <LinearLayout
@@ -138,7 +138,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="@string/step_pin_title"
                     android:src="@drawable/ic_key"
-                    app:tint="?attr/sgAccent" />
+                    app:tint="?attr/sgAccentText" />
             </FrameLayout>
 
             <LinearLayout
@@ -206,7 +206,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="@string/step_acc_title"
                     android:src="@drawable/ic_accessibility"
-                    app:tint="?attr/sgAccent" />
+                    app:tint="?attr/sgAccentText" />
             </FrameLayout>
 
             <LinearLayout
@@ -274,7 +274,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="@string/step_admin_title"
                     android:src="@drawable/ic_admin"
-                    app:tint="?attr/sgAccent" />
+                    app:tint="?attr/sgAccentText" />
             </FrameLayout>
 
             <LinearLayout
@@ -342,7 +342,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="@string/step_battery_title"
                     android:src="@drawable/ic_battery"
-                    app:tint="?attr/sgAccent" />
+                    app:tint="?attr/sgAccentText" />
             </FrameLayout>
 
             <LinearLayout

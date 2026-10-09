@@ -20,6 +20,11 @@
     <attr name="sgOnAccent" format="color" />
     <attr name="sgAccentContainer" format="color" />
     <attr name="sgAccentHairline" format="color" />
+    <!-- Accent tuned for TEXT/icons on the surface (vivid accent in dark,
+         deepened accent in light — always >= 5:1 against the surface). -->
+    <attr name="sgAccentText" format="color" />
+    <!-- Accent-tinted ripple for buttons/chips (mode-aware alpha tone). -->
+    <attr name="sgRipple" format="color" />
 
     <attr name="sgTextPrimary" format="color" />
     <attr name="sgTextSecondary" format="color" />

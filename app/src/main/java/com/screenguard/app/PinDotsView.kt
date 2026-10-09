@@ -57,13 +57,13 @@ class PinDotsView @JvmOverloads constructor(
 
     private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
-        color = attrColor(R.attr.sgAccent)
+        color = attrColor(R.attr.sgAccentText)
     }
 
     private val activePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeWidth = resources.displayMetrics.density * 2f
-        color = attrColor(R.attr.sgAccent)
+        color = attrColor(R.attr.sgAccentText)
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -78,7 +78,7 @@ class PinDotsView @JvmOverloads constructor(
         val activeColor = when (state) {
             STATE_ERROR -> ContextCompat.getColor(context, R.color.danger)
             STATE_SUCCESS -> ContextCompat.getColor(context, R.color.success_text)
-            else -> attrColor(R.attr.sgAccent)
+            else -> attrColor(R.attr.sgAccentText)
         }
 
         for (i in 0 until dotCount) {

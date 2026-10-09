@@ -11,8 +11,8 @@ android {
         applicationId = "com.screenguard.app"
         minSdk = 30
         targetSdk = 34
-        versionCode = 7
-        versionName = "2.2.0"
+        versionCode = 12
+        versionName = "3.2.0"
     }
 
     signingConfigs {
@@ -40,6 +40,11 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
 }
 
 dependencies {
@@ -49,4 +54,7 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.viewpager2:viewpager2:1.1.0")
+    implementation("androidx.fragment:fragment-ktx:1.6.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 }

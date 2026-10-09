@@ -59,7 +59,7 @@ class PinLockActivity : BaseActivity() {
 
     private fun verify() {
         val pin = entry.toString()
-        if (PinManager.verify(this, pin)) {
+        if (PinManager.verifyWithLockout(this, pin)) {
             dots.state = PinDotsView.STATE_SUCCESS
             PinManager.unlockSession()
             dots.postDelayed({
@@ -69,7 +69,7 @@ class PinLockActivity : BaseActivity() {
                     TARGET_SETTINGS -> Intent(this, SettingsActivity::class.java)
                     else -> {
                         if (Prefs.isSetupComplete(this)) {
-                            Intent(this, DashboardActivity::class.java)
+                            Intent(this, MainTabsActivity::class.java)
                         } else {
                             Intent(this, MainActivity::class.java)
                         }

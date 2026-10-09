@@ -1,120 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- ============================================================
-         ScreenGuard — five permanent-dark luxury palettes.
-         Every palette exposes the SAME token set; themes map the
-         tokens to sg_* attributes. Shared semantics stay neutral.
-         ============================================================ -->
+    <!-- =========================================================
+         ScreenGuard — LIGHT palettes (new in v3.2.0).
+         Daybreak counterparts of the five luxury themes with
+         WCAG-verified contrast (deep accent text on ivory).
+         Same token names as the light/dark counterpart file,
+         so every layout, drawable and chart flips by mode.
+         ========================================================= -->
 
-    <!-- ========== Palette 1 · Midnight Prestige (default) ========== -->
-    <color name="bg">#0A0E18</color>
-    <color name="header">#0D1424</color>
-    <color name="surface">#121A2C</color>
-    <color name="surface_elev">#18233B</color>
-    <color name="surface_alt">#0F1626</color>
-    <color name="outline">#232F49</color>
-    <color name="outline_strong">#324268</color>
-    <color name="divider">#1D2740</color>
+    <!-- ========== Palette 1 · Midnight Prestige (light) ========== -->
+    <color name="bg">#F4F6FB</color>
+    <color name="header">#EBEFF7</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_elev">#FAFBFE</color>
+    <color name="surface_alt">#F2F5FA</color>
+    <color name="outline">#D9E0EC</color>
+    <color name="outline_strong">#B4C0D4</color>
+    <color name="divider">#E6EBF3</color>
     <color name="gold">#D4B46A</color>
-    <color name="gold_soft">#E9D8AC</color>
+    <color name="gold_soft">#7E6434</color>
     <color name="gold_deep">#8F7440</color>
     <color name="on_gold">#211907</color>
-    <color name="gold_container">#2A2312</color>
-    <color name="gold_hairline">#808F7440</color>
-    <color name="text_primary">#F1EDE2</color>
-    <color name="text_secondary">#9AA6BF</color>
-    <color name="text_tertiary">#6B7893</color>
-    <color name="key_bg">#151D31</color>
+    <color name="gold_container">#F2E9D2</color>
+    <color name="gold_hairline">#668F7440</color>
+    <color name="text_primary">#101724</color>
+    <color name="text_secondary">#42506B</color>
+    <color name="text_tertiary">#59677F</color>
+    <color name="key_bg">#EEF1F8</color>
+    <color name="gold_text">#755E2E</color>
 
-    <!-- ========== Palette 2 · Emerald Vault ========== -->
-    <color name="em_canvas">#06120E</color>
-    <color name="em_header">#081914</color>
-    <color name="em_surface">#0D211B</color>
-    <color name="em_surface_elev">#122B23</color>
-    <color name="em_surface_alt">#0A1A15</color>
-    <color name="em_outline">#1E3A30</color>
-    <color name="em_outline_strong">#2B5346</color>
-    <color name="em_divider">#193028</color>
+    <!-- ========== Palette 2 · Emerald Vault (light) ========== -->
+    <color name="em_canvas">#F1F8F4</color>
+    <color name="em_header">#E6F1EA</color>
+    <color name="em_surface">#FFFFFF</color>
+    <color name="em_surface_elev">#F9FCFA</color>
+    <color name="em_surface_alt">#EDF4EF</color>
+    <color name="em_outline">#D0E2D7</color>
+    <color name="em_outline_strong">#A9C8B8</color>
+    <color name="em_divider">#E2EDE6</color>
     <color name="em_accent">#46C79A</color>
-    <color name="em_accent_soft">#BEE8D6</color>
+    <color name="em_accent_soft">#23684E</color>
     <color name="em_accent_deep">#2C7A5D</color>
     <color name="em_on_accent">#06231A</color>
-    <color name="em_accent_container">#122B20</color>
-    <color name="em_accent_hairline">#802C7A5D</color>
-    <color name="em_text_primary">#EDF3EF</color>
-    <color name="em_text_secondary">#97B5A8</color>
-    <color name="em_text_tertiary">#648275</color>
-    <color name="em_key_bg">#10241E</color>
+    <color name="em_accent_container">#DEF0E6</color>
+    <color name="em_accent_hairline">#662C7A5D</color>
+    <color name="em_text_primary">#0D1712</color>
+    <color name="em_text_secondary">#3E544A</color>
+    <color name="em_text_tertiary">#566D60</color>
+    <color name="em_key_bg">#EBF2ED</color>
+    <color name="em_accent_text">#23684E</color>
 
-    <!-- ========== Palette 3 · Rose Aristocrat ========== -->
-    <color name="ra_canvas">#150910</color>
-    <color name="ra_header">#1B0C15</color>
-    <color name="ra_surface">#211019</color>
-    <color name="ra_surface_elev">#2B1622</color>
-    <color name="ra_surface_alt">#1A0D14</color>
-    <color name="ra_outline">#3A2230</color>
-    <color name="ra_outline_strong">#543449</color>
-    <color name="ra_divider">#301D28</color>
+    <!-- ========== Palette 3 · Rose Aristocrat (light) ========== -->
+    <color name="ra_canvas">#FAF3F1</color>
+    <color name="ra_header">#F4EAE7</color>
+    <color name="ra_surface">#FFFFFF</color>
+    <color name="ra_surface_elev">#FDF9F7</color>
+    <color name="ra_surface_alt">#F5ECE9</color>
+    <color name="ra_outline">#E6D5CF</color>
+    <color name="ra_outline_strong">#C9B0A9</color>
+    <color name="ra_divider">#F0E3DF</color>
     <color name="ra_accent">#E2A78F</color>
-    <color name="ra_accent_soft">#F7DCCB</color>
+    <color name="ra_accent_soft">#8A4A33</color>
     <color name="ra_accent_deep">#96604B</color>
     <color name="ra_on_accent">#2A140C</color>
-    <color name="ra_accent_container">#2E1B13</color>
-    <color name="ra_accent_hairline">#8096604B</color>
-    <color name="ra_text_primary">#F5EEE9</color>
-    <color name="ra_text_secondary">#BCA5A2</color>
-    <color name="ra_text_tertiary">#8A726F</color>
-    <color name="ra_key_bg">#251219</color>
+    <color name="ra_accent_container">#F7E4DC</color>
+    <color name="ra_accent_hairline">#6696604B</color>
+    <color name="ra_text_primary">#1A1013</color>
+    <color name="ra_text_secondary">#5C4A4E</color>
+    <color name="ra_text_tertiary">#76615F</color>
+    <color name="ra_key_bg">#F2EBE8</color>
+    <color name="ra_accent_text">#8A4A33</color>
 
-    <!-- ========== Palette 4 · Onyx Platinum ========== -->
-    <color name="op_canvas">#09090B</color>
-    <color name="op_header">#0D0D10</color>
-    <color name="op_surface">#141419</color>
-    <color name="op_surface_elev">#1B1B21</color>
-    <color name="op_surface_alt">#101014</color>
-    <color name="op_outline">#26262E</color>
-    <color name="op_outline_strong">#393944</color>
-    <color name="op_divider">#1F1F26</color>
-    <color name="op_accent">#C6CCD8</color>
-    <color name="op_accent_soft">#EDF0F5</color>
+    <!-- ========== Palette 4 · Onyx Platinum (light) ========== -->
+    <color name="op_canvas">#F4F5F7</color>
+    <color name="op_header">#ECEDEF</color>
+    <color name="op_surface">#FFFFFF</color>
+    <color name="op_surface_elev">#FBFBFC</color>
+    <color name="op_surface_alt">#F0F1F3</color>
+    <color name="op_outline">#D6D8DE</color>
+    <color name="op_outline_strong">#B0B4BE</color>
+    <color name="op_divider">#E6E8EC</color>
+    <color name="op_accent">#8F96A6</color>
+    <color name="op_accent_soft">#4E5563</color>
     <color name="op_accent_deep">#6E7686</color>
     <color name="op_on_accent">#12151C</color>
-    <color name="op_accent_container">#1D2129</color>
-    <color name="op_accent_hairline">#806E7686</color>
-    <color name="op_text_primary">#F0F1F4</color>
-    <color name="op_text_secondary">#A3A7B1</color>
-    <color name="op_text_tertiary">#71757F</color>
-    <color name="op_key_bg">#17171D</color>
+    <color name="op_accent_container">#E3E6EC</color>
+    <color name="op_accent_hairline">#666E7686</color>
+    <color name="op_text_primary">#0E1014</color>
+    <color name="op_text_secondary">#444852</color>
+    <color name="op_text_tertiary">#5F636E</color>
+    <color name="op_key_bg">#EDEEF2</color>
+    <color name="op_accent_text">#4E5563</color>
 
-    <!-- ========== Palette 5 · Sapphire Crown ========== -->
-    <color name="sc_canvas">#070E1F</color>
-    <color name="sc_header">#0A1228</color>
-    <color name="sc_surface">#0E1832</color>
-    <color name="sc_surface_elev">#132042</color>
-    <color name="sc_surface_alt">#0B1429</color>
-    <color name="sc_outline">#1E2E55</color>
-    <color name="sc_outline_strong">#2C4478</color>
-    <color name="sc_divider">#182646</color>
+    <!-- ========== Palette 5 · Sapphire Crown (light) ========== -->
+    <color name="sc_canvas">#F0F4FB</color>
+    <color name="sc_header">#E7EDF8</color>
+    <color name="sc_surface">#FFFFFF</color>
+    <color name="sc_surface_elev">#F9FBFE</color>
+    <color name="sc_surface_alt">#EDF2FA</color>
+    <color name="sc_outline">#D2DDEC</color>
+    <color name="sc_outline_strong">#A6BAD6</color>
+    <color name="sc_divider">#E3EAF5</color>
     <color name="sc_accent">#7BA7E8</color>
-    <color name="sc_accent_soft">#C8DCF7</color>
+    <color name="sc_accent_soft">#38609F</color>
     <color name="sc_accent_deep">#416CA6</color>
     <color name="sc_on_accent">#081426</color>
-    <color name="sc_accent_container">#14203C</color>
-    <color name="sc_accent_hairline">#80416CA6</color>
-    <color name="sc_text_primary">#EEF2F9</color>
-    <color name="sc_text_secondary">#9BAAC4</color>
-    <color name="sc_text_tertiary">#68778F</color>
-    <color name="sc_key_bg">#101B36</color>
+    <color name="sc_accent_container">#E0EAF8</color>
+    <color name="sc_accent_hairline">#66416CA6</color>
+    <color name="sc_text_primary">#0D1420</color>
+    <color name="sc_text_secondary">#3F4E68</color>
+    <color name="sc_text_tertiary">#586883</color>
+    <color name="sc_key_bg">#EBF0F8</color>
+    <color name="sc_accent_text">#38609F</color>
 
-    <!-- ========== Shared semantics (quiet, work on every canvas) ========== -->
-    <color name="success_text">#7FD6A4</color>
-    <color name="success_container">#132A1F</color>
-    <color name="danger">#F0938C</color>
-    <color name="danger_container">#331B1C</color>
+    <!-- ========== Shared semantics (light) ========== -->
+    <color name="success_text">#146340</color>
+    <color name="success_container">#DDF2E5</color>
+    <color name="danger">#A82C26</color>
+    <color name="danger_container">#FBE5E2</color>
+    <color name="error_on">#FFFFFF</color>
+    <color name="warning">#96591A</color>
+    <color name="warning_container">#FAEEDA</color>
+    <color name="success">#2E9B66</color>
+    <color name="accent_blue">#3B6BC7</color>
+    <color name="accent_purple">#7E5BC9</color>
+    <color name="chart_bar_dim">#DCE2EE</color>
 
-    <!-- Security chrome / immersive -->
-    <color name="glass">#26FFFFFF</color>
+    <!-- ========== Security chrome / immersive ========== -->
+    <color name="glass">#17000000</color>
     <color name="viewer_bg">#000000</color>
-    <color name="header_chip">#29FFFFFF</color>
-    <color name="header_icon_circle">#29FFFFFF</color>
+    <color name="header_chip">#1F101828</color>
+    <color name="header_icon_circle">#1F101828</color>
+
+    <!-- ========== Inverse roles (snackbars, tooltips) ========== -->
+    <color name="inverse_surface">#1A2233</color>
+    <color name="inverse_on_surface">#F1F4FA</color>
+
+    <!-- ========== Blocking overlay (pinned dark, both modes) ========== -->
+    <color name="block_scrim">#B8000000</color>
+    <color name="overlay_card">#1B2232</color>
+    <color name="overlay_stroke">#2D3748</color>
+    <color name="overlay_amber">#F5A623</color>
+    <color name="overlay_danger">#F0938C</color>
+    <color name="overlay_warning">#F5A623</color>
+    <color name="overlay_text">#E8EDF5</color>
+    <color name="overlay_text_dim">#A7B4C8</color>
+    <color name="overlay_text_faint">#8C99AC</color>
 </resources>

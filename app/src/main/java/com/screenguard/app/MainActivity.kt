@@ -49,7 +49,7 @@ class MainActivity : BaseActivity() {
                 finish()
                 return
             } else if (Prefs.isSetupComplete(this)) {
-                startActivity(Intent(this, DashboardActivity::class.java))
+                startActivity(Intent(this, MainTabsActivity::class.java))
                 finish()
                 return
             }
@@ -99,7 +99,7 @@ class MainActivity : BaseActivity() {
         }
         findViewById<Button>(R.id.btnFinish).setOnClickListener {
             Prefs.setSetupComplete(this, true)
-            startActivity(Intent(this, DashboardActivity::class.java))
+            startActivity(Intent(this, MainTabsActivity::class.java))
             finish()
         }
     }

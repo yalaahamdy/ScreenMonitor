@@ -95,7 +95,7 @@
                         android:fontFamily="sans-serif-medium"
                         android:letterSpacing="0.12"
                         android:textSize="10sp"
-                        android:textColor="?attr/sgAccent"
+                        android:textColor="?attr/sgAccentText"
                         android:text="@string/stat_label" />
                 </LinearLayout>
 
@@ -203,7 +203,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="@string/row_acc_title"
                     android:src="@drawable/ic_accessibility"
-                    app:tint="?attr/sgAccent" />
+                    app:tint="?attr/sgAccentText" />
             </FrameLayout>
 
             <LinearLayout
@@ -268,7 +268,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="@string/row_admin_title"
                     android:src="@drawable/ic_admin"
-                    app:tint="?attr/sgAccent" />
+                    app:tint="?attr/sgAccentText" />
             </FrameLayout>
 
             <LinearLayout
@@ -333,7 +333,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="@string/row_battery_title"
                     android:src="@drawable/ic_battery"
-                    app:tint="?attr/sgAccent" />
+                    app:tint="?attr/sgAccentText" />
             </FrameLayout>
 
             <LinearLayout
@@ -405,7 +405,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="@string/row_gallery_title"
                     android:src="@drawable/ic_photos"
-                    app:tint="?attr/sgAccent" />
+                    app:tint="?attr/sgAccentText" />
             </FrameLayout>
 
             <LinearLayout
@@ -462,7 +462,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="@string/row_settings_title"
                     android:src="@drawable/ic_settings"
-                    app:tint="?attr/sgAccent" />
+                    app:tint="?attr/sgAccentText" />
             </FrameLayout>
 
             <LinearLayout

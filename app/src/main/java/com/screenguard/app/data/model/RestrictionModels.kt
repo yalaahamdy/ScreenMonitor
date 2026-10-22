@@ -92,6 +92,7 @@ data class AppRestriction(
     val hasSchedule: Boolean = false,
     val timeWindows: List<TimeWindow> = emptyList(),
     val activeDays: Set<Int> = (1..7).toSet(), // Calendar days (1 = Sunday .. 7 = Saturday)
+    val blockDownloads: Boolean = false, // block downloading files/media from this app
     val createdAt: Long = System.currentTimeMillis()
 ) {
     /** All packages governed by this restriction. */
@@ -135,6 +136,7 @@ data class AppRestriction(
         activeDays.forEach { daysArray.put(it) }
         json.put("activeDays", daysArray)
 
+        json.put("blockDownloads", blockDownloads)
         json.put("createdAt", createdAt)
         return json
     }
@@ -194,6 +196,7 @@ data class AppRestriction(
                 hasSchedule = json.optBoolean("hasSchedule", false),
                 timeWindows = windows,
                 activeDays = days,
+                blockDownloads = json.optBoolean("blockDownloads", false),
                 createdAt = json.optLong("createdAt", System.currentTimeMillis())
             )
         }

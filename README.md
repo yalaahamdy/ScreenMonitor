@@ -1,15 +1,15 @@
-# ScreenGuard (ScreenMonitor) v3.2.0 — Unified Parental Control & Screen Protection 🛡️
+# ScreenGuard (ScreenMonitor) v3.3.0 — Unified Parental Control & Screen Protection 🛡️
 
 <p align="center">
   <img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" width="128" height="128" alt="ScreenGuard App Icon" />
 </p>
 
 <p align="center">
-  <b>The all-in-one transparent, offline parental screen monitoring & app usage controller for Android 11+ (API 30–34).</b>
+  <b>The all-in-one transparent, offline parental screen monitoring, installation gatekeeper & app usage controller for Android 11+ (API 30–34).</b>
 </p>
 
 <p align="center">
-  <a href="#whats-new-in-v320">What's New in v3.2</a> •
+  <a href="#whats-new-in-v330">What's New in v3.3</a> •
   <a href="#core-features">Core Features</a> •
   <a href="#luxury-themes">Luxury Themes</a> •
   <a href="#architecture">Architecture</a> •
@@ -19,15 +19,38 @@
 
 ---
 
-## 🌟 What is ScreenGuard v3.2.0?
+## 🌟 What is ScreenGuard v3.3.0?
 
-**ScreenGuard v3.2.0** is the ultimate unified parental control application, seamlessly merging **ScreenMonitor** (intelligent stealth screen capture, luxury themes, parental PIN gate) with **Muraqib / App-Usage-Tracker-Controller** (screen-time analytics, data usage statistics, and real-time app restriction engine) into a single, cohesive, high-performance app.
+**ScreenGuard v3.3.0** is the ultimate unified parental control application, seamlessly merging **ScreenMonitor** (intelligent stealth screen capture, luxury themes, parental PIN gate) with **Muraqib / App-Usage-Tracker-Controller** (screen-time analytics, data usage statistics, and real-time app restriction engine) and **Advanced Installation & Download Gatekeeper** into a single, cohesive, high-performance app.
 
 Everything runs 100% on-device with **zero internet permissions**, completely respecting user privacy.
 
 ---
 
-## 🆕 What's New in v3.2.0 (Merged Suite)
+## 🆕 What's New in v3.3.0 (Installation & Download Protection Engine)
+
+### 1. 🛡️ Complete Installation & Update Lock (Zero Loophole)
+- **App Store Interception**: Prevents installing or updating any app from Google Play Store, Samsung Galaxy Store, Xiaomi GetApps, Huawei AppGallery, or Android system updaters without the parent PIN.
+- **Package Installer Gate**: Automatically covers package installers with the parental PIN overlay whenever an APK installation or update is attempted.
+- **PIN-Protected Bypass**: Parents can enter their PIN directly on the block overlay to grant a temporary installation window.
+
+### 2. 🔒 Automatic New App Quarantine (`PackageAddedReceiver`)
+- **Instant Lockdown**: Any newly installed app on the device (whether from store, browser, or sideload) is instantly quarantined and blocked by default.
+- **No Unrestricted Window**: Even if a child attempts to immediately open a newly added game or browser, ScreenGuard instantly blocks it with a notice requiring parental approval.
+
+### 3. 📥 Professional & Comprehensive Download Monitoring
+- **Real-Time Storage Watcher**: Watches device download directories using a multi-engine `FileObserver` + `ContentObserver` on `MediaStore.Downloads`.
+- **Full Download Audit History (`DownloadHistoryActivity`)**: Dedicated luxury interface listing all downloaded files, file size, timestamp, source application, and status (Allowed vs. Blocked & Deleted).
+- **Interactive Filtering**: Filter downloads by "All", "Blocked", or "Allowed", with PIN-protected history clearing.
+
+### 4. 🚫 App-Specific Download Blocking (In App Restrictions)
+- **Granular Download Switch**: Toggle "حظر التنزيلات والتحميلات" (Block Downloads) for any specific application (e.g. Google Chrome, browsers, messaging apps).
+- **Prompt Interception**: Intercepts and auto-dismisses download confirmation dialogs before downloads start.
+- **Instant File Neutralization**: If a blocked app writes a file to disk, the download monitor immediately deletes the file from storage and logs the event.
+
+---
+
+## 🧭 Core Features
 
 ### 1. 🧭 Unified 4-Tab Bottom Navigation (`MainTabsActivity`)
 - **🏠 Home**: Quick overview of device protection shields, active screen time, recent captures, and one-tap lock.
@@ -80,10 +103,10 @@ ScreenGuard includes five distinct prestige themes selectable at runtime:
 
 ## 📲 Quick Setup (Child's Device)
 
-1. **Install APK**: Download `ScreenGuard-v3.2.0.apk` from the [Releases](https://github.com/yalaahamdy/ScreenMonitor/releases) tab.
+1. **Install APK**: Download `ScreenGuard-release.apk` from the [Releases](https://github.com/yalaahamdy/ScreenMonitor/releases) tab.
 2. **Notification Permission**: Displays the permanent parental transparency banner.
 3. **Set Parent PIN**: Choose a secret 4-digit PIN with a recovery security question.
-4. **Enable Accessibility Service**: Powers screen capture, instant blocking, and anti-tamper shields.
+4. **Enable Accessibility Service**: Powers screen capture, instant blocking, installation interception, and anti-tamper shields.
 5. **Activate Device Admin**: Prevents unauthorized app uninstallation and enables instant screen lock.
 6. **Battery Optimization Exemption**: Ensures uninterrupted monitoring without OS kills.
 7. **Usage Access Permission**: Enables screen-time analytics and usage limits.
@@ -121,5 +144,4 @@ Signed release APK output:
 ## ⚖️ License & Ethics
 
 - ScreenGuard code is licensed under the **MIT License**.
-- App-Usage-Tracker-Controller components under **Apache License 2.0**.
 - Strictly designed for **transparent, ethical parental guidance of minors**.

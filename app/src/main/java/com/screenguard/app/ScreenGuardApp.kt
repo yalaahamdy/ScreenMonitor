@@ -32,6 +32,7 @@ class ScreenGuardApp : Application(), Application.ActivityLifecycleCallbacks {
         Prefs.init(this)
         ThemeHelper.applyDayNight(this)
         CrashLogger.install(this)
+        com.screenguard.app.download.DownloadMonitor.init(this)
         registerActivityLifecycleCallbacks(this)
     }
 

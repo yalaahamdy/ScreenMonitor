@@ -345,6 +345,10 @@ class SettingsActivity : BaseActivity() {
 
         findViewById<View>(R.id.rowOemAutostart).visibility =
             if (BootResilienceManager.isOemWithAggressiveBatteryManagement()) View.VISIBLE else View.GONE
+        findViewById<com.google.android.material.materialswitch.MaterialSwitch>(R.id.swInstallLock)?.isChecked =
+            PinManager.isInstallLockEnabled(this)
+        findViewById<com.google.android.material.materialswitch.MaterialSwitch>(R.id.swAutoBlockNewApps)?.isChecked =
+            PinManager.isAutoBlockNewApps(this)
     }
 
     // ---------- Crash log (v3.1) ----------
@@ -567,6 +571,24 @@ class SettingsActivity : BaseActivity() {
             .setOnCheckedChangeListener { _, checked ->
                 PinManager.setSafeModeProtectionEnabled(this, checked)
             }
+
+        findViewById<com.google.android.material.materialswitch.MaterialSwitch>(R.id.swInstallLock)?.apply {
+            isChecked = PinManager.isInstallLockEnabled(this@SettingsActivity)
+            setOnCheckedChangeListener { _, checked ->
+                PinManager.setInstallLockEnabled(this@SettingsActivity, checked)
+            }
+        }
+
+        findViewById<com.google.android.material.materialswitch.MaterialSwitch>(R.id.swAutoBlockNewApps)?.apply {
+            isChecked = PinManager.isAutoBlockNewApps(this@SettingsActivity)
+            setOnCheckedChangeListener { _, checked ->
+                PinManager.setAutoBlockNewApps(this@SettingsActivity, checked)
+            }
+        }
+
+        findViewById<View>(R.id.rowDownloadMonitoring)?.setOnClickListener {
+            startActivity(Intent(this, com.screenguard.app.ui.download.DownloadHistoryActivity::class.java))
+        }
 
         findViewById<View>(R.id.rowSecurityQuestion).setOnClickListener {
             showUpdateSecurityQuestionDialog()

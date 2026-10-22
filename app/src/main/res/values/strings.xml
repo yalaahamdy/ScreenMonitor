@@ -490,4 +490,26 @@ Tap + to create your first restriction rule.</string>
     <string name="error_screen_sub">The rest of the app keeps working normally. Copy the report and send it to the developer so the cause can be fixed.</string>
     <string name="error_copy_report">Copy report</string>
 
+
+    <!-- ==== v3.3.0: App Installation & Download Control ==== -->
+    <string name="restriction_block_downloads">Block downloads and saving files</string>
+    <string name="restriction_block_downloads_sub">Prevent this app from downloading or saving files, media or documents to storage</string>
+    <string name="protection_install_lock">Lock app installation &amp; updates</string>
+    <string name="protection_install_lock_sub">Require parent PIN to install or update any app via app stores or package installers</string>
+    <string name="protection_auto_block_new_apps">Auto-block newly installed apps</string>
+    <string name="protection_auto_block_new_apps_sub">Instantly lock any newly installed app until reviewed and approved by parent</string>
+    <string name="protection_download_monitoring">Download monitoring &amp; history</string>
+    <string name="protection_download_monitoring_sub">Track and view all downloaded files and blocked downloads on device</string>
+    <string name="install_block_reason">Installing or updating apps is locked by parental control</string>
+    <string name="install_block_next">Enter parent PIN to proceed with installation or update</string>
+    <string name="new_app_block_reason">Newly installed app — locked pending parental approval</string>
+    <string name="new_app_block_next">Enter parent PIN to approve or customize restrictions</string>
+    <string name="toast_download_blocked">Download from %s was blocked by parental control</string>
+    <string name="download_status_allowed">Allowed</string>
+    <string name="download_status_blocked">Blocked &amp; deleted</string>
+    <string name="download_status_intercepted">Prompt blocked</string>
+    <string name="download_history_title">Download History</string>
+    <string name="download_history_empty">No downloads recorded yet</string>
+    <string name="download_history_clear">Clear history</string>
+    <string name="download_history_clear_confirm">Are you sure you want to clear the entire download history?</string>
 </resources>

@@ -490,4 +490,26 @@
     <string name="error_screen_sub">بقية التطبيق تعمل بشكل طبيعي. انسخ التقرير وأرسله للمطوّر لإصلاح السبب.</string>
     <string name="error_copy_report">نسخ التقرير</string>
 
+
+    <!-- ==== v3.3.0: التحكم في تثبيت وتحميل التطبيقات ==== -->
+    <string name="restriction_block_downloads">حظر التنزيلات والتحميلات</string>
+    <string name="restriction_block_downloads_sub">منع هذا التطبيق من تنزيل أو حفظ الملفات والوسائط والمستندات إلى ذاكرة الجهاز</string>
+    <string name="protection_install_lock">قفل تثبيت وتحديث التطبيقات</string>
+    <string name="protection_install_lock_sub">طلب رمز مرور الوالدين لتثبيت أو تحديث أي تطبيق من المتجر أو مثبت الحزم</string>
+    <string name="protection_auto_block_new_apps">حظر التطبيقات الجديدة تلقائياً</string>
+    <string name="protection_auto_block_new_apps_sub">قفل أي تطبيق يتم تنزيله أو تثبيته فوراً لحين موافقة ولي الأمر</string>
+    <string name="protection_download_monitoring">مراقبة وسجل التحميلات</string>
+    <string name="protection_download_monitoring_sub">تتبع وعرض كل الملفات المحملة والتنزيلات المحظورة على الجهاز</string>
+    <string name="install_block_reason">تثبيت وتحديث التطبيقات مقفل بالرقابة الأبوية</string>
+    <string name="install_block_next">أدخل رمز مرور الوالدين للسماح بالتثبيت أو التحديث</string>
+    <string name="new_app_block_reason">تطبيق جديد — مقفل تلقائياً لحين موافقة ولي الأمر</string>
+    <string name="new_app_block_next">أدخل رمز مرور الوالدين للموافقة أو تعديل القيود</string>
+    <string name="toast_download_blocked">تم حظر التحميل من %s بواسطة الرقابة الأبوية</string>
+    <string name="download_status_allowed">مسموح</string>
+    <string name="download_status_blocked">تم الحظر والحذف</string>
+    <string name="download_status_intercepted">تم حظر نافذة التحميل</string>
+    <string name="download_history_title">سجل التحميلات والمراقبة</string>
+    <string name="download_history_empty">لا توجد ملفات محملة مسجلة بعد</string>
+    <string name="download_history_clear">مسح السجل</string>
+    <string name="download_history_clear_confirm">هل أنت متأكد من رغبتك في مسح سجل التحميلات بالكامل؟</string>
 </resources>

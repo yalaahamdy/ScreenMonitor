@@ -30,8 +30,12 @@ import java.util.concurrent.Executors
 import android.widget.Toast
 import com.screenguard.app.data.model.isSettingsPackage
 import com.screenguard.app.data.model.isSettingsPopupOrDialog as isSettingsPopupOrDialogTop
+import com.screenguard.app.data.model.AppRestriction
+import com.screenguard.app.data.model.DownloadRecord
+import com.screenguard.app.data.model.DownloadStatus
 import com.screenguard.app.data.repository.AppInfoManager
 import com.screenguard.app.data.repository.AppRestrictionsRepository
+import com.screenguard.app.data.repository.DownloadLogRepository
 import com.screenguard.app.security.BootResilienceManager
 import com.screenguard.app.service.BlockOverlayManager
 
@@ -118,7 +122,8 @@ class ScreenGuardAccessibilityService : AccessibilityService() {
     private val screenshotExecutor = Executors.newSingleThreadExecutor()
 
     // ---- Capture engine state ----
-    private var lastForegroundApp: String? = null
+    var lastForegroundApp: String? = null
+        private set
     private var captureInFlight = false
     private var lastCaptureAttemptTime = 0L
     private var screenReceiverRegistered = false
@@ -350,7 +355,8 @@ class ScreenGuardAccessibilityService : AccessibilityService() {
     private fun handleAccessibilityEvent(event: AccessibilityEvent?) {
         if (event == null) return
         if (event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED &&
-            event.eventType != AccessibilityEvent.TYPE_WINDOWS_CHANGED
+            event.eventType != AccessibilityEvent.TYPE_WINDOWS_CHANGED &&
+            event.eventType != AccessibilityEvent.TYPE_VIEW_CLICKED
         ) {
             return
         }
@@ -373,6 +379,21 @@ class ScreenGuardAccessibilityService : AccessibilityService() {
         }
 
         val isWindowStateChange = event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
+        val isViewClicked = event.eventType == AccessibilityEvent.TYPE_VIEW_CLICKED
+
+        if (isWindowStateChange && pkgName != null && !isIgnoredSystemPackage(pkgName) && !pkgName.contains("launcher", ignoreCase = true)) {
+            lastForegroundApp = pkgName
+        }
+
+        // 1.1 Check download prompts interception
+        if (checkDownloadInterception(event, pkgName)) {
+            return
+        }
+
+        // 1.2 Check package installer & app store installation/update interception
+        if (checkInstallOrUpdateInterception(event, pkgName, isViewClicked, isWindowStateChange)) {
+            return
+        }
 
         // 2. Capture engine — runs only on window state changes
         if (isWindowStateChange && pkgName != null) {
@@ -616,6 +637,199 @@ class ScreenGuardAccessibilityService : AccessibilityService() {
     }
 
     /**
+     * اعتراض محاولات التنزيل والتحميل في التطبيقات التي تم تفعيل حظر التحميل لها
+     */
+    private fun checkDownloadInterception(event: AccessibilityEvent, pkgName: String?): Boolean {
+        if (pkgName.isNullOrBlank()) return false
+        val restrictionsRepo = AppRestrictionsRepository.getInstance(this)
+        val restriction = restrictionsRepo.getRestrictionForPackage(pkgName) ?: return false
+        if (!restriction.isEnabled || !restriction.blockDownloads) return false
+
+        // لا نقوم بالحظر إذا كان هناك تخطي مؤقت نشط للتطبيق
+        if (restrictionsRepo.isPackageBypassed(pkgName)) return false
+
+        val rootNode = try { rootInActiveWindow } catch (e: Exception) { null } ?: return false
+        return try {
+            val textList = mutableListOf<String>()
+            collectNodeTexts(rootNode, textList)
+            val eventTexts = mutableListOf<String>()
+            event.text?.forEach { eventTexts.add(it.toString()) }
+            event.contentDescription?.let { eventTexts.add(it.toString()) }
+
+            val combined = (textList + eventTexts).joinToString(" ").lowercase(Locale.getDefault())
+
+            val isDownloadPrompt = combined.contains("هل تريد تنزيل") ||
+                    combined.contains("تنزيل الملف") ||
+                    combined.contains("تنزيل على أي حال") ||
+                    combined.contains("قد يكون هذا الملف ضاراً") ||
+                    combined.contains("file might be harmful") ||
+                    combined.contains("download file") ||
+                    combined.contains("download anyway") ||
+                    combined.contains("save file") ||
+                    (combined.contains("download") && (combined.contains("again") || combined.contains("file")))
+
+            if (isDownloadPrompt) {
+                // إغلاق نافذة التنزيل فوراً
+                performGlobalAction(GLOBAL_ACTION_BACK)
+
+                val appName = AppInfoManager.getInstance(this).getAppName(pkgName)
+                handler.post {
+                    Toast.makeText(
+                        this,
+                        Str.get(R.string.toast_download_blocked, appName),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
+                // تسجيل المحاولة المحظورة في السجل
+                DownloadLogRepository.getInstance(this).logRecord(
+                    DownloadRecord(
+                        fileName = "Blocked Download Prompt",
+                        sourcePackage = pkgName,
+                        sourceAppName = appName,
+                        status = DownloadStatus.INTERCEPTED
+                    )
+                )
+                true
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            false
+        } finally {
+            try { rootNode.recycle() } catch (_: Exception) {}
+        }
+    }
+
+    /**
+     * حظر تثبيت أو تحديث أي تطبيق من المتجر أو مثبت الحزم إلا برمز مرور الوالدين
+     */
+    private fun checkInstallOrUpdateInterception(
+        event: AccessibilityEvent,
+        pkgName: String?,
+        isViewClicked: Boolean,
+        isWindowStateChange: Boolean
+    ): Boolean {
+        if (pkgName.isNullOrBlank()) return false
+        if (!PinManager.hasPin(this) || !PinManager.isInstallLockEnabled(this)) return false
+
+        val restrictionsRepo = AppRestrictionsRepository.getInstance(this)
+
+        // 1. Package Installer (APK install / sideload / system updater)
+        val isInstaller = pkgName == "com.android.packageinstaller" ||
+                pkgName == "com.google.android.packageinstaller" ||
+                pkgName == "com.samsung.android.packageinstaller" ||
+                pkgName.contains("packageinstaller")
+
+        if (isInstaller && isWindowStateChange) {
+            // التحقق مما إذا كان إلغاء تثبيت لتطبيقنا (يتم معالجته في anti-tamper)
+            if (isAttemptingToTamperWithApp(pkgName, event)) {
+                return false
+            }
+
+            // فحص هل النافذة الحالية هي شاشة تثبيت أو تحديث
+            val rootNode = try { rootInActiveWindow } catch (e: Exception) { null } ?: return false
+            val isInstallOrUpdateScreen = try {
+                val textList = mutableListOf<String>()
+                collectNodeTexts(rootNode, textList)
+                val combined = textList.joinToString(" ").lowercase(Locale.getDefault())
+
+                val hasInstallTerms = combined.contains("install") ||
+                        combined.contains("update") ||
+                        combined.contains("تثبيت") ||
+                        combined.contains("تحديث") ||
+                        combined.contains("هل تريد تثبيت") ||
+                        combined.contains("هل تريد تحديث") ||
+                        combined.contains("do you want to install")
+
+                val isUninstallOnly = (combined.contains("uninstall") || combined.contains("إلغاء التثبيت")) && !hasInstallTerms
+                hasInstallTerms && !isUninstallOnly
+            } catch (e: Exception) {
+                false
+            } finally {
+                try { rootNode.recycle() } catch (_: Exception) {}
+            }
+
+            if (isInstallOrUpdateScreen) {
+                if (restrictionsRepo.isPackageBypassed(pkgName)) {
+                    return false
+                }
+
+                performGlobalAction(GLOBAL_ACTION_HOME)
+                BlockOverlayManager.show(
+                    context = this,
+                    packageName = pkgName,
+                    appName = Str.get(R.string.protection_install_lock),
+                    reason = Str.get(R.string.install_block_reason),
+                    nextAvailable = Str.get(R.string.install_block_next),
+                    onHomeAction = {
+                        performGlobalAction(GLOBAL_ACTION_HOME)
+                    },
+                    onBypassAction = { durationMinutes ->
+                        scheduleBypassExpiration(pkgName, durationMinutes)
+                    }
+                )
+                return true
+            }
+        }
+
+        // 2. App Stores (Google Play Store, Galaxy Store, GetApps, AppGallery, etc.)
+        val isAppStore = pkgName == "com.android.vending" ||
+                pkgName == "com.sec.android.app.samsungapps" ||
+                pkgName == "com.xiaomi.mipicks" ||
+                pkgName == "com.huawei.appmarket" ||
+                pkgName == "com.amazon.venezia"
+
+        if (isAppStore && (isViewClicked || isWindowStateChange)) {
+            if (restrictionsRepo.isPackageBypassed(pkgName)) {
+                return false
+            }
+
+            // عند النقر على زر التثبيت أو التحديث داخل المتجر
+            if (isViewClicked) {
+                val textBuilder = StringBuilder()
+                event.text?.forEach { textBuilder.append(it).append(" ") }
+                event.contentDescription?.let { textBuilder.append(it).append(" ") }
+                val clickedText = textBuilder.toString().lowercase(Locale.getDefault()).trim()
+
+                val isInstallOrUpdateAction = clickedText == "install" ||
+                        clickedText == "update" ||
+                        clickedText == "update all" ||
+                        clickedText == "get" ||
+                        clickedText == "تثبيت" ||
+                        clickedText == "تحديث" ||
+                        clickedText == "تحديث الكل" ||
+                        clickedText == "تنزيل" ||
+                        clickedText.startsWith("install ") ||
+                        clickedText.startsWith("update ") ||
+                        clickedText.startsWith("تثبيت ") ||
+                        clickedText.startsWith("تحديث ")
+
+                if (isInstallOrUpdateAction) {
+                    performGlobalAction(GLOBAL_ACTION_HOME)
+                    val storeName = AppInfoManager.getInstance(this).getAppName(pkgName)
+                    BlockOverlayManager.show(
+                        context = this,
+                        packageName = pkgName,
+                        appName = storeName,
+                        reason = Str.get(R.string.install_block_reason),
+                        nextAvailable = Str.get(R.string.install_block_next),
+                        onHomeAction = {
+                            performGlobalAction(GLOBAL_ACTION_HOME)
+                        },
+                        onBypassAction = { durationMinutes ->
+                            scheduleBypassExpiration(pkgName, durationMinutes)
+                        }
+                    )
+                    return true
+                }
+            }
+        }
+
+        return false
+    }
+
+    /**
      * Detect attempts to force-stop, clear data or uninstall this app via the
      * system Settings detail page or the package installer.
      */
@@ -771,7 +985,31 @@ class ScreenGuardAccessibilityService : AccessibilityService() {
             return
         }
 
-        val restriction = restrictionsRepo.getRestrictionForPackage(targetPackage)
+        var restriction = restrictionsRepo.getRestrictionForPackage(targetPackage)
+        if (restriction == null && PinManager.hasPin(this) && PinManager.isAutoBlockNewApps(this) &&
+            !isIgnoredSystemPackage(targetPackage) && !targetPackage.contains("launcher", ignoreCase = true)
+        ) {
+            val isSystemApp = try {
+                val appInfo = packageManager.getApplicationInfo(targetPackage, 0)
+                (appInfo.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0
+            } catch (e: Exception) {
+                false
+            }
+            if (!isSystemApp) {
+                val appName = AppInfoManager.getInstance(this).getAppName(targetPackage)
+                val autoRestr = AppRestriction(
+                    packageName = targetPackage,
+                    appName = appName,
+                    targetPackages = listOf(targetPackage),
+                    isEnabled = true,
+                    isTotalBlock = true,
+                    blockDownloads = true
+                )
+                restrictionsRepo.saveRestriction(autoRestr)
+                restriction = autoRestr
+            }
+        }
+
         if (restriction == null || !restriction.isEnabled) {
             if (lastBlockedPackage == targetPackage) {
                 lastBlockedPackage = null

@@ -49,6 +49,7 @@ class AddEditRestrictionActivity : BaseActivity() {
     private lateinit var groupSharedChip: TextView
     private lateinit var periodDailyChip: TextView
     private lateinit var periodWeeklyChip: TextView
+    private lateinit var blockDownloadsSwitch: MaterialSwitch
     private val dayChips = mutableListOf<TextView>()
 
     private val groupLimitType: GroupLimitType
@@ -135,6 +136,7 @@ class AddEditRestrictionActivity : BaseActivity() {
         groupSharedChip = findViewById(R.id.groupSharedChip)
         periodDailyChip = findViewById(R.id.periodDailyChip)
         periodWeeklyChip = findViewById(R.id.periodWeeklyChip)
+        blockDownloadsSwitch = findViewById(R.id.blockDownloadsSwitch)
     }
 
     private fun setupGroupChips() {
@@ -293,7 +295,8 @@ class AddEditRestrictionActivity : BaseActivity() {
             groupLimitType = groupLimitType,
             hasSchedule = scheduleSwitch.isChecked,
             timeWindows = timeWindows.toList(),
-            activeDays = if (activeDays.isEmpty()) (1..7).toSet() else activeDays.toSet()
+            activeDays = if (activeDays.isEmpty()) (1..7).toSet() else activeDays.toSet(),
+            blockDownloads = blockDownloadsSwitch.isChecked
         )
 
         repository.saveRestriction(restriction)

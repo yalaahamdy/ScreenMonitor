@@ -247,6 +247,23 @@ class AppBlockerService : Service() {
             return
         }
 
+        // Enforce 100% App Store lock when Install Lock is enabled
+        if (PinManager.hasPin(this) && PinManager.isInstallLockEnabled(this) &&
+            ScreenGuardAccessibilityService.APP_STORE_PACKAGES.contains(topPackage) &&
+            !restrictionsRepo.isPackageBypassed(topPackage) &&
+            !restrictionsRepo.isPackageBypassed(ScreenGuardAccessibilityService.INSTALL_LOCK_BYPASS_KEY)
+        ) {
+            val storeName = appInfoManager.getAppName(topPackage)
+            val msg = Str.get(R.string.toast_store_blocked_open_screenguard, storeName)
+            val svc = ScreenGuardAccessibilityService.instance
+            if (svc != null) {
+                svc.kickAndTerminateBlockedApp(topPackage, msg)
+            } else {
+                kickToHomeFallback(topPackage)
+            }
+            return
+        }
+
         val restriction = restrictionsRepo.getRestrictionForPackage(topPackage)
         if (restriction == null || !restriction.isEnabled) {
             if (lastBlockedPackage == topPackage) {
@@ -275,51 +292,33 @@ class AppBlockerService : Service() {
         val evaluation = restrictionsRepo.evaluateRestriction(restriction, consumedMinutes, calendar, topPackage)
 
         if (evaluation.isBlocked) {
-            // De-duplicate repeated block launches within 2 seconds
-            if (lastBlockedPackage == topPackage && (now - lastBlockTimestamp) < 2000L) {
+            val appName = appInfoManager.getAppName(topPackage)
+            val msg = Str.get(
+                R.string.toast_app_blocked_open_screenguard,
+                appName,
+                evaluation.detailedReasonText
+            )
+
+            // Zero-Open enforcement: immediately kick to Home and terminate background process
+            val svc = ScreenGuardAccessibilityService.instance
+            if (svc != null) {
+                svc.kickAndTerminateBlockedApp(topPackage, msg)
+            } else {
+                kickToHomeFallback(topPackage)
+            }
+
+            // De-duplicate repeated notifications within 3 seconds
+            if (lastBlockedPackage == topPackage && (now - lastBlockTimestamp) < 3000L) {
                 return
             }
 
             lastBlockedPackage = topPackage
             lastBlockTimestamp = now
 
-            val appName = appInfoManager.getAppName(topPackage)
-            val canDrawOverlay = Settings.canDrawOverlays(this)
-            val isSettingsApp = isSettingsPackage(topPackage)
-
-            if (isSettingsApp && !ScreenGuardAccessibilityService.isRunning()) {
-                val homeIntent = Intent(Intent.ACTION_MAIN).apply {
-                    addCategory(Intent.CATEGORY_HOME)
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                }
-                try {
-                    startActivity(homeIntent)
-                } catch (e: Exception) {}
-            }
-
             val notifIntent = Intent(this, MainTabsActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             }
-
             showBlockNotification(notifIntent, appName, evaluation.detailedReasonText)
-
-            if (canDrawOverlay) {
-                // Show the floating shield directly above the blocked app
-                BlockOverlayManager.show(
-                    context = this,
-                    packageName = topPackage,
-                    appName = appName,
-                    reason = evaluation.detailedReasonText,
-                    nextAvailable = evaluation.nextAvailableText,
-                    onBypassAction = { durationMinutes ->
-                        serviceScope.launch {
-                            delay(durationMinutes * 60_000L)
-                            restrictionsRepo.clearTemporaryBypass(topPackage)
-                            checkForegroundApp()
-                        }
-                    }
-                )
-            }
         } else {
             if (lastBlockedPackage == topPackage) {
                 lastBlockedPackage = null
@@ -328,6 +327,23 @@ class AppBlockerService : Service() {
                 BlockOverlayManager.dismiss()
             }
         }
+    }
+
+    private fun kickToHomeFallback(targetPackage: String) {
+        if (BlockOverlayManager.isShowing) {
+            BlockOverlayManager.dismiss()
+        }
+        val homeIntent = Intent(Intent.ACTION_MAIN).apply {
+            addCategory(Intent.CATEGORY_HOME)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        try {
+            startActivity(homeIntent)
+        } catch (e: Exception) {}
+        try {
+            val am = getSystemService(Context.ACTIVITY_SERVICE) as? android.app.ActivityManager
+            am?.killBackgroundProcesses(targetPackage)
+        } catch (e: Exception) {}
     }
 
     private fun showBlockNotification(intent: Intent, appName: String, reason: String) {

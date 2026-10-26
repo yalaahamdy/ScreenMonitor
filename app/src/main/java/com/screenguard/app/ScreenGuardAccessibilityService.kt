@@ -115,6 +115,37 @@ class ScreenGuardAccessibilityService : AccessibilityService() {
             "com.google.android.inputmethod",
             "com.samsung.android.honeyboard"
         )
+
+        /** Key used in AppRestrictionsRepository for temporary global store/install bypass */
+        const val INSTALL_LOCK_BYPASS_KEY = "screenguard_install_lock_bypass"
+
+        /** Known official & third-party app stores blocked 100% when Install Lock is enabled */
+        val APP_STORE_PACKAGES = setOf(
+            "com.android.vending",
+            "com.sec.android.app.samsungapps",
+            "com.xiaomi.mipicks",
+            "com.huawei.appmarket",
+            "com.amazon.venezia",
+            "com.heytap.market",
+            "com.oppo.market",
+            "com.bbk.appstore",
+            "com.vivo.appstore",
+            "com.aurora.store",
+            "org.fdroid.fdroid",
+            "com.apkpure.aegon",
+            "cm.aptoide.pt",
+            "com.uptodown",
+            "com.taptap"
+        )
+
+        @Volatile
+        private var selfUpdateAllowedUntil: Long = 0L
+
+        fun allowSelfUpdateWindow(durationMs: Long = 180_000L) {
+            selfUpdateAllowedUntil = System.currentTimeMillis() + durationMs
+        }
+
+        fun isSelfUpdateAllowed(): Boolean = System.currentTimeMillis() < selfUpdateAllowedUntil
     }
 
     private val handler = Handler(Looper.getMainLooper())
@@ -136,6 +167,8 @@ class ScreenGuardAccessibilityService : AccessibilityService() {
     // ---- Restrictions engine state ----
     private var lastBlockedPackage: String? = null
     private var lastBlockTimestamp: Long = 0L
+    private var lastToastPackage: String? = null
+    private var lastToastTimestamp: Long = 0L
     private var lastHeartbeatTime: Long = 0L
 
     private val powerManager: PowerManager by lazy { getSystemService(Context.POWER_SERVICE) as PowerManager }
@@ -278,7 +311,8 @@ class ScreenGuardAccessibilityService : AccessibilityService() {
     private fun configureServiceInfo() {
         val info = AccessibilityServiceInfo().apply {
             eventTypes = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED or
-                    AccessibilityEvent.TYPE_WINDOWS_CHANGED
+                    AccessibilityEvent.TYPE_WINDOWS_CHANGED or
+                    AccessibilityEvent.TYPE_VIEW_CLICKED
             feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC
             flags = AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS or
                     AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
@@ -381,8 +415,15 @@ class ScreenGuardAccessibilityService : AccessibilityService() {
         val isWindowStateChange = event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
         val isViewClicked = event.eventType == AccessibilityEvent.TYPE_VIEW_CLICKED
 
-        if (isWindowStateChange && pkgName != null && !isIgnoredSystemPackage(pkgName) && !pkgName.contains("launcher", ignoreCase = true)) {
+        if (isWindowStateChange && pkgName != null && !isIgnoredSystemPackage(pkgName) && !isLauncherPackage(pkgName)) {
             lastForegroundApp = pkgName
+        }
+
+        // 1.0 Pre-launch launcher icon click interception (Zero-Open before app starts)
+        if (isViewClicked && pkgName != null && isLauncherPackage(pkgName)) {
+            if (interceptLauncherClick(event)) {
+                return
+            }
         }
 
         // 1.1 Check download prompts interception
@@ -402,6 +443,109 @@ class ScreenGuardAccessibilityService : AccessibilityService() {
 
         // 3. Blocking engine
         runBlockingPipeline(event, pkgName, isWindowStateChange)
+    }
+
+    private fun isLauncherPackage(pkg: String): Boolean {
+        val lower = pkg.lowercase(Locale.getDefault())
+        return lower.contains("launcher") ||
+                lower.contains("trebuchet") ||
+                lower.contains("miui.home") ||
+                lower.contains("oneui.home") ||
+                lower.contains("oppo.launcher") ||
+                lower.contains("bbk.launcher")
+    }
+
+    /**
+     * اعتراض نقرة أيقونة التطبيق على الشاشة الرئيسية (Launcher) قبل فتحه من الأساس
+     */
+    private fun interceptLauncherClick(event: AccessibilityEvent): Boolean {
+        val textBuilder = StringBuilder()
+        event.text?.forEach { textBuilder.append(it).append(" ") }
+        event.contentDescription?.let { textBuilder.append(it).append(" ") }
+        val clickedLabel = textBuilder.toString().trim()
+        if (clickedLabel.isBlank()) return false
+
+        val restrictionsRepo = AppRestrictionsRepository.getInstance(this)
+        val appInfo = AppInfoManager.getInstance(this)
+
+        // 1. فحص ما إذا كانت الأيقونة المنقورة هي متجر تطبيقات مقفل
+        if (PinManager.hasPin(this) && PinManager.isInstallLockEnabled(this) &&
+            !restrictionsRepo.isPackageBypassed(INSTALL_LOCK_BYPASS_KEY)
+        ) {
+            for (storePkg in APP_STORE_PACKAGES) {
+                if (restrictionsRepo.isPackageBypassed(storePkg)) continue
+                val storeName = appInfo.getAppName(storePkg)
+                if (storeName.isNotBlank() &&
+                    (clickedLabel.equals(storeName, ignoreCase = true) ||
+                     clickedLabel.contains(storeName, ignoreCase = true))
+                ) {
+                    kickAndTerminateBlockedApp(
+                        targetPackage = storePkg,
+                        toastMessage = Str.get(R.string.toast_store_blocked_open_screenguard, storeName)
+                    )
+                    return true
+                }
+            }
+        }
+
+        // 2. فحص ما إذا كانت الأيقونة المنقورة لتطبيق مقيد ومحظور حالياً
+        val allRestrictions = restrictionsRepo.getAllRestrictions().filter { it.isEnabled }
+        val calendar = Calendar.getInstance()
+        for (restriction in allRestrictions) {
+            for (pkg in restriction.allPackages) {
+                if (restrictionsRepo.isPackageBypassed(pkg)) continue
+                val name = appInfo.getAppName(pkg)
+                if (name.isNotBlank() &&
+                    (clickedLabel.equals(name, ignoreCase = true) ||
+                     clickedLabel.startsWith("$name ", ignoreCase = true))
+                ) {
+                    val consumed = calculateConsumedMinutes(restriction, pkg)
+                    val eval = restrictionsRepo.evaluateRestriction(restriction, consumed, calendar, pkg)
+                    if (eval.isBlocked) {
+                        kickAndTerminateBlockedApp(
+                            targetPackage = pkg,
+                            toastMessage = Str.get(
+                                R.string.toast_app_blocked_open_screenguard,
+                                name,
+                                eval.detailedReasonText
+                            )
+                        )
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+    /**
+     * إغلاق التطبيق المحظور فوراً من الأساس وإرجاع المستخدم للشاشة الرئيسية وقتل عمليته في الخلفية
+     * بدون إظهار أي نوافذ عائمة فوق التطبيق لتفادي أي تهنيج
+     */
+    fun kickAndTerminateBlockedApp(targetPackage: String, toastMessage: String? = null) {
+        if (BlockOverlayManager.isShowing) {
+            BlockOverlayManager.dismiss()
+        }
+        performGlobalAction(GLOBAL_ACTION_BACK)
+        performGlobalAction(GLOBAL_ACTION_HOME)
+
+        if (targetPackage.isNotBlank() && targetPackage != packageName) {
+            try {
+                val am = getSystemService(Context.ACTIVITY_SERVICE) as? android.app.ActivityManager
+                am?.killBackgroundProcesses(targetPackage)
+            } catch (_: Exception) {}
+        }
+
+        if (!toastMessage.isNullOrBlank()) {
+            val now = System.currentTimeMillis()
+            if (lastToastPackage != targetPackage || (now - lastToastTimestamp) > 2500L) {
+                lastToastPackage = targetPackage
+                lastToastTimestamp = now
+                handler.post {
+                    Toast.makeText(this, toastMessage, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
     // ---------------------------------------------------------------------
@@ -528,9 +672,6 @@ class ScreenGuardAccessibilityService : AccessibilityService() {
         // 1. Immediate Settings-app block with popup/dialog exemption
         if (pkgName != null && isSettingsPackage(pkgName)) {
             if (isEventSettingsPopup(event)) {
-                if (BlockOverlayManager.isShowing && isSettingsPackage(BlockOverlayManager.currentShowingPackage)) {
-                    BlockOverlayManager.dismiss()
-                }
                 return
             }
 
@@ -539,22 +680,14 @@ class ScreenGuardAccessibilityService : AccessibilityService() {
                 val consumed = calculateConsumedMinutes(settingsRestriction, pkgName)
                 val eval = restrictionsRepo.evaluateRestriction(settingsRestriction, consumed, Calendar.getInstance(), pkgName)
                 if (eval.isBlocked) {
-                    performGlobalAction(GLOBAL_ACTION_HOME)
-                    performGlobalAction(GLOBAL_ACTION_BACK)
-
                     val appName = AppInfoManager.getInstance(this).getAppName(pkgName)
-                    BlockOverlayManager.show(
-                        context = this,
-                        packageName = pkgName,
-                        appName = appName,
-                        reason = eval.detailedReasonText,
-                        nextAvailable = eval.nextAvailableText,
-                        onHomeAction = {
-                            performGlobalAction(GLOBAL_ACTION_HOME)
-                        },
-                        onBypassAction = { durationMinutes ->
-                            scheduleBypassExpiration(pkgName, durationMinutes)
-                        }
+                    kickAndTerminateBlockedApp(
+                        targetPackage = pkgName,
+                        toastMessage = Str.get(
+                            R.string.toast_app_blocked_open_screenguard,
+                            appName,
+                            eval.detailedReasonText
+                        )
                     )
                     return
                 }
@@ -563,53 +696,41 @@ class ScreenGuardAccessibilityService : AccessibilityService() {
 
         // 2. Anti-tamper / anti-uninstall interception
         if (pkgName != null && isAttemptingToTamperWithApp(pkgName, event)) {
-            performGlobalAction(GLOBAL_ACTION_HOME)
-            val appLocked = PinManager.isAppLocked(this)
-            if (appLocked) {
-                val lockIntent = Intent(this, PinLockActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                }
-                try {
-                    startActivity(lockIntent)
-                } catch (e: Exception) {}
-            } else {
-                BlockOverlayManager.show(
-                    context = this,
-                    packageName = packageName,
-                    appName = getString(R.string.app_name),
-                    reason = Str.get(R.string.tamper_block_reason),
-                    nextAvailable = Str.get(R.string.tamper_block_next),
-                    onHomeAction = {
-                        performGlobalAction(GLOBAL_ACTION_HOME)
-                    }
-                )
-            }
+            kickAndTerminateBlockedApp(
+                targetPackage = pkgName,
+                toastMessage = Str.get(R.string.toast_tamper_blocked)
+            )
             return
         }
 
-        // 3. PiP-only check on windows-changed events
+        // 3. PiP & Split-Screen check on windows-changed events
         if (!isWindowStateChange) {
-            if (pkgName != null) {
-                try {
-                    val windowList = windows ?: return
-                    for (w in windowList) {
-                        if (isWindowInPip(w)) {
-                            val nodePkg = w.root?.packageName?.toString() ?: continue
-                            if (isIgnoredSystemPackage(nodePkg)) continue
-                            val restriction = restrictionsRepo.getRestrictionForPackage(nodePkg)
-                            if (restriction != null && restriction.isEnabled && !restrictionsRepo.isPackageBypassed(nodePkg)) {
-                                val consumed = calculateConsumedMinutes(restriction, nodePkg)
-                                val eval = restrictionsRepo.evaluateRestriction(restriction, consumed, Calendar.getInstance(), nodePkg)
-                                if (eval.isBlocked) {
-                                    performGlobalAction(GLOBAL_ACTION_HOME)
-                                    checkAndBlockIfNeeded(nodePkg, event)
-                                    break
-                                }
+            try {
+                val windowList = windows ?: return
+                for (w in windowList) {
+                    val nodePkg = w.root?.packageName?.toString() ?: continue
+                    if (isIgnoredSystemPackage(nodePkg)) continue
+                    if (isWindowInPip(w) || isPackageVisibleInSplitScreen(nodePkg)) {
+                        val restriction = restrictionsRepo.getRestrictionForPackage(nodePkg)
+                        if (restriction != null && restriction.isEnabled && !restrictionsRepo.isPackageBypassed(nodePkg)) {
+                            val consumed = calculateConsumedMinutes(restriction, nodePkg)
+                            val eval = restrictionsRepo.evaluateRestriction(restriction, consumed, Calendar.getInstance(), nodePkg)
+                            if (eval.isBlocked) {
+                                val appName = AppInfoManager.getInstance(this).getAppName(nodePkg)
+                                kickAndTerminateBlockedApp(
+                                    targetPackage = nodePkg,
+                                    toastMessage = Str.get(
+                                        R.string.toast_app_blocked_open_screenguard,
+                                        appName,
+                                        eval.detailedReasonText
+                                    )
+                                )
+                                break
                             }
                         }
                     }
-                } catch (e: Exception) {}
-            }
+                }
+            } catch (e: Exception) {}
             return
         }
 
@@ -618,21 +739,7 @@ class ScreenGuardAccessibilityService : AccessibilityService() {
             return
         }
 
-        // 5. Manage overlay dismissal when the user leaves the blocked app
-        if (BlockOverlayManager.isShowing && BlockOverlayManager.currentShowingPackage != null) {
-            val showingPkg = BlockOverlayManager.currentShowingPackage!!
-            if (isSettingsPackage(showingPkg) && isEventSettingsPopup(event)) {
-                BlockOverlayManager.dismiss()
-            } else if (!isSameAppOrSubComponent(showingPkg, pkgName)) {
-                // Keep the overlay if the blocked app is still visible in split-screen
-                val stillInSplit = isPackageVisibleInSplitScreen(showingPkg)
-                if (!stillInSplit) {
-                    BlockOverlayManager.dismiss()
-                }
-            }
-        }
-
-        // 6. Evaluate and instantly block the active app when restricted
+        // 5. Evaluate and instantly kick/terminate the active app when restricted
         checkAndBlockIfNeeded(pkgName, event)
     }
 
@@ -702,7 +809,7 @@ class ScreenGuardAccessibilityService : AccessibilityService() {
     }
 
     /**
-     * حظر تثبيت أو تحديث أي تطبيق من المتجر أو مثبت الحزم إلا برمز مرور الوالدين
+     * حظر تثبيت أو تحديث أي تطبيق من المتجر أو مثبت الحزم 100% إلا بعد السماح من داخل ScreenGuard
      */
     private fun checkInstallOrUpdateInterception(
         event: AccessibilityEvent,
@@ -714,116 +821,79 @@ class ScreenGuardAccessibilityService : AccessibilityService() {
         if (!PinManager.hasPin(this) || !PinManager.isInstallLockEnabled(this)) return false
 
         val restrictionsRepo = AppRestrictionsRepository.getInstance(this)
+        if (restrictionsRepo.isPackageBypassed(INSTALL_LOCK_BYPASS_KEY)) return false
 
-        // 1. Package Installer (APK install / sideload / system updater)
-        val isInstaller = pkgName == "com.android.packageinstaller" ||
-                pkgName == "com.google.android.packageinstaller" ||
-                pkgName == "com.samsung.android.packageinstaller" ||
-                pkgName.contains("packageinstaller")
+        // 1. App Stores — قفل كامل 100% لجميع متاجر التطبيقات فور محاولة فتحها
+        if (APP_STORE_PACKAGES.contains(pkgName)) {
+            if (restrictionsRepo.isPackageBypassed(pkgName)) {
+                return false
+            }
+            val storeName = AppInfoManager.getInstance(this).getAppName(pkgName)
+            kickAndTerminateBlockedApp(
+                targetPackage = pkgName,
+                toastMessage = Str.get(R.string.toast_store_blocked_open_screenguard, storeName)
+            )
+            return true
+        }
 
-        if (isInstaller && isWindowStateChange) {
+        // 2. Package Installer (APK install / sideload / session installer / system updater)
+        val lowerPkg = pkgName.lowercase(Locale.getDefault())
+        val isInstaller = !lowerPkg.contains("permissioncontroller") && (
+                lowerPkg == "com.android.packageinstaller" ||
+                lowerPkg == "com.google.android.packageinstaller" ||
+                lowerPkg == "com.samsung.android.packageinstaller" ||
+                lowerPkg == "com.miui.packageinstaller" ||
+                lowerPkg == "com.oplus.appinstaller" ||
+                lowerPkg == "com.coloros.appinstaller" ||
+                lowerPkg.contains("packageinstaller") ||
+                lowerPkg.contains("appinstaller") ||
+                lowerPkg.contains("sessioninstaller")
+        )
+
+        if (isInstaller && (isWindowStateChange || isViewClicked)) {
             // التحقق مما إذا كان إلغاء تثبيت لتطبيقنا (يتم معالجته في anti-tamper)
             if (isAttemptingToTamperWithApp(pkgName, event)) {
                 return false
             }
 
-            // فحص هل النافذة الحالية هي شاشة تثبيت أو تحديث
-            val rootNode = try { rootInActiveWindow } catch (e: Exception) { null } ?: return false
-            val isInstallOrUpdateScreen = try {
-                val textList = mutableListOf<String>()
-                collectNodeTexts(rootNode, textList)
-                val combined = textList.joinToString(" ").lowercase(Locale.getDefault())
-
-                val hasInstallTerms = combined.contains("install") ||
-                        combined.contains("update") ||
-                        combined.contains("تثبيت") ||
-                        combined.contains("تحديث") ||
-                        combined.contains("هل تريد تثبيت") ||
-                        combined.contains("هل تريد تحديث") ||
-                        combined.contains("do you want to install")
-
-                val isUninstallOnly = (combined.contains("uninstall") || combined.contains("إلغاء التثبيت")) && !hasInstallTerms
-                hasInstallTerms && !isUninstallOnly
-            } catch (e: Exception) {
-                false
-            } finally {
-                try { rootNode.recycle() } catch (_: Exception) {}
+            // السماح بالتحديث الذاتي لتطبيق ScreenGuard نفسه من داخل التطبيق
+            if (isSelfUpdateAllowed()) {
+                return false
             }
 
-            if (isInstallOrUpdateScreen) {
-                if (restrictionsRepo.isPackageBypassed(pkgName)) {
-                    return false
-                }
-
-                performGlobalAction(GLOBAL_ACTION_HOME)
-                BlockOverlayManager.show(
-                    context = this,
-                    packageName = pkgName,
-                    appName = Str.get(R.string.protection_install_lock),
-                    reason = Str.get(R.string.install_block_reason),
-                    nextAvailable = Str.get(R.string.install_block_next),
-                    onHomeAction = {
-                        performGlobalAction(GLOBAL_ACTION_HOME)
-                    },
-                    onBypassAction = { durationMinutes ->
-                        scheduleBypassExpiration(pkgName, durationMinutes)
-                    }
-                )
-                return true
-            }
-        }
-
-        // 2. App Stores (Google Play Store, Galaxy Store, GetApps, AppGallery, etc.)
-        val isAppStore = pkgName == "com.android.vending" ||
-                pkgName == "com.sec.android.app.samsungapps" ||
-                pkgName == "com.xiaomi.mipicks" ||
-                pkgName == "com.huawei.appmarket" ||
-                pkgName == "com.amazon.venezia"
-
-        if (isAppStore && (isViewClicked || isWindowStateChange)) {
             if (restrictionsRepo.isPackageBypassed(pkgName)) {
                 return false
             }
 
-            // عند النقر على زر التثبيت أو التحديث داخل المتجر
-            if (isViewClicked) {
-                val textBuilder = StringBuilder()
-                event.text?.forEach { textBuilder.append(it).append(" ") }
-                event.contentDescription?.let { textBuilder.append(it).append(" ") }
-                val clickedText = textBuilder.toString().lowercase(Locale.getDefault()).trim()
-
-                val isInstallOrUpdateAction = clickedText == "install" ||
-                        clickedText == "update" ||
-                        clickedText == "update all" ||
-                        clickedText == "get" ||
-                        clickedText == "تثبيت" ||
-                        clickedText == "تحديث" ||
-                        clickedText == "تحديث الكل" ||
-                        clickedText == "تنزيل" ||
-                        clickedText.startsWith("install ") ||
-                        clickedText.startsWith("update ") ||
-                        clickedText.startsWith("تثبيت ") ||
-                        clickedText.startsWith("تحديث ")
-
-                if (isInstallOrUpdateAction) {
-                    performGlobalAction(GLOBAL_ACTION_HOME)
-                    val storeName = AppInfoManager.getInstance(this).getAppName(pkgName)
-                    BlockOverlayManager.show(
-                        context = this,
-                        packageName = pkgName,
-                        appName = storeName,
-                        reason = Str.get(R.string.install_block_reason),
-                        nextAvailable = Str.get(R.string.install_block_next),
-                        onHomeAction = {
-                            performGlobalAction(GLOBAL_ACTION_HOME)
-                        },
-                        onBypassAction = { durationMinutes ->
-                            scheduleBypassExpiration(pkgName, durationMinutes)
-                        }
-                    )
-                    return true
+            // فحص ما إذا كان التثبيت خاصاً بتحديث ScreenGuard أو أي تطبيق آخر
+            val rootNode = try { rootInActiveWindow } catch (e: Exception) { null }
+            val isSelfUpdateScreen = if (rootNode != null) {
+                try {
+                    val textList = mutableListOf<String>()
+                    collectNodeTexts(rootNode, textList)
+                    val combined = textList.joinToString(" ").lowercase(Locale.getDefault())
+                    val ourAppName = getString(R.string.app_name).lowercase(Locale.getDefault())
+                    val mentionsUs = combined.contains("screenguard") || (ourAppName.isNotBlank() && combined.contains(ourAppName))
+                    val isUninstall = combined.contains("uninstall") || combined.contains("إلغاء التثبيت") || combined.contains("إلغاء تثبيت")
+                    mentionsUs && !isUninstall && isSelfUpdateAllowed()
+                } catch (e: Exception) {
+                    false
+                } finally {
+                    try { rootNode.recycle() } catch (_: Exception) {}
                 }
+            } else false
+
+            if (isSelfUpdateScreen) {
+                return false
             }
+
+            // طرد فوري وإغلاق لمثبت الحزم ومنع تثبيت أي تطبيق خارجي 100%
+            val installerLabel = Str.get(R.string.protection_install_lock)
+            kickAndTerminateBlockedApp(
+                targetPackage = pkgName,
+                toastMessage = Str.get(R.string.toast_store_blocked_open_screenguard, installerLabel)
+            )
+            return true
         }
 
         return false
@@ -979,43 +1049,13 @@ class ScreenGuardAccessibilityService : AccessibilityService() {
 
         val isSettings = isSettingsPackage(targetPackage)
         if (isSettings && event != null && isEventSettingsPopup(event)) {
-            if (BlockOverlayManager.isShowing && isSettingsPackage(BlockOverlayManager.currentShowingPackage)) {
-                BlockOverlayManager.dismiss()
-            }
             return
         }
 
-        var restriction = restrictionsRepo.getRestrictionForPackage(targetPackage)
-        if (restriction == null && PinManager.hasPin(this) && PinManager.isAutoBlockNewApps(this) &&
-            !isIgnoredSystemPackage(targetPackage) && !targetPackage.contains("launcher", ignoreCase = true)
-        ) {
-            val isSystemApp = try {
-                val appInfo = packageManager.getApplicationInfo(targetPackage, 0)
-                (appInfo.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0
-            } catch (e: Exception) {
-                false
-            }
-            if (!isSystemApp) {
-                val appName = AppInfoManager.getInstance(this).getAppName(targetPackage)
-                val autoRestr = AppRestriction(
-                    packageName = targetPackage,
-                    appName = appName,
-                    targetPackages = listOf(targetPackage),
-                    isEnabled = true,
-                    isTotalBlock = true,
-                    blockDownloads = true
-                )
-                restrictionsRepo.saveRestriction(autoRestr)
-                restriction = autoRestr
-            }
-        }
-
+        val restriction = restrictionsRepo.getRestrictionForPackage(targetPackage)
         if (restriction == null || !restriction.isEnabled) {
             if (lastBlockedPackage == targetPackage) {
                 lastBlockedPackage = null
-            }
-            if (BlockOverlayManager.currentShowingPackage == targetPackage) {
-                BlockOverlayManager.dismiss()
             }
             return
         }
@@ -1025,9 +1065,6 @@ class ScreenGuardAccessibilityService : AccessibilityService() {
             if (lastBlockedPackage == targetPackage) {
                 lastBlockedPackage = null
             }
-            if (BlockOverlayManager.currentShowingPackage == targetPackage) {
-                BlockOverlayManager.dismiss()
-            }
             return
         }
 
@@ -1036,56 +1073,21 @@ class ScreenGuardAccessibilityService : AccessibilityService() {
         val evaluation = restrictionsRepo.evaluateRestriction(restriction, consumedMinutes, calendar, targetPackage)
 
         if (evaluation.isBlocked) {
-            val now = System.currentTimeMillis()
-
-            if (isSettings) {
-                if (event != null && isEventSettingsPopup(event)) {
-                    if (BlockOverlayManager.isShowing && isSettingsPackage(BlockOverlayManager.currentShowingPackage)) {
-                        BlockOverlayManager.dismiss()
-                    }
-                    return
-                }
-                performGlobalAction(GLOBAL_ACTION_HOME)
-                performGlobalAction(GLOBAL_ACTION_BACK)
-            }
-
-            // Avoid relaunching the block UI for the same app within 1.5 s
-            if (lastBlockedPackage == targetPackage && (now - lastBlockTimestamp) < BYPASS_POLL_MS && BlockOverlayManager.isShowing && !isSettings) {
-                return
-            }
-
             lastBlockedPackage = targetPackage
-            lastBlockTimestamp = now
+            lastBlockTimestamp = System.currentTimeMillis()
 
             val appName = AppInfoManager.getInstance(this).getAppName(targetPackage)
-            val isPip = isPackageInPipMode(targetPackage)
-            if (isPip) {
-                performGlobalAction(GLOBAL_ACTION_HOME)
-            }
-            val windowBounds = if (isPip) null else getAppWindowBounds(targetPackage)
-
-            // Full-cover floating window (TYPE_ACCESSIBILITY_OVERLAY)
-            BlockOverlayManager.show(
-                context = this,
-                packageName = targetPackage,
-                appName = appName,
-                reason = evaluation.detailedReasonText,
-                nextAvailable = evaluation.nextAvailableText,
-                windowBounds = windowBounds,
-                isPipMode = isPip,
-                onHomeAction = {
-                    performGlobalAction(GLOBAL_ACTION_HOME)
-                },
-                onBypassAction = { durationMinutes ->
-                    scheduleBypassExpiration(targetPackage, durationMinutes)
-                }
+            kickAndTerminateBlockedApp(
+                targetPackage = targetPackage,
+                toastMessage = Str.get(
+                    R.string.toast_app_blocked_open_screenguard,
+                    appName,
+                    evaluation.detailedReasonText
+                )
             )
         } else {
             if (lastBlockedPackage == targetPackage) {
                 lastBlockedPackage = null
-            }
-            if (BlockOverlayManager.currentShowingPackage == targetPackage) {
-                BlockOverlayManager.dismiss()
             }
         }
     }
@@ -1183,11 +1185,12 @@ class ScreenGuardAccessibilityService : AccessibilityService() {
     }
 
     /** Schedule re-blocking when a temporary bypass expires. */
-    private fun scheduleBypassExpiration(targetPackage: String, durationMinutes: Int) {
+    fun scheduleBypassExpiration(targetPackage: String, durationMinutes: Int) {
         handler.postDelayed({
             AppRestrictionsRepository.getInstance(this).clearTemporaryBypass(targetPackage)
-            performGlobalAction(GLOBAL_ACTION_HOME)
-            checkAndBlockIfNeeded(targetPackage)
+            if (lastForegroundApp == targetPackage) {
+                checkAndBlockIfNeeded(targetPackage)
+            }
         }, durationMinutes * 60_000L)
     }
 

@@ -53,13 +53,7 @@ class AppDetailActivity : BaseActivity() {
         if (icon != null) findViewById<ImageView>(R.id.detailAppIcon).setImageDrawable(icon)
 
         findViewById<View>(R.id.btnOpenApp).setOnClickListener {
-            try {
-                val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
-                if (launchIntent != null) {
-                    launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    startActivity(launchIntent)
-                }
-            } catch (e: Exception) {}
+            openOrUnlockApp()
         }
         findViewById<View>(R.id.btnRestrictThisApp).setOnClickListener {
             val intent = Intent(this, AddEditRestrictionActivity::class.java)
@@ -80,6 +74,55 @@ class AppDetailActivity : BaseActivity() {
             }
         }
         syncPeriodChips(periodChips, PeriodType.TODAY)
+    }
+
+    private fun openOrUnlockApp() {
+        val repo = com.screenguard.app.data.repository.AppRestrictionsRepository.getInstance(this)
+        val restriction = repo.getRestrictionForPackage(packageName)
+        val isCurrentlyBlocked = restriction != null &&
+                restriction.isEnabled &&
+                repo.isPackageBlocked(this, restriction, packageName)
+
+        if (!isCurrentlyBlocked) {
+            launchPackageDirectly()
+            return
+        }
+
+        val appName = AppInfoManager.getInstance(this).getAppName(packageName)
+        val options = arrayOf(
+            getString(R.string.bypass_opt_5m),
+            getString(R.string.bypass_opt_15m),
+            getString(R.string.bypass_opt_30m),
+            getString(R.string.bypass_opt_60m)
+        )
+        val durations = intArrayOf(5, 15, 30, 60)
+
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.dialog_launch_restricted_title, appName))
+            .setItems(options) { _, which ->
+                val mins = durations[which]
+                repo.setTemporaryBypass(packageName, mins)
+                com.screenguard.app.ScreenGuardAccessibilityService.instance
+                    ?.scheduleBypassExpiration(packageName, mins)
+                android.widget.Toast.makeText(
+                    this,
+                    getString(R.string.bypass_granted_launching, appName, mins),
+                    android.widget.Toast.LENGTH_SHORT
+                ).show()
+                launchPackageDirectly()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun launchPackageDirectly() {
+        try {
+            val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
+            if (launchIntent != null) {
+                launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(launchIntent)
+            }
+        } catch (e: Exception) {}
     }
 
     private fun syncPeriodChips(map: Map<Int, PeriodType>, selected: PeriodType) {

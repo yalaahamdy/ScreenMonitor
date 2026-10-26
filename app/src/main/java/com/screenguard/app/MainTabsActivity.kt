@@ -62,6 +62,7 @@ class MainTabsActivity : BaseActivity() {
             switchTo(HomeFragment())
             bottomNav.selectedItemId = R.id.tab_home
             maybeShowPermissionsDialog()
+            com.screenguard.app.update.UpdateDialogHelper.checkAndPromptIfAvailable(this, manualCheck = false)
         }
     }
 

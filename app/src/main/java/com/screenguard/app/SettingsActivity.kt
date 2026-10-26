@@ -73,6 +73,10 @@ class SettingsActivity : BaseActivity() {
 
     private fun onResumeSafe() {
         findViewById<TextView>(R.id.tvVersion).text = BuildConfig.VERSION_NAME
+        findViewById<TextView>(R.id.tvCheckUpdateSub)?.text =
+            getString(R.string.update_check_now_sub, BuildConfig.VERSION_NAME)
+        findViewById<com.google.android.material.materialswitch.MaterialSwitch>(R.id.swAutoUpdate)?.isChecked =
+            PinManager.isAutoUpdateEnabled(this)
         refreshAppearanceChecks()
         refreshPermissionsStatus()
         refreshCaptureInputs()
@@ -590,6 +594,24 @@ class SettingsActivity : BaseActivity() {
             startActivity(Intent(this, com.screenguard.app.ui.download.DownloadHistoryActivity::class.java))
         }
 
+        findViewById<View>(R.id.rowAllowInstallTemp)?.setOnClickListener {
+            showAllowInstallBypassDialog()
+        }
+
+        findViewById<com.google.android.material.materialswitch.MaterialSwitch>(R.id.swAutoUpdate)?.apply {
+            isChecked = PinManager.isAutoUpdateEnabled(this@SettingsActivity)
+            setOnCheckedChangeListener { _, checked ->
+                PinManager.setAutoUpdateEnabled(this@SettingsActivity, checked)
+            }
+        }
+
+        findViewById<View>(R.id.rowCheckUpdate)?.setOnClickListener {
+            com.screenguard.app.update.UpdateDialogHelper.checkAndPromptIfAvailable(
+                this@SettingsActivity,
+                manualCheck = true
+            )
+        }
+
         findViewById<View>(R.id.rowSecurityQuestion).setOnClickListener {
             showUpdateSecurityQuestionDialog()
         }
@@ -603,6 +625,42 @@ class SettingsActivity : BaseActivity() {
                 Toast.makeText(this, R.string.protection_autostart_unavailable, Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun showAllowInstallBypassDialog() {
+        val options = arrayOf(
+            getString(R.string.bypass_opt_5m),
+            getString(R.string.bypass_opt_15m),
+            getString(R.string.bypass_opt_30m),
+            getString(R.string.bypass_opt_60m)
+        )
+        val durations = intArrayOf(5, 15, 30, 60)
+
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.protection_allow_install_temp)
+            .setItems(options) { _, which ->
+                val mins = durations[which]
+                val repo = AppRestrictionsRepository.getInstance(this)
+                val key = ScreenGuardAccessibilityService.INSTALL_LOCK_BYPASS_KEY
+                repo.setTemporaryBypass(key, mins)
+                ScreenGuardAccessibilityService.instance?.scheduleBypassExpiration(key, mins)
+                Toast.makeText(
+                    this,
+                    getString(R.string.toast_install_bypass_granted, mins),
+                    Toast.LENGTH_LONG
+                ).show()
+
+                // فتح متجر Google Play مباشرةً من داخل ScreenGuard لتسهيل التثبيت لولي الأمر
+                try {
+                    val playIntent = packageManager.getLaunchIntentForPackage("com.android.vending")
+                    if (playIntent != null) {
+                        playIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(playIntent)
+                    }
+                } catch (_: Exception) {}
+            }
+            .setNegativeButton(R.string.act_cancel, null)
+            .show()
     }
 
     private fun showUpdateSecurityQuestionDialog() {

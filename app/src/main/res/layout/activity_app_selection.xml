@@ -91,8 +91,10 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/appsRecycler"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:layout_marginTop="10dp"
         android:clipToPadding="false"
+        android:scrollbars="vertical"
         android:paddingBottom="20dp" />
 </LinearLayout>

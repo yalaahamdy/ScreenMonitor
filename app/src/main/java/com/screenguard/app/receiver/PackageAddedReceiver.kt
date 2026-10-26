@@ -25,6 +25,9 @@ class PackageAddedReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
         if (intent == null || intent.action != Intent.ACTION_PACKAGE_ADDED) return
 
+        // تجاهل تحديثات التطبيقات المثبتة مسبقاً
+        if (intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)) return
+
         val uri = intent.data ?: return
         val packageName = uri.schemeSpecificPart ?: return
 
@@ -32,21 +35,31 @@ class PackageAddedReceiver : BroadcastReceiver() {
         if (packageName == context.packageName) return
 
         // التحقق من تفعيل ميزة القفل التلقائي للتطبيقات الجديدة
-        if (!PinManager.isAutoBlockNewApps(context)) {
+        if (!PinManager.hasPin(context) || !PinManager.isAutoBlockNewApps(context)) {
             Log.d(TAG, "Auto-block for new apps is disabled; skipping package $packageName")
             return
         }
 
         try {
+            val pm = context.packageManager
+            val appInfo = pm.getApplicationInfo(packageName, 0)
+            val isSystem = (appInfo.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0 ||
+                    (appInfo.flags and android.content.pm.ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
+            if (isSystem) return
+
+            val pkgInfo = pm.getPackageInfo(packageName, 0)
+            val guardInfo = pm.getPackageInfo(context.packageName, 0)
+            if (pkgInfo.firstInstallTime < guardInfo.firstInstallTime) {
+                return
+            }
+
             val repo = AppRestrictionsRepository.getInstance(context)
             val existing = repo.getRestrictionForPackage(packageName)
 
             if (existing == null) {
                 val appName = AppInfoManager.getInstance(context).getAppName(packageName).ifBlank {
                     try {
-                        val pm = context.packageManager
-                        val info = pm.getApplicationInfo(packageName, 0)
-                        pm.getApplicationLabel(info).toString()
+                        pm.getApplicationLabel(appInfo).toString()
                     } catch (e: Exception) {
                         packageName
                     }

@@ -512,4 +512,39 @@
     <string name="download_history_empty">لا توجد ملفات محملة مسجلة بعد</string>
     <string name="download_history_clear">مسح السجل</string>
     <string name="download_history_clear_confirm">هل أنت متأكد من رغبتك في مسح سجل التحميلات بالكامل؟</string>
+
+    <!-- ==== v3.4.0: الحظر الفوري من الأساس، الفتح من داخل التطبيق، قفل التحميلات 100% والتحديث التلقائي ==== -->
+    <string name="toast_app_blocked_open_screenguard">🔒 تطبيق %1$s مقفل (%2$s) — افتح تطبيق ScreenGuard لفتحه أو إدارته</string>
+    <string name="toast_store_blocked_open_screenguard">🔒 تثبيت التطبيقات والمتجر (%s) مقفل — افتح تطبيق ScreenGuard للسماح بالتثبيت</string>
+    <string name="toast_tamper_blocked">🛡️ محمي بواسطة الرقابة الأبوية في ScreenGuard</string>
+    <string name="restriction_launch_app">فتح التطبيق / سماح مؤقت</string>
+    <string name="dialog_launch_restricted_title">فتح تطبيق %s</string>
+    <string name="dialog_launch_restricted_msg">اختر مدة السماح بفتح تطبيق %s قبل إعادة قفله تلقائياً:</string>
+    <string name="dialog_select_app_to_launch">اختر التطبيق المراد فتحه</string>
+    <string name="bypass_opt_5m">5 دقائق</string>
+    <string name="bypass_opt_15m">15 دقيقة</string>
+    <string name="bypass_opt_30m">30 دقيقة</string>
+    <string name="bypass_opt_60m">ساعة واحدة</string>
+    <string name="bypass_opt_custom">مدة مخصصة (بالدقائق)…</string>
+    <string name="bypass_granted_launching">تم السماح لتطبيق %1$s لمدة %2$d دقيقة — جارٍ الفتح…</string>
+    <string name="protection_allow_install_temp">سماح مؤقت بتثبيت تطبيق / فتح المتجر</string>
+    <string name="protection_allow_install_temp_sub">فتح متجر Play ومثبت الحزم مؤقتاً لمدة محددة من داخل تطبيق ScreenGuard</string>
+    <string name="toast_install_bypass_granted">تم السماح بتثبيت التطبيقات وفتح المتجر لمدة %d دقيقة</string>
+    <string name="toast_apk_blocked_deleted">🚫 تم حظر وحذف حزمة التطبيق (%s) — تثبيت التطبيقات يتطلب رمز مرور الوالدين</string>
+
+    <string name="section_updates">التحديثات</string>
+    <string name="update_auto_check">التحديث التلقائي للتطبيق</string>
+    <string name="update_auto_check_sub">التحقق تلقائياً من وجود إصدارات جديدة على GitHub عند فتح التطبيق</string>
+    <string name="update_check_now">التحقق من وجود تحديثات الآن</string>
+    <string name="update_check_now_sub">الإصدار الحالي: %s — اضغط للتحقق من آخر إصدار</string>
+    <string name="update_checking">جارٍ التحقق من وجود تحديثات…</string>
+    <string name="update_up_to_date">لديك أحدث إصدار بالفعل (%s)</string>
+    <string name="update_available_title">تحديث جديد متاح (%s)</string>
+    <string name="update_available_msg">يتوفر إصدار جديد (%1$s) من تطبيق ScreenGuard!\n\nتفاصيل التحديث:\n%2$s</string>
+    <string name="update_btn_now">تحديث الآن</string>
+    <string name="update_btn_later">لاحقاً</string>
+    <string name="update_downloading_title">جارٍ تحميل التحديث (%s)…</string>
+    <string name="update_downloading_progress">تم التحميل %d%%</string>
+    <string name="update_download_failed">فشل تحميل التحديث: %s</string>
+    <string name="update_check_failed">تعذر التحقق من التحديثات: %s</string>
 </resources>

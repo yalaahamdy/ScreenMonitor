@@ -77,6 +77,12 @@ class RestrictionsFragment : Fragment() {
             onCancelBypass = { restriction ->
                 restriction.allPackages.forEach { repository.clearTemporaryBypass(it) }
                 refresh()
+            },
+            onLaunchRestriction = { restriction ->
+                handleLaunchRestriction(restriction)
+            },
+            onLaunchPackage = { pkg ->
+                showBypassAndLaunchDialog(pkg)
             }
         )
 
@@ -121,6 +127,100 @@ class RestrictionsFragment : Fragment() {
             }
             .setNegativeButton(R.string.cancel, null)
             .show()
+    }
+
+    private fun handleLaunchRestriction(restriction: AppRestriction) {
+        val packages = restriction.allPackages
+        if (packages.isEmpty()) return
+        if (packages.size == 1) {
+            showBypassAndLaunchDialog(packages.first())
+            return
+        }
+        val appInfo = AppInfoManager.getInstance(requireContext())
+        val labels = packages.map { appInfo.getAppName(it) }.toTypedArray()
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.dialog_select_app_to_launch)
+            .setItems(labels) { _, which ->
+                showBypassAndLaunchDialog(packages[which])
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun showBypassAndLaunchDialog(pkg: String) {
+        val ctx = requireContext()
+        val appName = AppInfoManager.getInstance(ctx).getAppName(pkg)
+        val options = arrayOf(
+            getString(R.string.bypass_opt_5m),
+            getString(R.string.bypass_opt_15m),
+            getString(R.string.bypass_opt_30m),
+            getString(R.string.bypass_opt_60m),
+            getString(R.string.bypass_opt_custom)
+        )
+        val durations = intArrayOf(5, 15, 30, 60, -1)
+
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(ctx)
+            .setTitle(getString(R.string.dialog_launch_restricted_title, appName))
+            .setItems(options) { _, which ->
+                val mins = durations[which]
+                if (mins > 0) {
+                    grantBypassAndOpenApp(pkg, appName, mins)
+                } else {
+                    showCustomBypassInputDialog(pkg, appName)
+                }
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun showCustomBypassInputDialog(pkg: String, appName: String) {
+        val ctx = requireContext()
+        val input = android.widget.EditText(ctx).apply {
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            hint = getString(R.string.unit_minutes)
+            setText("20")
+        }
+        val pad = (20 * resources.displayMetrics.density).toInt()
+        val container = LinearLayout(ctx).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(pad, pad / 2, pad, 0)
+            addView(input)
+        }
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(ctx)
+            .setTitle(getString(R.string.dialog_launch_restricted_title, appName))
+            .setMessage(getString(R.string.dialog_launch_restricted_msg, appName))
+            .setView(container)
+            .setPositiveButton(R.string.restriction_launch_app) { _, _ ->
+                val mins = input.text?.toString()?.trim()?.toIntOrNull()?.coerceIn(1, 720) ?: 15
+                grantBypassAndOpenApp(pkg, appName, mins)
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun grantBypassAndOpenApp(pkg: String, appName: String, durationMinutes: Int) {
+        val ctx = requireContext()
+        repository.setTemporaryBypass(pkg, durationMinutes)
+        ScreenGuardAccessibilityService.instance?.scheduleBypassExpiration(pkg, durationMinutes)
+        refresh()
+
+        android.widget.Toast.makeText(
+            ctx,
+            getString(R.string.bypass_granted_launching, appName, durationMinutes),
+            android.widget.Toast.LENGTH_SHORT
+        ).show()
+
+        try {
+            val launchIntent = if (com.screenguard.app.data.model.isSettingsPackage(pkg)) {
+                Intent(Settings.ACTION_SETTINGS)
+            } else {
+                ctx.packageManager.getLaunchIntentForPackage(pkg)
+            }
+            if (launchIntent != null) {
+                launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(launchIntent)
+            }
+        } catch (e: Exception) {}
     }
 
     private fun refresh() {
@@ -172,7 +272,9 @@ class RestrictionsAdapter(
     private val onToggle: (AppRestriction, Boolean) -> Unit,
     private val onEdit: (AppRestriction) -> Unit,
     private val onDelete: (AppRestriction) -> Unit,
-    private val onCancelBypass: (AppRestriction) -> Unit
+    private val onCancelBypass: (AppRestriction) -> Unit,
+    private val onLaunchRestriction: (AppRestriction) -> Unit,
+    private val onLaunchPackage: (String) -> Unit
 ) : RecyclerView.Adapter<RestrictionsAdapter.Holder>() {
 
     private val items = mutableListOf<AppRestriction>()
@@ -189,6 +291,7 @@ class RestrictionsAdapter(
         val toggle: MaterialSwitch = v.findViewById(R.id.restrictionToggle)
         val appsContainer: LinearLayout = v.findViewById(R.id.restrictionAppsContainer)
         val bypassInfo: TextView = v.findViewById(R.id.restrictionBypassInfo)
+        val btnLaunch: View = v.findViewById(R.id.btnLaunchRestrictedApp)
         val btnClearBypass: View = v.findViewById(R.id.btnClearBypass)
         val btnEdit: View = v.findViewById(R.id.btnEditRestriction)
         val btnDelete: View = v.findViewById(R.id.btnDeleteRestriction)
@@ -233,6 +336,7 @@ class RestrictionsAdapter(
             onToggle(restriction, checked)
         }
 
+        holder.btnLaunch.setOnClickListener { onLaunchRestriction(restriction) }
         holder.btnEdit.setOnClickListener { onEdit(restriction) }
         holder.btnDelete.setOnClickListener { onDelete(restriction) }
 
@@ -300,6 +404,9 @@ class RestrictionsAdapter(
                 )
             )
 
+            row.setOnClickListener {
+                onLaunchPackage(pkg)
+            }
             holder.appsContainer.addView(row)
         }
 

@@ -512,4 +512,39 @@ Tap + to create your first restriction rule.</string>
     <string name="download_history_empty">No downloads recorded yet</string>
     <string name="download_history_clear">Clear history</string>
     <string name="download_history_clear_confirm">Are you sure you want to clear the entire download history?</string>
+
+    <!-- ==== v3.4.0: Zero-Open Blocking, In-App Launch, 100% Install Lock & Auto-Update ==== -->
+    <string name="toast_app_blocked_open_screenguard">🔒 %1$s is locked (%2$s) — Open ScreenGuard to unlock or launch it</string>
+    <string name="toast_store_blocked_open_screenguard">🔒 App installation &amp; stores (%s) are locked — Open ScreenGuard to allow installation</string>
+    <string name="toast_tamper_blocked">🛡️ Protected by ScreenGuard parental control</string>
+    <string name="restriction_launch_app">Open / Allow</string>
+    <string name="dialog_launch_restricted_title">Open %s</string>
+    <string name="dialog_launch_restricted_msg">Choose how long to allow %s before automatically locking it again:</string>
+    <string name="dialog_select_app_to_launch">Select app to open</string>
+    <string name="bypass_opt_5m">5 minutes</string>
+    <string name="bypass_opt_15m">15 minutes</string>
+    <string name="bypass_opt_30m">30 minutes</string>
+    <string name="bypass_opt_60m">1 hour</string>
+    <string name="bypass_opt_custom">Custom duration (minutes)…</string>
+    <string name="bypass_granted_launching">Allowed %1$s for %2$d min — opening app…</string>
+    <string name="protection_allow_install_temp">Temporarily allow app install / Open Store</string>
+    <string name="protection_allow_install_temp_sub">Unlock Play Store &amp; package installer for a set duration from inside ScreenGuard</string>
+    <string name="toast_install_bypass_granted">App installation &amp; stores unlocked for %d minutes</string>
+    <string name="toast_apk_blocked_deleted">🚫 App package (%s) blocked and deleted — app installation requires parent PIN</string>
+
+    <string name="section_updates">Updates</string>
+    <string name="update_auto_check">Automatic updates</string>
+    <string name="update_auto_check_sub">Automatically check for new versions on GitHub when opening the app</string>
+    <string name="update_check_now">Check for updates now</string>
+    <string name="update_check_now_sub">Current version: %s — Tap to check GitHub Releases</string>
+    <string name="update_checking">Checking for updates…</string>
+    <string name="update_up_to_date">You already have the latest version (%s)</string>
+    <string name="update_available_title">New Update Available (%s)</string>
+    <string name="update_available_msg">A new version (%1$s) of ScreenGuard is available!\n\nRelease notes:\n%2$s</string>
+    <string name="update_btn_now">Update Now</string>
+    <string name="update_btn_later">Later</string>
+    <string name="update_downloading_title">Downloading Update (%s)…</string>
+    <string name="update_downloading_progress">Downloaded %d%%</string>
+    <string name="update_download_failed">Failed to download update: %s</string>
+    <string name="update_check_failed">Could not check for updates: %s</string>
 </resources>

@@ -142,7 +142,36 @@ class HourlyUsageBarChartView @JvmOverloads constructor(
         }
     })
 
+    private var downX = 0f
+    private var downY = 0f
+
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                downX = event.x
+                downY = event.y
+            }
+            MotionEvent.ACTION_MOVE -> {
+                val dx = kotlin.math.abs(event.x - downX)
+                val dy = kotlin.math.abs(event.y - downY)
+                if (dx > dy && dx > 12f) {
+                    parent?.requestDisallowInterceptTouchEvent(true)
+                    if (data.isNotEmpty() && width > 0) {
+                        val slot = (event.x / width.toFloat() * data.size).toInt().coerceIn(0, data.size - 1)
+                        if (selectedIndex != slot) {
+                            selectedIndex = slot
+                            invalidate()
+                        }
+                    }
+                    return true
+                } else if (dy > dx) {
+                    parent?.requestDisallowInterceptTouchEvent(false)
+                }
+            }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                parent?.requestDisallowInterceptTouchEvent(false)
+            }
+        }
         return gestureDetector.onTouchEvent(event) || super.onTouchEvent(event)
     }
 

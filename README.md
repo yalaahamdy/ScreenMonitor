@@ -1,15 +1,15 @@
-# ScreenGuard (ScreenMonitor) v3.3.0 — Unified Parental Control & Screen Protection 🛡️
+# ScreenGuard (ScreenMonitor) v3.4.0 — Unified Parental Control & Screen Protection 🛡️
 
 <p align="center">
   <img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" width="128" height="128" alt="ScreenGuard App Icon" />
 </p>
 
 <p align="center">
-  <b>The all-in-one transparent, offline parental screen monitoring, installation gatekeeper & app usage controller for Android 11+ (API 30–34).</b>
+  <b>The all-in-one transparent parental screen monitoring, zero-open app blocker, 100% installation gatekeeper &amp; device-wide download controller for Android 11+ (API 30–34).</b>
 </p>
 
 <p align="center">
-  <a href="#whats-new-in-v330">What's New in v3.3</a> •
+  <a href="#whats-new-in-v340">What's New in v3.4.0</a> •
   <a href="#core-features">Core Features</a> •
   <a href="#luxury-themes">Luxury Themes</a> •
   <a href="#architecture">Architecture</a> •
@@ -19,34 +19,34 @@
 
 ---
 
-## 🌟 What is ScreenGuard v3.3.0?
+## 🌟 What is ScreenGuard v3.4.0?
 
-**ScreenGuard v3.3.0** is the ultimate unified parental control application, seamlessly merging **ScreenMonitor** (intelligent stealth screen capture, luxury themes, parental PIN gate) with **Muraqib / App-Usage-Tracker-Controller** (screen-time analytics, data usage statistics, and real-time app restriction engine) and **Advanced Installation & Download Gatekeeper** into a single, cohesive, high-performance app.
-
-Everything runs 100% on-device with **zero internet permissions**, completely respecting user privacy.
+**ScreenGuard v3.4.0** is the ultimate unified parental control application, combining **ScreenMonitor** (intelligent active-usage screen capture, luxury themes, parental PIN gate), **App Usage Tracker & Controller** (screen-time analytics, data usage statistics, and real-time app restriction engine), **Zero-Open App Blocking Architecture**, **100% Installation & APK Gatekeeper**, **Device-Wide Download Monitor**, and **In-App Auto-Updater via GitHub Releases**.
 
 ---
 
-## 🆕 What's New in v3.3.0 (Installation & Download Protection Engine)
+## 🆕 What's New in v3.4.0
 
-### 1. 🛡️ Complete Installation & Update Lock (Zero Loophole)
-- **App Store Interception**: Prevents installing or updating any app from Google Play Store, Samsung Galaxy Store, Xiaomi GetApps, Huawei AppGallery, or Android system updaters without the parent PIN.
-- **Package Installer Gate**: Automatically covers package installers with the parental PIN overlay whenever an APK installation or update is attempted.
-- **PIN-Protected Bypass**: Parents can enter their PIN directly on the block overlay to grant a temporary installation window.
+### 1. 🚫 Zero-Open App Blocking Architecture (Zero Overlay Freezes)
+- **Pre-Launch & Instant Kick-Back**: Blocked apps are prevented from opening outside `ScreenGuard` from the very start — intercepting launcher icon taps, recent apps switches, notifications, PiP, and split-screen, immediately returning the device to the Home screen (`GLOBAL_ACTION_BACK` + `GLOBAL_ACTION_HOME`) and terminating the background process (`killBackgroundProcesses`).
+- **No Floating Overlay Glitches**: Completely eliminates floating block overlays over restricted apps so rapid exit/re-entry spam can never freeze or bypass the blocker.
+- **Exclusive In-App Unlock & Launch**: Blocked apps can **only** be unlocked and launched from inside `ScreenGuard` itself (protected by the parent PIN) via the dedicated **"فتح التطبيق / سماح مؤقت" (Open / Allow)** button on each restriction card or app detail screen.
 
-### 2. 🔒 Automatic New App Quarantine (`PackageAddedReceiver`)
-- **Instant Lockdown**: Any newly installed app on the device (whether from store, browser, or sideload) is instantly quarantined and blocked by default.
-- **No Unrestricted Window**: Even if a child attempts to immediately open a newly added game or browser, ScreenGuard instantly blocks it with a notice requiring parental approval.
+### 2. 🔒 100% App Download & Installation Lock Without PIN
+- **100% Store & Installer Lockdown**: Blocks all official and third-party app stores (Google Play, Galaxy Store, Xiaomi GetApps, Huawei AppGallery, Aurora Store, F-Droid, APKPure, Aptoide, Uptodown, TapTap, etc.) and all system package/session installers immediately on open unless temporarily unlocked from inside `ScreenGuard`.
+- **Automatic APK Neutralization**: Any `.apk`, `.xapk`, `.apks`, `.apkm`, or `.aab` package downloaded from any browser or app while Install Lock is active is immediately blocked, deleted from storage, and logged.
+- **In-App Temporary Store Unlock**: Parents can grant a temporary 5/15/30/60-minute installation window and launch Google Play Store directly from inside `ScreenGuard` Settings.
 
-### 3. 📥 Professional & Comprehensive Download Monitoring
-- **Real-Time Storage Watcher**: Watches device download directories using a multi-engine `FileObserver` + `ContentObserver` on `MediaStore.Downloads`.
-- **Full Download Audit History (`DownloadHistoryActivity`)**: Dedicated luxury interface listing all downloaded files, file size, timestamp, source application, and status (Allowed vs. Blocked & Deleted).
-- **Interactive Filtering**: Filter downloads by "All", "Blocked", or "Allowed", with PIN-protected history clearing.
+### 3. 📥 Device-Wide Comprehensive Download Monitoring
+- **3-Layer Real-Time Detection**: Combines `ContentObserver` + `ContentResolver` queries across `MediaStore.Downloads`, `MediaStore.Files`, `Images`, `Video`, and `Audio` (reading `OWNER_PACKAGE_NAME` on Android 10+), multi-directory `FileObserver` (`Download` and subdirectories, `Documents`, `Pictures`, `Movies`, `Music`, `DCIM`), and `DownloadManager.ACTION_DOWNLOAD_COMPLETE` broadcasts.
+- **Granular Per-App Download Blocking**: Toggle download blocking for any specific app to intercept download prompts and immediately delete any files saved by that app.
 
-### 4. 🚫 App-Specific Download Blocking (In App Restrictions)
-- **Granular Download Switch**: Toggle "حظر التنزيلات والتحميلات" (Block Downloads) for any specific application (e.g. Google Chrome, browsers, messaging apps).
-- **Prompt Interception**: Intercepts and auto-dismisses download confirmation dialogs before downloads start.
-- **Instant File Neutralization**: If a blocked app writes a file to disk, the download monitor immediately deletes the file from storage and logs the event.
+### 4. 🔄 Automatic & Manual Self-Update via GitHub Releases API
+- **GitHub Releases Integration**: Automatically checks `https://api.github.com/repos/yalaahamdy/ScreenMonitor/releases/latest` on launch (and manually from Settings).
+- **In-App Download & Seamless Install**: Downloads the latest release APK with a live percentage progress dialog and launches the system package installer with automatic self-update whitelisting.
+
+### 5. 📜 Smooth Nested List Scrolling Across All Screens
+- Upgraded all nested list screens (`AnalyticsFragment`, `DataUsageFragment`, `RestrictionsFragment`, `AppDetailActivity`, `AddEditRestrictionActivity`, `AppSelectionActivity`, `DownloadHistoryActivity`) to `NestedScrollView` and proper weighted `RecyclerView` constraints with conflict-free chart touch handling.
 
 ---
 

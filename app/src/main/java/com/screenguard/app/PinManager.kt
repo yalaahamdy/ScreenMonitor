@@ -39,6 +39,7 @@ object PinManager {
     private const val KEY_SAFE_MODE_PROTECTION_ENABLED = "safe_mode_protection_enabled"
     private const val KEY_INSTALL_LOCK_ENABLED = "install_lock_enabled"
     private const val KEY_AUTO_BLOCK_NEW_APPS = "auto_block_new_apps"
+    private const val KEY_AUTO_UPDATE_ENABLED = "auto_update_enabled"
     private const val KEY_SAFE_MODE_VIOLATION_DETECTED = "safe_mode_violation_detected"
     private const val KEY_VIOLATION_MESSAGE = "safe_mode_violation_message"
     private const val KEY_LAST_HEARTBEAT_TIMESTAMP = "last_heartbeat_timestamp"
@@ -295,10 +296,17 @@ object PinManager {
     }
 
     fun isAutoBlockNewApps(ctx: Context): Boolean =
-        sp(ctx).getBoolean(KEY_AUTO_BLOCK_NEW_APPS, true)
+        sp(ctx).getBoolean(KEY_AUTO_BLOCK_NEW_APPS, false)
 
     fun setAutoBlockNewApps(ctx: Context, enabled: Boolean) {
         sp(ctx).edit().putBoolean(KEY_AUTO_BLOCK_NEW_APPS, enabled).apply()
+    }
+
+    fun isAutoUpdateEnabled(ctx: Context): Boolean =
+        sp(ctx).getBoolean(KEY_AUTO_UPDATE_ENABLED, true)
+
+    fun setAutoUpdateEnabled(ctx: Context, enabled: Boolean) {
+        sp(ctx).edit().putBoolean(KEY_AUTO_UPDATE_ENABLED, enabled).apply()
     }
 
     fun getLockTimeoutSeconds(ctx: Context): Int =
